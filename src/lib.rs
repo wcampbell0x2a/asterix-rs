@@ -2,6 +2,8 @@ use deku::prelude::*;
 
 //TODO use top level endian = "big"
 //TODO separate into packet/message
+//TODO endian doesn't matter with 1 byte
+//TODO function for fspec checking
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(id_type = "u8")]
