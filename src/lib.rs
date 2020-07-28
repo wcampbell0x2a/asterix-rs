@@ -445,6 +445,7 @@ mod tests {
             0x58, 0x2e, 0x41, 0x00, 0x20, 0xf5,
         ];
         let (_, ass) = Asterix::from_bytes((&bytes, 0)).unwrap();
+        assert_eq!(ass.to_bytes(), Ok(bytes));
         println!("{:#?}", ass);
     }
 }
