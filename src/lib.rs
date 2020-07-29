@@ -38,7 +38,6 @@ struct Cat48 {
     #[deku(skip, cond = "0b100_0000 & *fspec2 != 0b100_0000")]
     aircraft_address: Option<AircraftAddress>,
     // TODO check fspec
-    // TODO use map to_string()
     #[deku(skip, cond = "0b10_0000 & *fspec2 != 0b10_0000")]
     aircraft_identification: Option<AircraftIdentification>,
     // TODO check fspec
