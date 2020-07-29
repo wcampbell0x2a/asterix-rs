@@ -206,8 +206,115 @@ pub struct AircraftAddress {
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 pub struct AircraftIdentification {
     /// IA5 char array
-    #[deku(bytes = "6", endian = "big")]
-    pub identification: u64,
+    #[deku(
+        reader = "AircraftIdentification::read(rest)",
+        writer = "AircraftIdentification::write(&self.identification)"
+    )]
+    pub identification: String,
+}
+
+impl AircraftIdentification {
+    // Read and convert to String
+    fn read(rest: &BitSlice<Msb0, u8>) -> Result<(&BitSlice<Msb0, u8>, String), DekuError> {
+        let (rest, one) = u8::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(6usize)))?;
+        let (rest, two) = u8::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(6usize)))?;
+        let (rest, three) = u8::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(6usize)))?;
+        let (rest, four) = u8::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(6usize)))?;
+        let (rest, five) = u8::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(6usize)))?;
+        let (rest, six) = u8::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(6usize)))?;
+        let (rest, seven) = u8::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(6usize)))?;
+        let (rest, _) = u8::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(6usize)))?;
+        let value = format!(
+            "{}{}{}{}{}{}{}",
+            to_ascii(one) as char,
+            to_ascii(two) as char,
+            to_ascii(three) as char,
+            to_ascii(four) as char,
+            to_ascii(five) as char,
+            to_ascii(six) as char,
+            to_ascii(seven) as char
+        );
+        Ok((rest, value))
+    }
+
+    // Parse from String to u8 and write
+    fn write(field_a: &str) -> Result<BitVec<Msb0, u8>, DekuError> {
+        let mut acc: BitVec<Msb0, u8> = BitVec::new();
+        let mut chars = field_a.chars();
+        // TODO lol use iter()
+        let bits = from_ascii(chars.next().unwrap() as u8)
+            .write((deku::ctx::Endian::Big, deku::ctx::BitSize(6usize)))?;
+        acc.extend(bits);
+        let bits = from_ascii(chars.next().unwrap() as u8)
+            .write((deku::ctx::Endian::Big, deku::ctx::BitSize(6usize)))?;
+        acc.extend(bits);
+        let bits = from_ascii(chars.next().unwrap() as u8)
+            .write((deku::ctx::Endian::Big, deku::ctx::BitSize(6usize)))?;
+        acc.extend(bits);
+        let bits = from_ascii(chars.next().unwrap() as u8)
+            .write((deku::ctx::Endian::Big, deku::ctx::BitSize(6usize)))?;
+        acc.extend(bits);
+        let bits = from_ascii(chars.next().unwrap() as u8)
+            .write((deku::ctx::Endian::Big, deku::ctx::BitSize(6usize)))?;
+        acc.extend(bits);
+        let bits = from_ascii(chars.next().unwrap() as u8)
+            .write((deku::ctx::Endian::Big, deku::ctx::BitSize(6usize)))?;
+        acc.extend(bits);
+        let bits = from_ascii(chars.next().unwrap() as u8)
+            .write((deku::ctx::Endian::Big, deku::ctx::BitSize(6usize)))?;
+        acc.extend(bits);
+        let bits = 0_u8.write((deku::ctx::Endian::Big, deku::ctx::BitSize(6usize)))?;
+        acc.extend(bits);
+        Ok(acc)
+    }
+}
+
+const ia5_alpha: u8 = 0x01;
+const ia5_space: u8 = 0x20;
+const ia5_digit: u8 = 0x30;
+const asc_digit: u8 = b'0';
+const asc_alpha: u8 = b'A';
+const asc_space: u8 = b' ';
+const asc_error: u8 = b'?';
+
+/// parse into ascii from IA5 char array
+const fn to_ascii(code: u8) -> u8 {
+    // space
+    if code == ia5_space {
+        return asc_space;
+    }
+
+    // digit
+    if ia5_digit <= code && code < ia5_digit + 10 {
+        return asc_digit + (code - ia5_digit);
+    }
+
+    // letter
+    if ia5_alpha <= code && code < ia5_alpha + 26 {
+        return asc_alpha + (code - ia5_alpha);
+    }
+
+    asc_error
+}
+
+/// parse from IA5 char as u8 to u8 value
+const fn from_ascii(code: u8) -> u8 {
+    // space
+    if code == asc_space {
+        return ia5_space;
+    }
+
+    // digit
+    if asc_digit <= code && code < asc_digit + 10 {
+        return ia5_digit + (code - asc_digit);
+    }
+
+    // letter
+    if asc_alpha <= code && code < asc_alpha + 26 {
+        return ia5_alpha + (code - asc_alpha);
+    }
+
+    asc_error
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
@@ -443,11 +550,32 @@ mod tests {
         let bytes = vec![
             0x30, 0x00, 0x30, 0xfd, 0xf7, 0x02, 0x19, 0xc9, 0x35, 0x6d, 0x4d, 0xa0, 0xc5, 0xaf,
             0xf1, 0xe0, 0x02, 0x00, 0x05, 0x28, 0x3c, 0x66, 0x0c, 0x10, 0xc2, 0x36, 0xd4, 0x18,
-            0x20, 0x01, 0xc0, 0x78, 0x00, 0x31, 0xbc, 0x00, 0x00, 0x40, 0x0d, 0xeb, 0x07, 0xb9,
+            0x00, 0x01, 0xc0, 0x78, 0x00, 0x31, 0xbc, 0x00, 0x00, 0x40, 0x0d, 0xeb, 0x07, 0xb9,
             0x58, 0x2e, 0x41, 0x00, 0x20, 0xf5,
         ];
         let (_, ass) = Asterix::from_bytes((&bytes, 0)).unwrap();
-        assert_eq!(ass.to_bytes(), Ok(bytes));
         println!("{:#?}", ass);
+        assert_eq!(ass.to_bytes(), Ok(bytes));
+    }
+
+    #[test]
+    fn test01() {
+        // the last byte in the wireshark capture is 0xe0, but it's 0xc0 b/c the last bits 6 bits
+        // don't matter according to wirshark
+        // lol 6 bits of covert data :eyes:
+        let data: Vec<u8> = vec![0x1d, 0x72, 0x77, 0xdf, 0x5c, 0xc0];
+
+        let (_, value) = AircraftIdentification::from_bytes((data.as_ref(), 0)).unwrap();
+
+        assert_eq!(value.identification, "GWI7753".to_string());
+        assert_eq!(data, value.to_bytes().unwrap());
+    }
+
+    #[test]
+    fn test02() {
+        let i = 0x01;
+        let s = to_ascii(i);
+        assert_eq!(65, s);
+        assert_eq!(i, from_ascii(s))
     }
 }
