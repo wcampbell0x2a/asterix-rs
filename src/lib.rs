@@ -241,28 +241,11 @@ impl AircraftIdentification {
     fn write(field_a: &str) -> Result<BitVec<Msb0, u8>, DekuError> {
         let mut acc: BitVec<Msb0, u8> = BitVec::new();
         let mut chars = field_a.chars();
-        // TODO lol use iter()
-        let bits = from_ascii(chars.next().unwrap() as u8)
-            .write((deku::ctx::Endian::Big, deku::ctx::BitSize(6usize)))?;
-        acc.extend(bits);
-        let bits = from_ascii(chars.next().unwrap() as u8)
-            .write((deku::ctx::Endian::Big, deku::ctx::BitSize(6usize)))?;
-        acc.extend(bits);
-        let bits = from_ascii(chars.next().unwrap() as u8)
-            .write((deku::ctx::Endian::Big, deku::ctx::BitSize(6usize)))?;
-        acc.extend(bits);
-        let bits = from_ascii(chars.next().unwrap() as u8)
-            .write((deku::ctx::Endian::Big, deku::ctx::BitSize(6usize)))?;
-        acc.extend(bits);
-        let bits = from_ascii(chars.next().unwrap() as u8)
-            .write((deku::ctx::Endian::Big, deku::ctx::BitSize(6usize)))?;
-        acc.extend(bits);
-        let bits = from_ascii(chars.next().unwrap() as u8)
-            .write((deku::ctx::Endian::Big, deku::ctx::BitSize(6usize)))?;
-        acc.extend(bits);
-        let bits = from_ascii(chars.next().unwrap() as u8)
-            .write((deku::ctx::Endian::Big, deku::ctx::BitSize(6usize)))?;
-        acc.extend(bits);
+        for c in field_a.chars() {
+            let bits = from_ascii(c as u8)
+                .write((deku::ctx::Endian::Big, deku::ctx::BitSize(6usize)))?;
+            acc.extend(bits);
+        }
         let bits = 0_u8.write((deku::ctx::Endian::Big, deku::ctx::BitSize(6usize)))?;
         acc.extend(bits);
         Ok(acc)
