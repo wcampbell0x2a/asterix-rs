@@ -42,14 +42,6 @@ struct Cat48 {
     #[deku(skip, cond = "0b10_0000 & *fspec2 != 0b10_0000")]
     aircraft_identification: Option<AircraftIdentification>,
     // TODO check fspec
-    // TODO handle counter
-    #[deku(
-        skip,
-        cond = "0b100_0000 & *fspec2 != 0b100_0000",
-        bytes = "1",
-        endian = "big"
-    )]
-    counter: u8,
     #[deku(skip, cond = "0b100_0000 & *fspec2 != 0b100_0000")]
     mode_smb_data: Option<ModeSMBData>,
     #[deku(skip, cond = "0b1_0000 & *fspec2 != 0b1_0000")]
@@ -220,12 +212,20 @@ pub struct AircraftIdentification {
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 pub struct ModeSMBData {
-    #[deku(count = "7", endian = "big")]
-    pub mb_data: Vec<u8>,
+    #[deku(bytes = "1", update = "self.mb_data.len()", endian = "big")]
+    pub count: u8,
+    #[deku(count = "count")]
+    pub mb_data: Vec<MBData>,
     #[deku(bits = "4", endian = "big")]
     pub bds1: u8,
     #[deku(bits = "4", endian = "big")]
     pub bds2: u8,
+}
+
+#[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+pub struct MBData {
+    #[deku(count = "7", endian = "big")]
+    pub data: Vec<u8>,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
