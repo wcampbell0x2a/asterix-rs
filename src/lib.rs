@@ -214,7 +214,7 @@ pub struct AircraftIdentification {
 }
 
 impl AircraftIdentification {
-    // Read and convert to String
+    /// Read and convert to String
     fn read(rest: &BitSlice<Msb0, u8>) -> Result<(&BitSlice<Msb0, u8>, String), DekuError> {
         let (rest, one) = u8::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(6usize)))?;
         let (rest, two) = u8::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(6usize)))?;
@@ -237,7 +237,7 @@ impl AircraftIdentification {
         Ok((rest, value))
     }
 
-    // Parse from String to u8 and write
+    /// Parse from String to u8 and write
     fn write(field_a: &str) -> Result<BitVec<Msb0, u8>, DekuError> {
         let mut acc: BitVec<Msb0, u8> = BitVec::new();
         let mut chars = field_a.chars();
