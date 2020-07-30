@@ -5,17 +5,27 @@ use deku::prelude::*;
 //TODO endian doesn't matter with 1 byte
 //TODO function for fspec checking
 
+
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(id_type = "u8")]
-enum Asterix {
+struct AsterixPacket {
+    #[deku(bytes = "1", endian = "big")]
+    category: u8,
+    #[deku(bytes = "2", endian = "big")]
+    length: u16,
+    // TODO Update to Vec<T> till length is read
+    #[deku(ctx = "*category")]
+    messages: AsterixMessage,
+}
+
+#[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+#[deku(ctx = "category: u8", id = "category")]
+enum AsterixMessage {
     #[deku(id = "48")]
     Cat48(Cat48),
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 struct Cat48 {
-    #[deku(bytes = "2", endian = "big")]
-    length: u16,
     #[deku(bytes = "1", endian = "big")]
     fspec1: u8,
     #[deku(bytes = "1", endian = "big")]
@@ -536,7 +546,7 @@ mod tests {
             0x00, 0x01, 0xc0, 0x78, 0x00, 0x31, 0xbc, 0x00, 0x00, 0x40, 0x0d, 0xeb, 0x07, 0xb9,
             0x58, 0x2e, 0x41, 0x00, 0x20, 0xf5,
         ];
-        let (_, ass) = Asterix::from_bytes((&bytes, 0)).unwrap();
+        let (_, ass) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
         println!("{:#?}", ass);
         assert_eq!(ass.to_bytes(), Ok(bytes));
     }
