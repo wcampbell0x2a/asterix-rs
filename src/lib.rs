@@ -1,68 +1,63 @@
 use deku::prelude::*;
 
-//TODO use top level endian = "big"
-//TODO separate into packet/message
-//TODO endian doesn't matter with 1 byte
-//TODO function for fspec checking
-
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(endian = "big")]
-struct AsterixPacket {
+pub struct AsterixPacket {
     #[deku(bytes = "1")]
-    category: u8,
+    pub category: u8,
     #[deku(bytes = "2")]
-    length: u16,
+    pub length: u16,
     // TODO Update to Vec<T> till length is read
     #[deku(ctx = "*category")]
-    messages: AsterixMessage,
+    pub message: AsterixMessage,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(id = "category", ctx = "_: deku::ctx::Endian, category: u8")]
-enum AsterixMessage {
+pub enum AsterixMessage {
     #[deku(id = "48")]
     Cat48(Cat48),
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(endian = "big")]
-struct Cat48 {
+pub struct Cat48 {
     #[deku(bytes = "1")]
-    fspec1: u8,
+    pub fspec1: u8,
     #[deku(bytes = "1")]
-    fspec2: u8,
+    pub fspec2: u8,
     #[deku(bytes = "1")]
-    fspec3: u8,
+    pub fspec3: u8,
     #[deku(skip, cond = "is_fspec(0b1000_0000, *fspec1)")]
-    data_source_identifier: Option<DataSourceIdentifier>,
+    pub data_source_identifier: Option<DataSourceIdentifier>,
     #[deku(skip, cond = "is_fspec(0b100_0000, *fspec1)")]
-    time_of_day: Option<TimeOfDay>,
+    pub time_of_day: Option<TimeOfDay>,
     #[deku(skip, cond = "is_fspec(0b10_0000, *fspec1)")]
-    target_report_descriptor: Option<TargetReportDescriptor>,
+    pub target_report_descriptor: Option<TargetReportDescriptor>,
     #[deku(skip, cond = "is_fspec(0b1_0000, *fspec1)")]
-    measured_position_in_polar_coordinates: Option<MeasuredPositionInPolarCoordinates>,
+    pub measured_position_in_polar_coordinates: Option<MeasuredPositionInPolarCoordinates>,
     #[deku(skip, cond = "is_fspec(0b1000, *fspec1)")]
-    mode_3_a_code_in_octal_representation: Option<Mode3ACodeInOctalRepresentation>,
+    pub mode_3_a_code_in_octal_representation: Option<Mode3ACodeInOctalRepresentation>,
     #[deku(skip, cond = "is_fspec(0b100, *fspec1)")]
-    flight_level_in_binary_repre: Option<FlightLevelInBinaryRepresentation>,
+    pub flight_level_in_binary_repre: Option<FlightLevelInBinaryRepresentation>,
     // TODO check fspec
     #[deku(skip, cond = "is_fspec(0b100_0000, *fspec2)")]
-    aircraft_address: Option<AircraftAddress>,
+    pub aircraft_address: Option<AircraftAddress>,
     // TODO check fspec
     #[deku(skip, cond = "is_fspec(0b10_0000, *fspec2)")]
-    aircraft_identification: Option<AircraftIdentification>,
+    pub aircraft_identification: Option<AircraftIdentification>,
     // TODO check fspec
     #[deku(skip, cond = "is_fspec(0b100_0000, *fspec2)")]
-    mode_smb_data: Option<ModeSMBData>,
+    pub mode_smb_data: Option<ModeSMBData>,
     #[deku(skip, cond = "is_fspec(0b1_0000, *fspec2)")]
-    track_number: Option<TrackNumber>,
+    pub track_number: Option<TrackNumber>,
     #[deku(skip, cond = "is_fspec(0b100, *fspec2)")]
     // TODO handle special float
-    calculated_track_velocity: Option<CalculatedTrackVelocity>,
+    pub calculated_track_velocity: Option<CalculatedTrackVelocity>,
     #[deku(skip, cond = "is_fspec(0b10, *fspec2)")]
-    track_status: Option<TrackStatus>,
+    pub track_status: Option<TrackStatus>,
     #[deku(skip, cond = "is_fspec(0b10, *fspec3)")]
-    communications_capability_flight_status: Option<CommunicationsCapabilityFlightStatus>,
+    pub communications_capability_flight_status: Option<CommunicationsCapabilityFlightStatus>,
 }
 
 fn is_fspec(dataitem_fspec: u8, fspec: u8) -> bool {
@@ -78,7 +73,6 @@ pub struct DataSourceIdentifier {
     pub sic: u8,
 }
 
-//TODO fix display of f32
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct TimeOfDay {
@@ -400,10 +394,43 @@ pub struct TrackNumber {
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct CalculatedTrackVelocity {
-    #[deku(bytes = "2")]
+    #[deku(
+        reader = "Self::read_groundspeed(rest)",
+        writer = "Self::write_groundspeed(&self.groundspeed)"
+    )]
     pub groundspeed: f32,
-    #[deku(bytes = "2")]
+    #[deku(
+        reader = "Self::read_heading(rest)",
+        writer = "Self::write_heading(&self.heading)"
+    )]
     pub heading: f32,
+}
+
+impl CalculatedTrackVelocity {
+    const CTX: (deku::ctx::Endian, deku::ctx::BitSize) =
+        (deku::ctx::Endian::Big, deku::ctx::BitSize(16usize));
+
+    fn read_groundspeed(
+        rest: &BitSlice<Msb0, u8>,
+    ) -> Result<(&BitSlice<Msb0, u8>, f32), DekuError> {
+        let (rest, value) = u16::read(rest, Self::CTX)?;
+        Ok((rest, value as f32 * (1.0 / 16384.0)))
+    }
+
+    fn write_groundspeed(groundspeed: &f32) -> Result<BitVec<Msb0, u8>, DekuError> {
+        let value = (*groundspeed / (1.0 / 16384.0)) as u16;
+        value.write(Self::CTX)
+    }
+
+    fn read_heading(rest: &BitSlice<Msb0, u8>) -> Result<(&BitSlice<Msb0, u8>, f32), DekuError> {
+        let (rest, value) = u16::read(rest, Self::CTX)?;
+        Ok((rest, value as f32 * (360.0 / 65536.0)))
+    }
+
+    fn write_heading(heading: &f32) -> Result<BitVec<Msb0, u8>, DekuError> {
+        let value = (*heading / (360.0 / 65536.0)) as u16;
+        value.write(Self::CTX)
+    }
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
@@ -598,23 +625,4 @@ pub enum AIC {
     No,
     #[deku(id = "0x01")]
     Yes,
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let bytes = vec![
-            0x30, 0x00, 0x30, 0xfd, 0xf7, 0x02, 0x19, 0xc9, 0x35, 0x6d, 0x4d, 0xa0, 0xc5, 0xaf,
-            0xf1, 0xe0, 0x02, 0x00, 0x05, 0x28, 0x3c, 0x66, 0x0c, 0x10, 0xc2, 0x36, 0xd4, 0x18,
-            //0x20 in wireshark, but last 6 bits don't matter and will 0x00 by writer
-            0x00, 0x01, 0xc0, 0x78, 0x00, 0x31, 0xbc, 0x00, 0x00, 0x40, 0x0d, 0xeb, 0x07, 0xb9,
-            0x58, 0x2e, 0x41, 0x00, 0x20, 0xf5,
-        ];
-        let (_, ass) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
-        println!("{:#?}", ass);
-        assert_eq!(ass.to_bytes(), Ok(bytes));
-    }
 }
