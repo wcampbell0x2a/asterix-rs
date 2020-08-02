@@ -86,7 +86,7 @@ pub struct TimeOfDay {
 
 impl TimeOfDay {
     const CTX: (deku::ctx::Endian, deku::ctx::BitSize) =
-        (deku::ctx::Endian::Big, deku::ctx::BitSize(24usize));
+        (deku::ctx::Endian::Big, deku::ctx::BitSize(24_usize));
 
     fn read(rest: &BitSlice<Msb0, u8>) -> Result<(&BitSlice<Msb0, u8>, f32), DekuError> {
         let (rest, value) = u32::read(rest, Self::CTX)?;
@@ -124,11 +124,11 @@ pub struct MeasuredPositionInPolarCoordinates {
 
 impl MeasuredPositionInPolarCoordinates {
     const CTX: (deku::ctx::Endian, deku::ctx::BitSize) =
-        (deku::ctx::Endian::Big, deku::ctx::BitSize(16usize));
+        (deku::ctx::Endian::Big, deku::ctx::BitSize(16_usize));
 
     fn read_rho(rest: &BitSlice<Msb0, u8>) -> Result<(&BitSlice<Msb0, u8>, f32), DekuError> {
         let (rest, value) = u16::read(rest, Self::CTX)?;
-        Ok((rest, value as f32 * (1.0 / 256.0)))
+        Ok((rest, f32::from(value) * (1.0 / 256.0)))
     }
 
     fn write_rho(rho: &f32) -> Result<BitVec<Msb0, u8>, DekuError> {
@@ -138,7 +138,7 @@ impl MeasuredPositionInPolarCoordinates {
 
     fn read_theta(rest: &BitSlice<Msb0, u8>) -> Result<(&BitSlice<Msb0, u8>, f32), DekuError> {
         let (rest, value) = u16::read(rest, Self::CTX)?;
-        Ok((rest, value as f32 * (360.0 / 65536.0)))
+        Ok((rest, f32::from(value) * (360.0 / 65536.0)))
     }
 
     fn write_theta(rho: &f32) -> Result<BitVec<Msb0, u8>, DekuError> {
@@ -190,14 +190,14 @@ pub struct AircraftIdentification {
 impl AircraftIdentification {
     /// Read and convert to String
     fn read(rest: &BitSlice<Msb0, u8>) -> Result<(&BitSlice<Msb0, u8>, String), DekuError> {
-        let (rest, one) = u8::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(6usize)))?;
-        let (rest, two) = u8::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(6usize)))?;
-        let (rest, three) = u8::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(6usize)))?;
-        let (rest, four) = u8::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(6usize)))?;
-        let (rest, five) = u8::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(6usize)))?;
-        let (rest, six) = u8::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(6usize)))?;
-        let (rest, seven) = u8::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(6usize)))?;
-        let (rest, _) = u8::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(6usize)))?;
+        let (rest, one) = u8::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)))?;
+        let (rest, two) = u8::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)))?;
+        let (rest, three) = u8::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)))?;
+        let (rest, four) = u8::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)))?;
+        let (rest, five) = u8::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)))?;
+        let (rest, six) = u8::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)))?;
+        let (rest, seven) = u8::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)))?;
+        let (rest, _) = u8::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)))?;
         let value = format!(
             "{}{}{}{}{}{}{}",
             to_ascii(one) as char,
@@ -214,13 +214,12 @@ impl AircraftIdentification {
     /// Parse from String to u8 and write
     fn write(field_a: &str) -> Result<BitVec<Msb0, u8>, DekuError> {
         let mut acc: BitVec<Msb0, u8> = BitVec::new();
-        let mut chars = field_a.chars();
         for c in field_a.chars() {
             let bits =
-                from_ascii(c as u8).write((deku::ctx::Endian::Big, deku::ctx::BitSize(6usize)))?;
+                from_ascii(c as u8).write((deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)))?;
             acc.extend(bits);
         }
-        let bits = 0_u8.write((deku::ctx::Endian::Big, deku::ctx::BitSize(6usize)))?;
+        let bits = 0_u8.write((deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)))?;
         acc.extend(bits);
         Ok(acc)
     }
@@ -319,13 +318,13 @@ pub struct CalculatedTrackVelocity {
 
 impl CalculatedTrackVelocity {
     const CTX: (deku::ctx::Endian, deku::ctx::BitSize) =
-        (deku::ctx::Endian::Big, deku::ctx::BitSize(16usize));
+        (deku::ctx::Endian::Big, deku::ctx::BitSize(16_usize));
 
     fn read_groundspeed(
         rest: &BitSlice<Msb0, u8>,
     ) -> Result<(&BitSlice<Msb0, u8>, f32), DekuError> {
         let (rest, value) = u16::read(rest, Self::CTX)?;
-        Ok((rest, value as f32 * (1.0 / 16384.0)))
+        Ok((rest, f32::from(value) * (1.0 / 16384.0)))
     }
 
     fn write_groundspeed(groundspeed: &f32) -> Result<BitVec<Msb0, u8>, DekuError> {
@@ -335,7 +334,7 @@ impl CalculatedTrackVelocity {
 
     fn read_heading(rest: &BitSlice<Msb0, u8>) -> Result<(&BitSlice<Msb0, u8>, f32), DekuError> {
         let (rest, value) = u16::read(rest, Self::CTX)?;
-        Ok((rest, value as f32 * (360.0 / 65536.0)))
+        Ok((rest, f32::from(value) * (360.0 / 65536.0)))
     }
 
     fn write_heading(heading: &f32) -> Result<BitVec<Msb0, u8>, DekuError> {

@@ -1,6 +1,9 @@
 #[test]
 fn it_works() {
-    use asterix_deku::*;
+    use asterix_deku::{
+        AsterixMessage, AsterixPacket, MBData, AIC, ARC, CDM, CNF, COM, DOU, FX, G, GHO, L, MAH,
+        MSSC, RAB, RAD, RDP, SI, SIM, SPI, STAT, SUP, TCC, TRE, TYP, V,
+    };
     use deku::DekuContainerRead;
     use deku::DekuContainerWrite;
 
@@ -65,7 +68,7 @@ fn it_works() {
         assert_eq!(flight_level_in_binary_repre.flight_level, 10260);
 
         let aircraft_address = message.aircraft_address.as_ref().unwrap();
-        assert_eq!(aircraft_address.address, 812604);
+        assert_eq!(aircraft_address.address, 812_604);
 
         let aircraft_identification = message.aircraft_identification.as_ref().unwrap();
         assert_eq!(aircraft_identification.identification, "DLH65A ");
@@ -83,8 +86,8 @@ fn it_works() {
         assert_eq!(track_number.number, 3563);
 
         let calculated_track_velocity = message.calculated_track_velocity.as_ref().unwrap();
-        assert_eq!(calculated_track_velocity.groundspeed, 0.120666504);
-        assert_eq!(calculated_track_velocity.heading, 124.002686);
+        assert_eq!(calculated_track_velocity.groundspeed, 0.120_666_504);
+        assert_eq!(calculated_track_velocity.heading, 124.002_686);
 
         let track_status = message.track_status.as_ref().unwrap();
         assert_eq!(track_status.cnf, CNF::ConfirmedTrack);
