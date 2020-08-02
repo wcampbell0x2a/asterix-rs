@@ -83,14 +83,15 @@ pub struct DataSourceIdentifier {
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct TimeOfDay {
     #[deku(
-        reader="TimeOfDay::read(rest)",
-        writer="TimeOfDay::write(&self.time)"
+        reader = "TimeOfDay::read(rest)",
+        writer = "TimeOfDay::write(&self.time)"
     )]
     pub time: f32,
 }
 
 impl TimeOfDay {
-    const CTX: (deku::ctx::Endian, deku::ctx::BitSize) = (deku::ctx::Endian::Big, deku::ctx::BitSize(24usize));
+    const CTX: (deku::ctx::Endian, deku::ctx::BitSize) =
+        (deku::ctx::Endian::Big, deku::ctx::BitSize(24usize));
 
     fn read(rest: &BitSlice<Msb0, u8>) -> Result<(&BitSlice<Msb0, u8>, f32), DekuError> {
         let (rest, value) = u32::read(rest, Self::CTX)?;
@@ -281,8 +282,8 @@ impl AircraftIdentification {
         let mut acc: BitVec<Msb0, u8> = BitVec::new();
         let mut chars = field_a.chars();
         for c in field_a.chars() {
-            let bits = from_ascii(c as u8)
-                .write((deku::ctx::Endian::Big, deku::ctx::BitSize(6usize)))?;
+            let bits =
+                from_ascii(c as u8).write((deku::ctx::Endian::Big, deku::ctx::BitSize(6usize)))?;
             acc.extend(bits);
         }
         let bits = 0_u8.write((deku::ctx::Endian::Big, deku::ctx::BitSize(6usize)))?;
@@ -577,7 +578,7 @@ mod tests {
         let bytes = vec![
             0x30, 0x00, 0x30, 0xfd, 0xf7, 0x02, 0x19, 0xc9, 0x35, 0x6d, 0x4d, 0xa0, 0xc5, 0xaf,
             0xf1, 0xe0, 0x02, 0x00, 0x05, 0x28, 0x3c, 0x66, 0x0c, 0x10, 0xc2, 0x36, 0xd4, 0x18,
-          //0x20 in wireshark, but last 6 bits don't matter and will 0x00 by writer
+            //0x20 in wireshark, but last 6 bits don't matter and will 0x00 by writer
             0x00, 0x01, 0xc0, 0x78, 0x00, 0x31, 0xbc, 0x00, 0x00, 0x40, 0x0d, 0xeb, 0x07, 0xb9,
             0x58, 0x2e, 0x41, 0x00, 0x20, 0xf5,
         ];
