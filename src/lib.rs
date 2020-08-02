@@ -5,12 +5,12 @@ use deku::prelude::*;
 //TODO endian doesn't matter with 1 byte
 //TODO function for fspec checking
 
-
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+#[deku(endian = "big")]
 struct AsterixPacket {
-    #[deku(bytes = "1", endian = "big")]
+    #[deku(bytes = "1")]
     category: u8,
-    #[deku(bytes = "2", endian = "big")]
+    #[deku(bytes = "2")]
     length: u16,
     // TODO Update to Vec<T> till length is read
     #[deku(ctx = "*category")]
@@ -18,68 +18,76 @@ struct AsterixPacket {
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(ctx = "category: u8", id = "category")]
+#[deku(id = "category", ctx = "_: deku::ctx::Endian, category: u8")]
 enum AsterixMessage {
     #[deku(id = "48")]
     Cat48(Cat48),
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+#[deku(endian = "big")]
 struct Cat48 {
-    #[deku(bytes = "1", endian = "big")]
+    #[deku(bytes = "1")]
     fspec1: u8,
-    #[deku(bytes = "1", endian = "big")]
+    #[deku(bytes = "1")]
     fspec2: u8,
-    #[deku(bytes = "1", endian = "big")]
+    #[deku(bytes = "1")]
     fspec3: u8,
-    #[deku(skip, cond = "0b1000_0000 & *fspec1 != 0b1000_0000")]
+    #[deku(skip, cond = "is_fspec(0b1000_0000, *fspec1)")]
     data_source_identifier: Option<DataSourceIdentifier>,
-    #[deku(skip, cond = "0b100_0000 & *fspec1 != 0b100_0000")]
+    #[deku(skip, cond = "is_fspec(0b100_0000, *fspec1)")]
     time_of_day: Option<TimeOfDay>,
-    #[deku(skip, cond = "0b10_0000 & *fspec1 != 0b10_0000")]
+    #[deku(skip, cond = "is_fspec(0b10_0000, *fspec1)")]
     target_report_descriptor: Option<TargetReportDescriptor>,
-    #[deku(skip, cond = "0b1_0000 & *fspec1 != 0b1_0000")]
+    #[deku(skip, cond = "is_fspec(0b1_0000, *fspec1)")]
     measured_position_in_polar_coordinates: Option<MeasuredPositionInPolarCoordinates>,
-    #[deku(skip, cond = "0b1000 & *fspec1 != 0b1000")]
+    #[deku(skip, cond = "is_fspec(0b1000, *fspec1)")]
     mode_3_a_code_in_octal_representation: Option<Mode3ACodeInOctalRepresentation>,
-    #[deku(skip, cond = "0b100 & *fspec1 != 0b100")]
+    #[deku(skip, cond = "is_fspec(0b100, *fspec1)")]
     flight_level_in_binary_repre: Option<FlightLevelInBinaryRepresentation>,
     // TODO check fspec
-    #[deku(skip, cond = "0b100_0000 & *fspec2 != 0b100_0000")]
+    #[deku(skip, cond = "is_fspec(0b100_0000, *fspec2)")]
     aircraft_address: Option<AircraftAddress>,
     // TODO check fspec
-    #[deku(skip, cond = "0b10_0000 & *fspec2 != 0b10_0000")]
+    #[deku(skip, cond = "is_fspec(0b10_0000, *fspec2)")]
     aircraft_identification: Option<AircraftIdentification>,
     // TODO check fspec
-    #[deku(skip, cond = "0b100_0000 & *fspec2 != 0b100_0000")]
+    #[deku(skip, cond = "is_fspec(0b100_0000, *fspec2)")]
     mode_smb_data: Option<ModeSMBData>,
-    #[deku(skip, cond = "0b1_0000 & *fspec2 != 0b1_0000")]
+    #[deku(skip, cond = "is_fspec(0b1_0000, *fspec2)")]
     track_number: Option<TrackNumber>,
-    #[deku(skip, cond = "0b100 & *fspec2 != 0b100")]
+    #[deku(skip, cond = "is_fspec(0b100, *fspec2)")]
     // TODO handle special float
     calculated_track_velocity: Option<CalculatedTrackVelocity>,
-    #[deku(skip, cond = "0b10 & *fspec2 != 0b10")]
+    #[deku(skip, cond = "is_fspec(0b10, *fspec2)")]
     track_status: Option<TrackStatus>,
-    #[deku(skip, cond = "0b10 & *fspec3 != 0b10")]
+    #[deku(skip, cond = "is_fspec(0b10, *fspec3)")]
     communications_capability_flight_status: Option<CommunicationsCapabilityFlightStatus>,
 }
 
+fn is_fspec(dataitem_fspec: u8, fspec: u8) -> bool {
+    dataitem_fspec & fspec != dataitem_fspec
+}
+
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+#[deku(ctx = "_: deku::ctx::Endian")]
 pub struct DataSourceIdentifier {
-    #[deku(bytes = "1", endian = "big")]
+    #[deku(bytes = "1")]
     pub sac: u8,
-    #[deku(bytes = "1", endian = "big")]
+    #[deku(bytes = "1")]
     pub sic: u8,
 }
 
 //TODO fix display of f32
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+#[deku(ctx = "_: deku::ctx::Endian")]
 pub struct TimeOfDay {
-    #[deku(bytes = "3", endian = "big")]
+    #[deku(bytes = "3")]
     pub time: f32,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+#[deku(ctx = "_: deku::ctx::Endian")]
 pub struct TargetReportDescriptor {
     pub typ: TYP,
     pub sim: SIM,
@@ -90,7 +98,7 @@ pub struct TargetReportDescriptor {
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(id_type = "u8", id_bits = "3", endian = "big")]
+#[deku(id_type = "u8", id_bits = "3")]
 pub enum TYP {
     #[deku(id = "0x00")]
     NoDetection,
@@ -111,7 +119,7 @@ pub enum TYP {
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(id_type = "u8", id_bits = "1", endian = "big")]
+#[deku(id_type = "u8", id_bits = "1")]
 pub enum SIM {
     #[deku(id = "0x00")]
     ActualTargetReport,
@@ -120,7 +128,7 @@ pub enum SIM {
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(id_type = "u8", id_bits = "1", endian = "big")]
+#[deku(id_type = "u8", id_bits = "1")]
 pub enum RDP {
     #[deku(id = "0x00")]
     ReportFromRDPChain1,
@@ -129,7 +137,7 @@ pub enum RDP {
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(id_type = "u8", id_bits = "1", endian = "big")]
+#[deku(id_type = "u8", id_bits = "1")]
 pub enum SPI {
     #[deku(id = "0x00")]
     AbsenceOfSPI,
@@ -138,7 +146,7 @@ pub enum SPI {
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(id_type = "u8", id_bits = "1", endian = "big")]
+#[deku(id_type = "u8", id_bits = "1")]
 pub enum RAB {
     #[deku(id = "0x00")]
     ReportFromAircraftTransponder,
@@ -147,7 +155,7 @@ pub enum RAB {
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(id_type = "u8", id_bits = "1", endian = "big")]
+#[deku(id_type = "u8", id_bits = "1")]
 pub enum FX {
     #[deku(id = "0x00")]
     EndOfDataItem = 0,
@@ -156,12 +164,14 @@ pub enum FX {
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+#[deku(ctx = "_: deku::ctx::Endian")]
 pub struct MeasuredPositionInPolarCoordinates {
     pub rho: u16,
     pub theta: u16,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+#[deku(ctx = "_: deku::ctx::Endian")]
 pub struct Mode3ACodeInOctalRepresentation {
     pub v: V,
     pub g: G,
@@ -171,7 +181,7 @@ pub struct Mode3ACodeInOctalRepresentation {
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(id_type = "u8", id_bits = "1", endian = "big")]
+#[deku(id_type = "u8", id_bits = "1")]
 pub enum V {
     #[deku(id = "0x00")]
     CodeValidated = 0,
@@ -180,7 +190,7 @@ pub enum V {
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(id_type = "u8", id_bits = "1", endian = "big")]
+#[deku(id_type = "u8", id_bits = "1")]
 pub enum G {
     #[deku(id = "0x00")]
     Default = 0,
@@ -189,7 +199,7 @@ pub enum G {
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(id_type = "u8", id_bits = "1", endian = "big")]
+#[deku(id_type = "u8", id_bits = "1")]
 pub enum L {
     #[deku(id = "0x00")]
     Mode3CodeDerivedFromTheReplyOfTheTransponder = 0,
@@ -198,6 +208,7 @@ pub enum L {
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+#[deku(ctx = "_: deku::ctx::Endian")]
 pub struct FlightLevelInBinaryRepresentation {
     pub v: V,
     pub g: G,
@@ -207,12 +218,14 @@ pub struct FlightLevelInBinaryRepresentation {
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+#[deku(ctx = "_: deku::ctx::Endian")]
 pub struct AircraftAddress {
-    #[deku(bytes = "3", endian = "big")]
+    #[deku(bytes = "3")]
     pub address: u32,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+#[deku(ctx = "_: deku::ctx::Endian")]
 pub struct AircraftIdentification {
     /// IA5 char array
     #[deku(
@@ -310,38 +323,42 @@ const fn from_ascii(code: u8) -> u8 {
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+#[deku(ctx = "_: deku::ctx::Endian")]
 pub struct ModeSMBData {
-    #[deku(bytes = "1", update = "self.mb_data.len()", endian = "big")]
+    #[deku(bytes = "1", update = "self.mb_data.len()")]
     pub count: u8,
     #[deku(count = "count")]
     pub mb_data: Vec<MBData>,
-    #[deku(bits = "4", endian = "big")]
+    #[deku(bits = "4")]
     pub bds1: u8,
-    #[deku(bits = "4", endian = "big")]
+    #[deku(bits = "4")]
     pub bds2: u8,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 pub struct MBData {
-    #[deku(count = "7", endian = "big")]
+    #[deku(count = "7")]
     pub data: Vec<u8>,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+#[deku(ctx = "_: deku::ctx::Endian")]
 pub struct TrackNumber {
-    #[deku(bytes = "2", endian = "big")]
+    #[deku(bytes = "2")]
     pub number: u16,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+#[deku(ctx = "_: deku::ctx::Endian")]
 pub struct CalculatedTrackVelocity {
-    #[deku(bytes = "2", endian = "big")]
+    #[deku(bytes = "2")]
     pub groundspeed: f32,
-    #[deku(bytes = "2", endian = "big")]
+    #[deku(bytes = "2")]
     pub heading: f32,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+#[deku(ctx = "_: deku::ctx::Endian")]
 pub struct TrackStatus {
     pub cnf: CNF,
     pub rad: RAD,
@@ -353,13 +370,13 @@ pub struct TrackStatus {
     pub gho: GHO,
     pub sup: SUP,
     pub tcc: TCC,
-    #[deku(bits = "3", endian = "big")]
+    #[deku(bits = "3")]
     pub reserved: u32,
     pub fx2: FX,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(id_type = "u8", id_bits = "1", endian = "big")]
+#[deku(id_type = "u8", id_bits = "1")]
 pub enum CNF {
     #[deku(id = "0x00")]
     ConfirmedTrack,
@@ -368,7 +385,7 @@ pub enum CNF {
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(id_type = "u8", id_bits = "2", endian = "big")]
+#[deku(id_type = "u8", id_bits = "2")]
 pub enum RAD {
     #[deku(id = "0x00")]
     CombinedTrack,
@@ -381,7 +398,7 @@ pub enum RAD {
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(id_type = "u8", id_bits = "1", endian = "big")]
+#[deku(id_type = "u8", id_bits = "1")]
 pub enum DOU {
     #[deku(id = "0x00")]
     NormalConfidence,
@@ -390,7 +407,7 @@ pub enum DOU {
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(id_type = "u8", id_bits = "1", endian = "big")]
+#[deku(id_type = "u8", id_bits = "1")]
 pub enum MAH {
     #[deku(id = "0x00")]
     NoHorizontalManSensed,
@@ -399,7 +416,7 @@ pub enum MAH {
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(id_type = "u8", id_bits = "2", endian = "big")]
+#[deku(id_type = "u8", id_bits = "2")]
 pub enum CDM {
     #[deku(id = "0x00")]
     Maintaining,
@@ -412,7 +429,7 @@ pub enum CDM {
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(id_type = "u8", id_bits = "1", endian = "big")]
+#[deku(id_type = "u8", id_bits = "1")]
 pub enum TRE {
     #[deku(id = "0x00")]
     TrackStillAlive,
@@ -421,7 +438,7 @@ pub enum TRE {
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(id_type = "u8", id_bits = "1", endian = "big")]
+#[deku(id_type = "u8", id_bits = "1")]
 pub enum GHO {
     #[deku(id = "0x00")]
     TrueTargetTrack,
@@ -430,7 +447,7 @@ pub enum GHO {
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(id_type = "u8", id_bits = "1", endian = "big")]
+#[deku(id_type = "u8", id_bits = "1")]
 pub enum SUP {
     #[deku(id = "0x00")]
     No,
@@ -439,7 +456,7 @@ pub enum SUP {
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(id_type = "u8", id_bits = "1", endian = "big")]
+#[deku(id_type = "u8", id_bits = "1")]
 pub enum TCC {
     #[deku(id = "0x00")]
     RadarPlanePlotTransformation,
@@ -448,23 +465,24 @@ pub enum TCC {
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+#[deku(ctx = "_: deku::ctx::Endian")]
 pub struct CommunicationsCapabilityFlightStatus {
     pub com: COM,
     pub stat: STAT,
     pub si: SI,
-    #[deku(bits = "1", endian = "big")]
+    #[deku(bits = "1")]
     pub reserved: u8,
     pub mssc: MSSC,
     pub arc: ARC,
     pub aic: AIC,
-    #[deku(bits = "1", endian = "big")]
+    #[deku(bits = "1")]
     pub b1a: u8,
-    #[deku(bits = "4", endian = "big")]
+    #[deku(bits = "4")]
     pub b1b: u8,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(id_type = "u8", id_bits = "3", endian = "big")]
+#[deku(id_type = "u8", id_bits = "3")]
 pub enum COM {
     #[deku(id = "0x00")]
     NoCommunicationsSurveillanceOnly,
@@ -479,7 +497,7 @@ pub enum COM {
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(id_type = "u8", id_bits = "3", endian = "big")]
+#[deku(id_type = "u8", id_bits = "3")]
 pub enum STAT {
     #[deku(id = "0x00")]
     NoAlertNoSPIAircraftAirborne,
@@ -498,7 +516,7 @@ pub enum STAT {
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(id_type = "u8", id_bits = "1", endian = "big")]
+#[deku(id_type = "u8", id_bits = "1")]
 pub enum SI {
     #[deku(id = "0x00")]
     SICodeCapable,
@@ -507,7 +525,7 @@ pub enum SI {
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(id_type = "u8", id_bits = "1", endian = "big")]
+#[deku(id_type = "u8", id_bits = "1")]
 pub enum MSSC {
     #[deku(id = "0x00")]
     No,
@@ -516,7 +534,7 @@ pub enum MSSC {
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(id_type = "u8", id_bits = "1", endian = "big")]
+#[deku(id_type = "u8", id_bits = "1")]
 pub enum ARC {
     #[deku(id = "0x00")]
     Resolution100ft,
@@ -525,7 +543,7 @@ pub enum ARC {
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(id_type = "u8", id_bits = "1", endian = "big")]
+#[deku(id_type = "u8", id_bits = "1")]
 pub enum AIC {
     #[deku(id = "0x00")]
     No,
