@@ -227,6 +227,8 @@ pub struct Mode3ACodeInOctalRepresentation {
     pub v: V,
     pub g: G,
     pub l: L,
+    #[deku(bits = "1")]
+    pub reserved: u8,
     #[deku(bits = "12", endian = "big")]
     pub reply: u16,
 }
@@ -264,7 +266,7 @@ pub struct FlightLevelInBinaryRepresentation {
     pub v: V,
     pub g: G,
     // TODO check wireshark
-    #[deku(bits = "15", endian = "big")]
+    #[deku(bits = "14")]
     pub flight_level: u16,
 }
 
@@ -395,7 +397,9 @@ pub struct MBData {
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct TrackNumber {
-    #[deku(bytes = "2")]
+    #[deku(bits = "4")]
+    pub reserved: u8,
+    #[deku(bits = "12", endian = "big")]
     pub number: u16,
 }
 
