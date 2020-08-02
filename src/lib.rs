@@ -82,8 +82,25 @@ pub struct DataSourceIdentifier {
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct TimeOfDay {
-    #[deku(bytes = "3")]
+    #[deku(
+        reader="TimeOfDay::read(rest)",
+        writer="TimeOfDay::write(&self.time)"
+    )]
     pub time: f32,
+}
+
+impl TimeOfDay {
+    const CTX: (deku::ctx::Endian, deku::ctx::BitSize) = (deku::ctx::Endian::Big, deku::ctx::BitSize(24usize));
+
+    fn read(rest: &BitSlice<Msb0, u8>) -> Result<(&BitSlice<Msb0, u8>, f32), DekuError> {
+        let (rest, value) = u32::read(rest, Self::CTX)?;
+        Ok((rest, value as f32 / 128.0))
+    }
+
+    fn write(time: &f32) -> Result<BitVec<Msb0, u8>, DekuError> {
+        let value = (*time * 128.0) as u32;
+        value.write(Self::CTX)
+    }
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
