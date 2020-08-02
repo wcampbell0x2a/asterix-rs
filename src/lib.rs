@@ -617,25 +617,4 @@ mod tests {
         println!("{:#?}", ass);
         assert_eq!(ass.to_bytes(), Ok(bytes));
     }
-
-    #[test]
-    fn test01() {
-        // the last byte in the wireshark capture is 0xe0, but it's 0xc0 b/c the last bits 6 bits
-        // don't matter according to wirshark
-        // lol 6 bits of covert data :eyes:
-        let data: Vec<u8> = vec![0x1d, 0x72, 0x77, 0xdf, 0x5c, 0xc0];
-
-        let (_, value) = AircraftIdentification::from_bytes((data.as_ref(), 0)).unwrap();
-
-        assert_eq!(value.identification, "GWI7753".to_string());
-        assert_eq!(data, value.to_bytes().unwrap());
-    }
-
-    #[test]
-    fn test02() {
-        let i = 0x01;
-        let s = to_ascii(i);
-        assert_eq!(65, s);
-        assert_eq!(i, from_ascii(s))
-    }
 }
