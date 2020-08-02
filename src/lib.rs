@@ -83,8 +83,8 @@ pub struct DataSourceIdentifier {
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct TimeOfDay {
     #[deku(
-        reader = "TimeOfDay::read(rest)",
-        writer = "TimeOfDay::write(&self.time)"
+        reader = "Self::read(rest)",
+        writer = "Self::write(&self.time)"
     )]
     pub time: f32,
 }
