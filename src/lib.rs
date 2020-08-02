@@ -184,8 +184,41 @@ pub enum FX {
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct MeasuredPositionInPolarCoordinates {
-    pub rho: u16,
-    pub theta: u16,
+    #[deku(
+        reader = "Self::read_rho(rest)",
+        writer = "Self::write_rho(&self.rho)"
+    )]
+    pub rho: f32,
+    #[deku(
+        reader = "Self::read_theta(rest)",
+        writer = "Self::write_theta(&self.theta)"
+    )]
+    pub theta: f32,
+}
+
+impl MeasuredPositionInPolarCoordinates {
+    const CTX: (deku::ctx::Endian, deku::ctx::BitSize) =
+        (deku::ctx::Endian::Big, deku::ctx::BitSize(16usize));
+
+    fn read_rho(rest: &BitSlice<Msb0, u8>) -> Result<(&BitSlice<Msb0, u8>, f32), DekuError> {
+        let (rest, value) = u16::read(rest, Self::CTX)?;
+        Ok((rest, value as f32 * (1.0/256.0)))
+    }
+
+    fn write_rho(rho: &f32) -> Result<BitVec<Msb0, u8>, DekuError> {
+        let value = (*rho / (1.0/256.0)) as u16;
+        value.write(Self::CTX)
+    }
+
+    fn read_theta(rest: &BitSlice<Msb0, u8>) -> Result<(&BitSlice<Msb0, u8>, f32), DekuError> {
+        let (rest, value) = u16::read(rest, Self::CTX)?;
+        Ok((rest, value as f32 * (360.0/65536.0)))
+    }
+
+    fn write_theta(rho: &f32) -> Result<BitVec<Msb0, u8>, DekuError> {
+        let value = (*rho / (360.0/65536.0)) as u16;
+        value.write(Self::CTX)
+    }
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
