@@ -1,7 +1,7 @@
 mod types;
 
-use deku::prelude::*;
 pub use crate::types::*;
+use deku::prelude::*;
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(endian = "big")]
