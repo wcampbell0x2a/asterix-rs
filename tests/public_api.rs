@@ -1,12 +1,12 @@
+use asterix_deku::{
+    AsterixMessage, AsterixPacket, MBData, AIC, ARC, CDM, CNF, COM, DOU, FX, G, GHO, L, MAH,
+    MSSC, RAB, RAD, RDP, SI, SIM, SPI, STAT, SUP, TCC, TRE, TYP, V,
+};
+use deku::DekuContainerRead;
+use deku::DekuContainerWrite;
+
 #[test]
 fn it_works() {
-    use asterix_deku::{
-        AsterixMessage, AsterixPacket, MBData, AIC, ARC, CDM, CNF, COM, DOU, FX, G, GHO, L, MAH,
-        MSSC, RAB, RAD, RDP, SI, SIM, SPI, STAT, SUP, TCC, TRE, TYP, V,
-    };
-    use deku::DekuContainerRead;
-    use deku::DekuContainerWrite;
-
     let bytes = vec![
         0x30, 0x00, 0x30, 0xfd, 0xf7, 0x02, 0x19, 0xc9, 0x35, 0x6d, 0x4d, 0xa0, 0xc5, 0xaf, 0xf1,
         0xe0, 0x02, 0x00, 0x05, 0x28, 0x3c, 0x66, 0x0c, 0x10, 0xc2, 0x36, 0xd4, 0x18,
@@ -21,10 +21,7 @@ fn it_works() {
 
     // TODO check NONE values after more are implemented
     if let AsterixMessage::Cat48(ref message) = packet.message {
-        assert_eq!(message.fspec1, 0xfd);
-        assert_eq!(message.fspec2, 0xf7);
-        assert_eq!(message.fspec3, 0x02);
-        assert_eq!(message.fspec3, 0x02);
+        assert_eq!(message.fspec, &[0xfd, 0xf7, 0x02]);
 
         let data_source_identifier = message.data_source_identifier.as_ref().unwrap();
         assert_eq!(data_source_identifier.sac, 25);
@@ -123,6 +120,34 @@ fn it_works() {
         assert_eq!(communications_capability_flight_status.aic, AIC::Yes);
         assert_eq!(communications_capability_flight_status.b1a, 1);
         assert_eq!(communications_capability_flight_status.b1b, 5);
+    } else {
+        unreachable!("Message is not CAT48");
+    }
+
+    // Confirm packet back to bytes
+    assert_eq!(packet.to_bytes(), Ok(bytes));
+}
+
+#[test]
+/// Remove communications_capability_flight_status and update fspec, making sure to check if the
+/// fspec works as well as the communications_capability_flight_status is none
+fn it_works_only_two_fspec() {
+    let bytes = vec![
+        0x30, 0x00, 0x30, 0xfd, 0xf6, 0x19, 0xc9, 0x35, 0x6d, 0x4d, 0xa0, 0xc5, 0xaf, 0xf1,
+        0xe0, 0x02, 0x00, 0x05, 0x28, 0x3c, 0x66, 0x0c, 0x10, 0xc2, 0x36, 0xd4, 0x18,
+        //0x20 in wireshark, but last 6 bits don't matter and will 0x00 by writer
+        0x00, 0x01, 0xc0, 0x78, 0x00, 0x31, 0xbc, 0x00, 0x00, 0x40, 0x0d, 0xeb, 0x07, 0xb9, 0x58,
+        0x2e, 0x41, 0x00
+    ];
+    let (_, packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
+
+    assert_eq!(packet.category, 48);
+    assert_eq!(packet.length, 48);
+
+    if let AsterixMessage::Cat48(ref message) = packet.message {
+        assert_eq!(message.fspec, &[0xfd, 0xf6]);
+        // everything here is checked in the above test
+        assert!(message.communications_capability_flight_status.is_none());
     } else {
         unreachable!("Message is not CAT48");
     }
