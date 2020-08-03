@@ -214,13 +214,13 @@ impl AircraftIdentification {
         let (rest, _) = u8::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)))?;
         let value = format!(
             "{}{}{}{}{}{}{}",
-            to_ascii(one) as char,
-            to_ascii(two) as char,
-            to_ascii(three) as char,
-            to_ascii(four) as char,
-            to_ascii(five) as char,
-            to_ascii(six) as char,
-            to_ascii(seven) as char
+            Self::as_ascii(one) as char,
+            Self::as_ascii(two) as char,
+            Self::as_ascii(three) as char,
+            Self::as_ascii(four) as char,
+            Self::as_ascii(five) as char,
+            Self::as_ascii(six) as char,
+            Self::as_ascii(seven) as char
         );
         Ok((rest, value))
     }
@@ -230,61 +230,55 @@ impl AircraftIdentification {
         let mut acc: BitVec<Msb0, u8> = BitVec::new();
         for c in field_a.chars() {
             let bits =
-                from_ascii(c as u8).write((deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)))?;
+                Self::as_ia5(c as u8).write((deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)))?;
             acc.extend(bits);
         }
         let bits = 0_u8.write((deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)))?;
         acc.extend(bits);
         Ok(acc)
     }
-}
 
-const ia5_alpha: u8 = 0x01;
-const ia5_space: u8 = 0x20;
-const ia5_digit: u8 = 0x30;
-const asc_digit: u8 = b'0';
-const asc_alpha: u8 = b'A';
-const asc_space: u8 = b' ';
-const asc_error: u8 = b'?';
+    const IA5_ALPHA: u8 = 0x01;
+    const IA5_SPACE: u8 = 0x20;
+    const IA5_DIGIT: u8 = 0x30;
+    const ASC_DIGIT: u8 = b'0';
+    const ASC_ALPHA: u8 = b'A';
+    const ASC_SPACE: u8 = b' ';
+    const ASC_ERROR: u8 = b'?';
 
-/// parse into ascii from IA5 char array
-const fn to_ascii(code: u8) -> u8 {
-    // space
-    if code == ia5_space {
-        return asc_space;
+    /// parse into ascii from IA5 char array
+    const fn as_ascii(code: u8) -> u8 {
+        // space
+        if code == Self::IA5_SPACE {
+            return Self::ASC_SPACE;
+        }
+        // digit
+        if Self::IA5_DIGIT <= code && code < Self::IA5_DIGIT + 10 {
+            return Self::ASC_DIGIT + (code - Self::IA5_DIGIT);
+        }
+        // letter
+        if Self::IA5_ALPHA <= code && code < Self::IA5_ALPHA + 26 {
+            return Self::ASC_ALPHA + (code - Self::IA5_ALPHA);
+        }
+        Self::ASC_ERROR
     }
 
-    // digit
-    if ia5_digit <= code && code < ia5_digit + 10 {
-        return asc_digit + (code - ia5_digit);
+    /// parse from IA5 char as u8 to u8 value
+    const fn as_ia5(code: u8) -> u8 {
+        // space
+        if code == Self::ASC_SPACE {
+            return Self::IA5_SPACE;
+        }
+        // digit
+        if Self::ASC_DIGIT <= code && code < Self::ASC_DIGIT + 10 {
+            return Self::IA5_DIGIT + (code - Self::ASC_DIGIT);
+        }
+        // letter
+        if Self::ASC_ALPHA <= code && code < Self::ASC_ALPHA + 26 {
+            return Self::IA5_ALPHA + (code - Self::ASC_ALPHA);
+        }
+        Self::ASC_ERROR
     }
-
-    // letter
-    if ia5_alpha <= code && code < ia5_alpha + 26 {
-        return asc_alpha + (code - ia5_alpha);
-    }
-
-    asc_error
-}
-
-/// parse from IA5 char as u8 to u8 value
-const fn from_ascii(code: u8) -> u8 {
-    // space
-    if code == asc_space {
-        return ia5_space;
-    }
-
-    // digit
-    if asc_digit <= code && code < asc_digit + 10 {
-        return ia5_digit + (code - asc_digit);
-    }
-
-    // letter
-    if asc_alpha <= code && code < asc_alpha + 26 {
-        return ia5_alpha + (code - asc_alpha);
-    }
-
-    asc_error
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
