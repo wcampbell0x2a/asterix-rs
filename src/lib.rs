@@ -319,7 +319,7 @@ pub struct CalculatedTrackVelocity {
     pub groundspeed: f32,
     #[deku(
         reader = "Self::read_heading(rest)",
-        writer = "Self::write_heading(&self.heading)"
+        writer = "Self::write_heading(self.heading)"
     )]
     pub heading: f32,
 }
@@ -345,8 +345,8 @@ impl CalculatedTrackVelocity {
         Ok((rest, f32::from(value) * (360.0 / 65536.0)))
     }
 
-    fn write_heading(heading: &f32) -> Result<BitVec<Msb0, u8>, DekuError> {
-        let value = (*heading / (360.0 / 65536.0)) as u16;
+    fn write_heading(heading: f32) -> Result<BitVec<Msb0, u8>, DekuError> {
+        let value = (heading / (360.0 / 65536.0)) as u16;
         value.write(Self::CTX)
     }
 }
