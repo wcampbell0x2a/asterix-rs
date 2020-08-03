@@ -60,7 +60,10 @@ fn read_fspec(rest: &BitSlice<Msb0, u8>) -> Result<(&BitSlice<Msb0, u8>, Vec<u8>
     let mut v = vec![];
     let mut inner_rest = rest;
     loop {
-        let (rest, value) = u8::read(inner_rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(8_usize)))?;
+        let (rest, value) = u8::read(
+            inner_rest,
+            (deku::ctx::Endian::Big, deku::ctx::BitSize(8_usize)),
+        )?;
         inner_rest = rest;
         v.push(value);
         if value & 0x01 == 0 {
