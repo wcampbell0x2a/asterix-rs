@@ -318,15 +318,9 @@ pub struct TrackNumber {
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct CalculatedPositionCartesianCorr {
-    #[deku(
-        reader = "Self::read(rest)",
-        writer = "Self::write(&self.x)"
-    )]
+    #[deku(reader = "Self::read(rest)", writer = "Self::write(&self.x)")]
     x: f32,
-    #[deku(
-        reader = "Self::read(rest)",
-        writer = "Self::write(&self.y)"
-    )]
+    #[deku(reader = "Self::read(rest)", writer = "Self::write(&self.y)")]
     y: f32,
 }
 
