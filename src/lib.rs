@@ -195,8 +195,8 @@ pub struct AircraftAddress {
 pub struct AircraftIdentification {
     /// IA5 char array
     #[deku(
-        reader = "AircraftIdentification::read(rest)",
-        writer = "AircraftIdentification::write(&self.identification)"
+        reader = "Self::read(rest)",
+        writer = "Self::write(&self.identification)"
     )]
     pub identification: String,
 }
@@ -229,8 +229,8 @@ impl AircraftIdentification {
     fn write(field_a: &str) -> Result<BitVec<Msb0, u8>, DekuError> {
         let mut acc: BitVec<Msb0, u8> = BitVec::new();
         for c in field_a.chars() {
-            let bits =
-                Self::as_ia5(c as u8).write((deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)))?;
+            let bits = Self::as_ia5(c as u8)
+                .write((deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)))?;
             acc.extend(bits);
         }
         let bits = 0_u8.write((deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)))?;
@@ -384,4 +384,104 @@ pub struct CommunicationsCapabilityFlightStatus {
     pub b1a: u8,
     #[deku(bits = "4")]
     pub b1b: u8,
+}
+
+#[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+#[deku(ctx = "_: deku::ctx::Endian")]
+pub struct RadarPlotCharacteristics {
+    #[deku(reader = "read_fspec(rest)")]
+    pub fspec: Vec<u8>,
+    #[deku(
+        skip,
+        cond = "is_fspec(0b1000_0000, fspec, 0)",
+        reader = "Self::runlength_reader(rest)",
+        writer = "Self::runlength_writer(&self.srl)"
+    )]
+    pub srl: Option<f32>,
+    #[deku(skip, cond = "is_fspec(0b100_0000, fspec, 0)", bytes = "1")]
+    pub srr: Option<u8>,
+    #[deku(skip, cond = "is_fspec(0b10_0000, fspec, 0)", bytes = "1")]
+    pub sam: Option<i8>,
+    #[deku(
+        skip,
+        cond = "is_fspec(0b1_0000, fspec, 0)",
+        reader = "Self::runlength_reader(rest)",
+        writer = "Self::runlength_writer(&self.prl)"
+    )]
+    pub prl: Option<f32>,
+    #[deku(skip, cond = "is_fspec(0b1000, fspec, 0)", bytes = "1")]
+    pub pam: Option<u8>,
+    #[deku(
+        skip,
+        cond = "is_fspec(0b100, fspec, 0)",
+        reader = "Self::nm_reader(rest)",
+        writer = "Self::nm_writer(&self.rpd)"
+    )]
+    pub rpd: Option<f32>,
+    #[deku(
+        skip,
+        cond = "is_fspec(0b100, fspec, 0)",
+        reader = "Self::apd_reader(rest)",
+        writer = "Self::apd_writer(&self.apd)"
+    )]
+    pub apd: Option<f32>,
+}
+
+impl RadarPlotCharacteristics {
+    const CTX: (deku::ctx::Endian, deku::ctx::BitSize) =
+        (deku::ctx::Endian::Big, deku::ctx::BitSize(8_usize));
+
+    fn runlength_reader(
+        rest: &BitSlice<Msb0, u8>,
+    ) -> Result<(&BitSlice<Msb0, u8>, Option<f32>), DekuError> {
+        let (rest, value) = u8::read(rest, Self::CTX)?;
+        Ok((
+            rest,
+            Some(f32::from(value) * (360.0 / 2_u16.pow(13) as f32)),
+        ))
+    }
+
+    fn runlength_writer(srl: &Option<f32>) -> Result<BitVec<Msb0, u8>, DekuError> {
+        if let Some(srl) = srl {
+            let value = (*srl / (360.0 / 2_u16.pow(13) as f32)) as u16;
+            value.write(Self::CTX)
+        } else {
+            Ok(BitVec::new())
+        }
+    }
+
+    fn nm_reader(
+        rest: &BitSlice<Msb0, u8>,
+    ) -> Result<(&BitSlice<Msb0, u8>, Option<f32>), DekuError> {
+        let (rest, value) = u8::read(rest, Self::CTX)?;
+        Ok((rest, Some(f32::from(value) * (1.0 / 256.0))))
+    }
+
+    fn nm_writer(nm: &Option<f32>) -> Result<BitVec<Msb0, u8>, DekuError> {
+        if let Some(nm) = nm {
+            let value = (*nm / (1.0 / 256.0)) as u16;
+            value.write(Self::CTX)
+        } else {
+            Ok(BitVec::new())
+        }
+    }
+
+    fn apd_reader(
+        rest: &BitSlice<Msb0, u8>,
+    ) -> Result<(&BitSlice<Msb0, u8>, Option<f32>), DekuError> {
+        let (rest, value) = u8::read(rest, Self::CTX)?;
+        Ok((
+            rest,
+            Some(f32::from(value) * (360.0 / 2_u16.pow(14) as f32)),
+        ))
+    }
+
+    fn apd_writer(apd: &Option<f32>) -> Result<BitVec<Msb0, u8>, DekuError> {
+        if let Some(apd) = apd {
+            let value = (*apd / (360.0 / 2_u16.pow(14) as f32)) as u16;
+            value.write(Self::CTX)
+        } else {
+            Ok(BitVec::new())
+        }
+    }
 }
