@@ -358,27 +358,25 @@ impl CalculatedTrackVelocity {
     const CTX: (deku::ctx::Endian, deku::ctx::BitSize) =
         (deku::ctx::Endian::Big, deku::ctx::BitSize(16_usize));
 
-    // TODO use 2_i16.pow(-14)
     fn read_groundspeed(
         rest: &BitSlice<Msb0, u8>,
     ) -> Result<(&BitSlice<Msb0, u8>, f32), DekuError> {
         let (rest, value) = u16::read(rest, Self::CTX)?;
-        Ok((rest, f32::from(value) * (1.0 / 16384.0)))
+        Ok((rest, f32::from(value) * 2_f32.powf(-14.0)))
     }
 
     fn write_groundspeed(groundspeed: &f32) -> Result<BitVec<Msb0, u8>, DekuError> {
-        let value = (*groundspeed / (1.0 / 16384.0)) as u16;
+        let value = (*groundspeed / 2_f32.powf(-14.0)) as u16;
         value.write(Self::CTX)
     }
 
-    // TODO use 2_i16.pow(16)
     fn read_heading(rest: &BitSlice<Msb0, u8>) -> Result<(&BitSlice<Msb0, u8>, f32), DekuError> {
         let (rest, value) = u16::read(rest, Self::CTX)?;
-        Ok((rest, f32::from(value) * (360.0 / 65536.0)))
+        Ok((rest, f32::from(value) * (360.0 / 2_f32.powf(16.0))))
     }
 
     fn write_heading(heading: f32) -> Result<BitVec<Msb0, u8>, DekuError> {
-        let value = (heading / (360.0 / 65536.0)) as u16;
+        let value = (heading / (360.0 / 2_f32.powf(16.0))) as u16;
         value.write(Self::CTX)
     }
 }

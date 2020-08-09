@@ -93,11 +93,11 @@ fn it_works() {
         assert_eq!(track_status.mah, MAH::NoHorizontalManSensed);
         assert_eq!(track_status.cdm, CDM::Maintaining);
         assert_eq!(track_status.fx1, FX::ExtensionIntoFirstExtent);
-        assert_eq!(track_status.tre, TRE::TrackStillAlive);
-        assert_eq!(track_status.gho, GHO::TrueTargetTrack);
-        assert_eq!(track_status.sup, SUP::No);
-        assert_eq!(track_status.tcc, TCC::RadarPlanePlotTransformation);
-        assert_eq!(track_status.fx2, FX::EndOfDataItem);
+        assert_eq!(track_status.tre, Some(TRE::TrackStillAlive));
+        assert_eq!(track_status.gho, Some(GHO::TrueTargetTrack));
+        assert_eq!(track_status.sup, Some(SUP::No));
+        assert_eq!(track_status.tcc, Some(TCC::RadarPlanePlotTransformation));
+        assert_eq!(track_status.fx2, Some(FX::EndOfDataItem));
 
         let communications_capability_flight_status = message
             .communications_capability_flight_status
