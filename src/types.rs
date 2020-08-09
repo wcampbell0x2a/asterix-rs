@@ -195,6 +195,8 @@ pub enum COM {
     CommACommBUplinkELMDownlinkELM,
     #[deku(id = "0x04")]
     Top5TransponderCapability,
+    #[deku(id_pat = "0x05..=0x07")]
+    NoAssigned,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
