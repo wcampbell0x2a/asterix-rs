@@ -3,6 +3,8 @@ mod types;
 pub use crate::types::*;
 use deku::prelude::*;
 
+//TODO add Units for read/write
+
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(endian = "big")]
 pub struct AsterixPacket {
@@ -39,14 +41,18 @@ pub struct Cat48 {
     pub mode_3_a_code_in_octal_representation: Option<Mode3ACodeInOctalRepresentation>,
     #[deku(skip, cond = "is_fspec(0b100, fspec, 0)")]
     pub flight_level_in_binary_repre: Option<FlightLevelInBinaryRepresentation>,
-    #[deku(skip, cond = "is_fspec(0b100_0000, fspec, 1)")]
+    #[deku(skip, cond = "is_fspec(0b10, fspec, 0)")]
+    pub radar_plot_characteristics: Option<RadarPlotCharacteristics>,
+    #[deku(skip, cond = "is_fspec(0b1000_0000, fspec, 1)")]
     pub aircraft_address: Option<AircraftAddress>,
-    #[deku(skip, cond = "is_fspec(0b10_0000, fspec, 1)")]
-    pub aircraft_identification: Option<AircraftIdentification>,
     #[deku(skip, cond = "is_fspec(0b100_0000, fspec, 1)")]
+    pub aircraft_identification: Option<AircraftIdentification>,
+    #[deku(skip, cond = "is_fspec(0b10_0000, fspec, 1)")]
     pub mode_smb_data: Option<ModeSMBData>,
     #[deku(skip, cond = "is_fspec(0b1_0000, fspec, 1)")]
     pub track_number: Option<TrackNumber>,
+    #[deku(skip, cond = "is_fspec(0b1000, fspec, 1)")]
+    pub calculated_position_cartesian_coor: Option<CalculatedPositionCartesianCorr>,
     #[deku(skip, cond = "is_fspec(0b100, fspec, 1)")]
     pub calculated_track_velocity: Option<CalculatedTrackVelocity>,
     #[deku(skip, cond = "is_fspec(0b10, fspec, 1)")]
@@ -311,6 +317,36 @@ pub struct TrackNumber {
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
+pub struct CalculatedPositionCartesianCorr {
+    #[deku(
+        reader = "Self::read(rest)",
+        writer = "Self::write(&self.x)"
+    )]
+    x: f32,
+    #[deku(
+        reader = "Self::read(rest)",
+        writer = "Self::write(&self.y)"
+    )]
+    y: f32,
+}
+
+impl CalculatedPositionCartesianCorr {
+    const CTX: (deku::ctx::Endian, deku::ctx::BitSize) =
+        (deku::ctx::Endian::Big, deku::ctx::BitSize(16_usize));
+
+    fn read(rest: &BitSlice<Msb0, u8>) -> Result<(&BitSlice<Msb0, u8>, f32), DekuError> {
+        let (rest, value) = i16::read(rest, Self::CTX)?;
+        Ok((rest, f32::from(value) * (1.0 / 128.0)))
+    }
+
+    fn write(val: &f32) -> Result<BitVec<Msb0, u8>, DekuError> {
+        let value = (*val / (1.0 / 128.0)) as i16;
+        value.write(Self::CTX)
+    }
+}
+
+#[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+#[deku(ctx = "_: deku::ctx::Endian")]
 pub struct CalculatedTrackVelocity {
     #[deku(
         reader = "Self::read_groundspeed(rest)",
@@ -328,6 +364,7 @@ impl CalculatedTrackVelocity {
     const CTX: (deku::ctx::Endian, deku::ctx::BitSize) =
         (deku::ctx::Endian::Big, deku::ctx::BitSize(16_usize));
 
+    // TODO use 2_i16.pow(-14)
     fn read_groundspeed(
         rest: &BitSlice<Msb0, u8>,
     ) -> Result<(&BitSlice<Msb0, u8>, f32), DekuError> {
@@ -340,6 +377,7 @@ impl CalculatedTrackVelocity {
         value.write(Self::CTX)
     }
 
+    // TODO use 2_i16.pow(16)
     fn read_heading(rest: &BitSlice<Msb0, u8>) -> Result<(&BitSlice<Msb0, u8>, f32), DekuError> {
         let (rest, value) = u16::read(rest, Self::CTX)?;
         Ok((rest, f32::from(value) * (360.0 / 65536.0)))
@@ -360,13 +398,18 @@ pub struct TrackStatus {
     pub mah: MAH,
     pub cdm: CDM,
     pub fx1: FX,
-    pub tre: TRE,
-    pub gho: GHO,
-    pub sup: SUP,
-    pub tcc: TCC,
-    #[deku(bits = "3")]
-    pub reserved: u32,
-    pub fx2: FX,
+    #[deku(skip, cond = "*fx1 != FX::ExtensionIntoFirstExtent")]
+    pub tre: Option<TRE>,
+    #[deku(skip, cond = "*fx1 != FX::ExtensionIntoFirstExtent")]
+    pub gho: Option<GHO>,
+    #[deku(skip, cond = "*fx1 != FX::ExtensionIntoFirstExtent")]
+    pub sup: Option<SUP>,
+    #[deku(skip, cond = "*fx1 != FX::ExtensionIntoFirstExtent")]
+    pub tcc: Option<TCC>,
+    #[deku(skip, cond = "*fx1 != FX::ExtensionIntoFirstExtent", bits = "3")]
+    pub reserved: Option<u32>,
+    #[deku(skip, cond = "*fx1 != FX::ExtensionIntoFirstExtent")]
+    pub fx2: Option<FX>,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
