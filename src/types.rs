@@ -216,6 +216,8 @@ pub enum STAT {
     NoAlertSPIAircraftAirborneOrOnGround,
     #[deku(id = "0x06")]
     NotAssigned,
+    #[deku(id = "0x07")]
+    Unknown,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
