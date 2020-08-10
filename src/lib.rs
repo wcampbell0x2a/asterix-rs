@@ -208,7 +208,7 @@ impl FlightLevelInBinaryRepresentation {
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct AircraftAddress {
-    #[deku(bytes = "3")]
+    #[deku(bytes = "3", endian = "big")]
     pub address: u32,
 }
 
