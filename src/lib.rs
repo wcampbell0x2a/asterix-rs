@@ -184,9 +184,25 @@ pub struct Mode3ACodeInOctalRepresentation {
 pub struct FlightLevelInBinaryRepresentation {
     pub v: V,
     pub g: G,
-    // TODO check wireshark
-    #[deku(bits = "14")]
+    #[deku(
+        reader = "Self::read(rest)",
+        writer = "Self::write(&self.flight_level)"
+    )]
     pub flight_level: u16,
+}
+
+impl FlightLevelInBinaryRepresentation {
+    const CTX: (deku::ctx::Endian, deku::ctx::BitSize) =
+        (deku::ctx::Endian::Big, deku::ctx::BitSize(14_usize));
+
+    fn read(rest: &BitSlice<Msb0, u8>) -> Result<(&BitSlice<Msb0, u8>, u16), DekuError> {
+        let (rest, value) = u16::read(rest, Self::CTX)?;
+        Ok((rest, value / 4))
+    }
+    fn write(flight_level: &u16) -> Result<BitVec<Msb0, u8>, DekuError> {
+        let value = *flight_level * 4;
+        value.write(Self::CTX)
+    }
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]

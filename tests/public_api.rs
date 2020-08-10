@@ -62,7 +62,7 @@ fn it_works() {
         let flight_level_in_binary_repre = message.flight_level_in_binary_repre.as_ref().unwrap();
         assert_eq!(flight_level_in_binary_repre.v, V::CodeValidated);
         assert_eq!(flight_level_in_binary_repre.g, G::Default);
-        assert_eq!(flight_level_in_binary_repre.flight_level, 10260);
+        assert_eq!(flight_level_in_binary_repre.flight_level, 330);
 
         let aircraft_address = message.aircraft_address.as_ref().unwrap();
         assert_eq!(aircraft_address.address, 812_604);
