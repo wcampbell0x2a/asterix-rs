@@ -181,7 +181,7 @@ fn third_packet() {
         assert_eq!(data_source_identifier.sic, 13);
 
         let time_of_day = message.time_of_day.as_ref().unwrap();
-        assert_eq!(time_of_day.time, 27355.859);
+        assert_eq!(time_of_day.time, 27_355.86);
 
         let target_report_descriptor = message.target_report_descriptor.as_ref().unwrap();
         assert_eq!(target_report_descriptor.typ, TYP::SingleModeSRollCall);
@@ -198,8 +198,8 @@ fn third_packet() {
             .measured_position_in_polar_coordinates
             .as_ref()
             .unwrap();
-        assert_eq!(measured_position_in_polar_coordinates.rho, 194.82421875);
-        assert_eq!(measured_position_in_polar_coordinates.theta, 128.759765625);
+        assert_eq!(measured_position_in_polar_coordinates.rho, 194.824_22);
+        assert_eq!(measured_position_in_polar_coordinates.theta, 128.759_77);
 
         let mode_3_a_code_in_octal_representation = message
             .mode_3_a_code_in_octal_representation
@@ -239,12 +239,12 @@ fn third_packet() {
         assert_eq!(track_number.number, 482);
 
         let cal_pos_cartesian_coor = message.calculated_position_cartesian_coor.as_ref().unwrap();
-        assert_eq!(cal_pos_cartesian_coor.x, 151.921875);
+        assert_eq!(cal_pos_cartesian_coor.x, 151.921_88);
         assert_eq!(cal_pos_cartesian_coor.y, -121.96875);
 
         let calculated_track_velocity = message.calculated_track_velocity.as_ref().unwrap();
-        assert_eq!(calculated_track_velocity.groundspeed, 0.12683105468751);
-        assert_eq!(calculated_track_velocity.heading, 263.600463867188);
+        assert_eq!(calculated_track_velocity.groundspeed, 0.126_831_05);
+        assert_eq!(calculated_track_velocity.heading, 263.600_46);
 
         let track_status = message.track_status.as_ref().unwrap();
         assert_eq!(track_status.cnf, CNF::ConfirmedTrack);
