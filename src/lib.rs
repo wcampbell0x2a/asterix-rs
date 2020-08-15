@@ -356,11 +356,11 @@ pub struct CalculatedTrackVelocity {
 
 impl CalculatedTrackVelocity {
     fn groundspeed_modifier() -> f32 {
-        2_f32.powf(-14.0)
+        2_f32.powi(-14)
     }
 
     fn heading_modifier() -> f32 {
-        360.0 / 2_f32.powf(16.0)
+        360.0 / 2_f32.powi(16)
     }
 }
 
