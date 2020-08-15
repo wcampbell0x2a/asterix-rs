@@ -66,7 +66,7 @@ fn it_works() {
         assert_eq!(flight_level_in_binary_repre.flight_level, 330);
 
         let aircraft_address = message.aircraft_address.as_ref().unwrap();
-        assert_eq!(aircraft_address.address, 0x3c660c);
+        assert_eq!(aircraft_address.address, 0x003c_660c);
 
         let aircraft_identification = message.aircraft_identification.as_ref().unwrap();
         assert_eq!(aircraft_identification.identification, "DLH65A ");
@@ -219,7 +219,7 @@ fn third_packet() {
         assert_eq!(flight_level_in_binary_repre.flight_level, 360);
 
         let aircraft_address = message.aircraft_address.as_ref().unwrap();
-        assert_eq!(aircraft_address.address, 0x4baacd);
+        assert_eq!(aircraft_address.address, 0x004b_aacd);
 
         let aircraft_identification = message.aircraft_identification.as_ref().unwrap();
         assert_eq!(aircraft_identification.identification, "THY9TX ");
