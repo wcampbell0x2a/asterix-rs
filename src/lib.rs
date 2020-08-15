@@ -107,14 +107,15 @@ pub struct TimeOfDay {
 impl TimeOfDay {
     const CTX: (deku::ctx::Endian, deku::ctx::BitSize) =
         (deku::ctx::Endian::Big, deku::ctx::BitSize(24_usize));
+    const MODIFIER: f32 = 128.0;
 
     fn read(rest: &BitSlice<Msb0, u8>) -> Result<(&BitSlice<Msb0, u8>, f32), DekuError> {
         let (rest, value) = u32::read(rest, Self::CTX)?;
-        Ok((rest, value as f32 / 128.0))
+        Ok((rest, value as f32 / Self::MODIFIER))
     }
 
     fn write(time: &f32) -> Result<BitVec<Msb0, u8>, DekuError> {
-        let value = (*time * 128.0) as u32;
+        let value = (*time * Self::MODIFIER) as u32;
         value.write(Self::CTX)
     }
 }
@@ -374,25 +375,33 @@ impl CalculatedTrackVelocity {
     const CTX: (deku::ctx::Endian, deku::ctx::BitSize) =
         (deku::ctx::Endian::Big, deku::ctx::BitSize(16_usize));
 
+    fn groundspeed_modifier() -> f32 {
+        2_f32.powf(-14.0)
+    }
+
     fn read_groundspeed(
         rest: &BitSlice<Msb0, u8>,
     ) -> Result<(&BitSlice<Msb0, u8>, f32), DekuError> {
         let (rest, value) = u16::read(rest, Self::CTX)?;
-        Ok((rest, f32::from(value) * 2_f32.powf(-14.0)))
+        Ok((rest, f32::from(value) * Self::groundspeed_modifier()))
     }
 
     fn write_groundspeed(groundspeed: &f32) -> Result<BitVec<Msb0, u8>, DekuError> {
-        let value = (*groundspeed / 2_f32.powf(-14.0)) as u16;
+        let value = (*groundspeed / Self::groundspeed_modifier()) as u16;
         value.write(Self::CTX)
+    }
+
+    fn heading_modifier() -> f32 {
+        360.0 / 2_f32.powf(16.0)
     }
 
     fn read_heading(rest: &BitSlice<Msb0, u8>) -> Result<(&BitSlice<Msb0, u8>, f32), DekuError> {
         let (rest, value) = u16::read(rest, Self::CTX)?;
-        Ok((rest, f32::from(value) * (360.0 / 2_f32.powf(16.0))))
+        Ok((rest, f32::from(value) * Self::heading_modifier()))
     }
 
     fn write_heading(heading: f32) -> Result<BitVec<Msb0, u8>, DekuError> {
-        let value = (heading / (360.0 / 2_f32.powf(16.0))) as u16;
+        let value = (heading / Self::heading_modifier()) as u16;
         value.write(Self::CTX)
     }
 }
@@ -482,54 +491,60 @@ impl RadarPlotCharacteristics {
     const CTX: (deku::ctx::Endian, deku::ctx::BitSize) =
         (deku::ctx::Endian::Big, deku::ctx::BitSize(8_usize));
 
+    fn runlength_modifier() -> f32 {
+        360.0 / 2_u16.pow(13) as f32
+    }
+
     fn runlength_reader(
         rest: &BitSlice<Msb0, u8>,
     ) -> Result<(&BitSlice<Msb0, u8>, Option<f32>), DekuError> {
         let (rest, value) = u8::read(rest, Self::CTX)?;
-        Ok((
-            rest,
-            Some(f32::from(value) * (360.0 / 2_u16.pow(13) as f32)),
-        ))
+        Ok((rest, Some(f32::from(value) * Self::runlength_modifier())))
     }
 
     fn runlength_writer(srl: &Option<f32>) -> Result<BitVec<Msb0, u8>, DekuError> {
         if let Some(srl) = srl {
-            let value = (*srl / (360.0 / 2_u16.pow(13) as f32)) as u16;
+            let value = (*srl / Self::runlength_modifier()) as u16;
             value.write(Self::CTX)
         } else {
             Ok(BitVec::new())
         }
+    }
+
+    fn nm_modifier() -> f32 {
+        1.0 / 256.0
     }
 
     fn nm_reader(
         rest: &BitSlice<Msb0, u8>,
     ) -> Result<(&BitSlice<Msb0, u8>, Option<f32>), DekuError> {
         let (rest, value) = u8::read(rest, Self::CTX)?;
-        Ok((rest, Some(f32::from(value) * (1.0 / 256.0))))
+        Ok((rest, Some(f32::from(value) * Self::nm_modifier())))
     }
 
     fn nm_writer(nm: &Option<f32>) -> Result<BitVec<Msb0, u8>, DekuError> {
         if let Some(nm) = nm {
-            let value = (*nm / (1.0 / 256.0)) as u16;
+            let value = (*nm / Self::nm_modifier()) as u16;
             value.write(Self::CTX)
         } else {
             Ok(BitVec::new())
         }
     }
 
+    fn apd_modifier() -> f32 {
+        360.0 / 2_u16.pow(14) as f32
+    }
+
     fn apd_reader(
         rest: &BitSlice<Msb0, u8>,
     ) -> Result<(&BitSlice<Msb0, u8>, Option<f32>), DekuError> {
         let (rest, value) = u8::read(rest, Self::CTX)?;
-        Ok((
-            rest,
-            Some(f32::from(value) * (360.0 / 2_u16.pow(14) as f32)),
-        ))
+        Ok((rest, Some(f32::from(value) * Self::apd_modifier())))
     }
 
     fn apd_writer(apd: &Option<f32>) -> Result<BitVec<Msb0, u8>, DekuError> {
         if let Some(apd) = apd {
-            let value = (*apd / (360.0 / 2_u16.pow(14) as f32)) as u16;
+            let value = (*apd / Self::apd_modifier()) as u16;
             value.write(Self::CTX)
         } else {
             Ok(BitVec::new())
