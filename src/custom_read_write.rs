@@ -9,7 +9,7 @@ pub enum Op {
 }
 
 pub mod read {
-    use super::*;
+    use super::{BitSlice, DekuError, DekuRead, Msb0, Op};
 
     /// Read in big-endian bits to u32, multiply by f32, return f32
     pub fn bits_to_f32(
@@ -59,7 +59,7 @@ pub mod read {
 }
 
 pub mod write {
-    use super::*;
+    use super::{BitVec, DekuError, DekuWrite, Msb0, Op};
 
     pub fn f32_u32(
         value: &f32,
