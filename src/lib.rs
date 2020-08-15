@@ -162,11 +162,6 @@ impl MeasuredPositionInPolarCoordinates {
         value.write(Self::CTX)
     }
 
-    fn read_theta(rest: &BitSlice<Msb0, u8>) -> Result<(&BitSlice<Msb0, u8>, f32), DekuError> {
-        let (rest, value) = u16::read(rest, Self::CTX)?;
-        Ok((rest, f32::from(value) * (360.0 / 65536.0)))
-    }
-
     fn write_theta(rho: &f32) -> Result<BitVec<Msb0, u8>, DekuError> {
         let value = (*rho / (360.0 / 65536.0)) as u16;
         value.write(Self::CTX)
