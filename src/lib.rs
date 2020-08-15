@@ -88,6 +88,7 @@ fn is_fspec(dataitem_fspec: u8, fspec: &[u8], pos: usize) -> bool {
     }
 }
 
+/// Data Item I048/010, Data Source Identifier
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct DataSourceIdentifier {
@@ -120,6 +121,7 @@ impl TimeOfDay {
     }
 }
 
+/// Data Item I048/020, Target Report Descriptor
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct TargetReportDescriptor {
@@ -131,6 +133,7 @@ pub struct TargetReportDescriptor {
     pub fx: FX,
 }
 
+/// Data Item I048/040, Measured Position in Polar Co-ordinates
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct MeasuredPositionInPolarCoordinates {
@@ -168,6 +171,7 @@ impl MeasuredPositionInPolarCoordinates {
     }
 }
 
+/// Data Item I048/070, Mode-3/A Code in Octal Representation.
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct Mode3ACodeInOctalRepresentation {
@@ -180,6 +184,7 @@ pub struct Mode3ACodeInOctalRepresentation {
     pub reply: u16,
 }
 
+/// Data Item I048/090, Flight Level in Binary Representation.
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct FlightLevelInBinaryRepresentation {
@@ -206,6 +211,7 @@ impl FlightLevelInBinaryRepresentation {
     }
 }
 
+/// Data Item I048/220, Aircraft Address
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct AircraftAddress {
@@ -213,6 +219,7 @@ pub struct AircraftAddress {
     pub address: u32,
 }
 
+/// Data Item I048/240, Aircraft Identification
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct AircraftIdentification {
@@ -304,6 +311,7 @@ impl AircraftIdentification {
     }
 }
 
+/// Data Item I048/250, Mode S MB Data
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct ModeSMBData {
@@ -323,6 +331,7 @@ pub struct MBData {
     pub data: Vec<u8>,
 }
 
+/// Data Item I048/161, Track Number
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct TrackNumber {
@@ -332,6 +341,7 @@ pub struct TrackNumber {
     pub number: u16,
 }
 
+/// Data Item I048/042, Calculated Position in Cartesian Co-ordinates
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct CalculatedPositionCartesianCorr {
@@ -356,6 +366,7 @@ impl CalculatedPositionCartesianCorr {
     }
 }
 
+/// Data Item I048/200, Calculated Track Velocity in Polar Co-ordinates.
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct CalculatedTrackVelocity {
@@ -406,6 +417,7 @@ impl CalculatedTrackVelocity {
     }
 }
 
+/// Data Item I048/170, Track Status
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct TrackStatus {
@@ -429,6 +441,7 @@ pub struct TrackStatus {
     pub fx2: Option<FX>,
 }
 
+/// Data Item I048/230, Communications/ACAS Capability and Flight Status.
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct CommunicationsCapabilityFlightStatus {
@@ -446,6 +459,7 @@ pub struct CommunicationsCapabilityFlightStatus {
     pub b1b: u8,
 }
 
+/// Data Item I048/130, Radar Plot Characteristics
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct RadarPlotCharacteristics {
