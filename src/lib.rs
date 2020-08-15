@@ -1,7 +1,10 @@
-mod types;
-
-pub use crate::types::*;
 use deku::prelude::*;
+
+mod types;
+pub use crate::types::*;
+
+mod custom_read_write;
+use custom_read_write::{read, Op};
 
 //TODO add Units for read/write
 
@@ -101,7 +104,10 @@ pub struct DataSourceIdentifier {
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct TimeOfDay {
-    #[deku(reader = "Self::read(rest)", writer = "Self::write(&self.time)")]
+    #[deku(
+        reader = "read::bits_to_f32(rest, 24, Self::MODIFIER, Op::Divide)",
+        writer = "Self::write(&self.time)"
+    )]
     pub time: f32,
 }
 
@@ -109,11 +115,6 @@ impl TimeOfDay {
     const CTX: (deku::ctx::Endian, deku::ctx::BitSize) =
         (deku::ctx::Endian::Big, deku::ctx::BitSize(24_usize));
     const MODIFIER: f32 = 128.0;
-
-    fn read(rest: &BitSlice<Msb0, u8>) -> Result<(&BitSlice<Msb0, u8>, f32), DekuError> {
-        let (rest, value) = u32::read(rest, Self::CTX)?;
-        Ok((rest, value as f32 / Self::MODIFIER))
-    }
 
     fn write(time: &f32) -> Result<BitVec<Msb0, u8>, DekuError> {
         let value = (*time * Self::MODIFIER) as u32;
@@ -137,10 +138,13 @@ pub struct TargetReportDescriptor {
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct MeasuredPositionInPolarCoordinates {
-    #[deku(reader = "Self::read_rho(rest)", writer = "Self::write_rho(&self.rho)")]
+    #[deku(
+        reader = "read::bits_to_f32(rest, 16, Self::RHO_MODIFIER, Op::Multiply)",
+        writer = "Self::write_rho(&self.rho)"
+    )]
     pub rho: f32,
     #[deku(
-        reader = "Self::read_theta(rest)",
+        reader = "read::bits_to_f32(rest, 16, Self::THETA_MODIFIER, Op::Multiply)",
         writer = "Self::write_theta(&self.theta)"
     )]
     pub theta: f32,
@@ -150,10 +154,8 @@ impl MeasuredPositionInPolarCoordinates {
     const CTX: (deku::ctx::Endian, deku::ctx::BitSize) =
         (deku::ctx::Endian::Big, deku::ctx::BitSize(16_usize));
 
-    fn read_rho(rest: &BitSlice<Msb0, u8>) -> Result<(&BitSlice<Msb0, u8>, f32), DekuError> {
-        let (rest, value) = u16::read(rest, Self::CTX)?;
-        Ok((rest, f32::from(value) * (1.0 / 256.0)))
-    }
+    const RHO_MODIFIER: f32 = 1.0 / 256.0;
+    const THETA_MODIFIER: f32 = 360.0 / 65536.0;
 
     fn write_rho(rho: &f32) -> Result<BitVec<Msb0, u8>, DekuError> {
         let value = (*rho / (1.0 / 256.0)) as u16;
@@ -345,20 +347,22 @@ pub struct TrackNumber {
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct CalculatedPositionCartesianCorr {
-    #[deku(reader = "Self::read(rest)", writer = "Self::write(&self.x)")]
+    #[deku(
+        reader = "read::bits_i16_to_f32(rest, 16, Self::MODIFIER, Op::Multiply)",
+        writer = "Self::write(&self.x)"
+    )]
     pub x: f32,
-    #[deku(reader = "Self::read(rest)", writer = "Self::write(&self.y)")]
+    #[deku(
+        reader = "read::bits_i16_to_f32(rest, 16, Self::MODIFIER, Op::Multiply)",
+        writer = "Self::write(&self.y)"
+    )]
     pub y: f32,
 }
 
 impl CalculatedPositionCartesianCorr {
     const CTX: (deku::ctx::Endian, deku::ctx::BitSize) =
         (deku::ctx::Endian::Big, deku::ctx::BitSize(16_usize));
-
-    fn read(rest: &BitSlice<Msb0, u8>) -> Result<(&BitSlice<Msb0, u8>, f32), DekuError> {
-        let (rest, value) = i16::read(rest, Self::CTX)?;
-        Ok((rest, f32::from(value) * (1.0 / 128.0)))
-    }
+    const MODIFIER: f32 = 1.0 / 128.0;
 
     fn write(val: &f32) -> Result<BitVec<Msb0, u8>, DekuError> {
         let value = (*val / (1.0 / 128.0)) as i16;
@@ -371,7 +375,7 @@ impl CalculatedPositionCartesianCorr {
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct CalculatedTrackVelocity {
     #[deku(
-        reader = "Self::read_groundspeed(rest)",
+        reader = "read::bits_to_f32(rest, 16, Self::groundspeed_modifier(), Op::Multiply)",
         writer = "Self::write_groundspeed(&self.groundspeed)"
     )]
     pub groundspeed: f32,
@@ -468,7 +472,7 @@ pub struct RadarPlotCharacteristics {
     #[deku(
         skip,
         cond = "is_fspec(0b1000_0000, fspec, 0)",
-        reader = "Self::runlength_reader(rest)",
+        reader = "read::bits_to_optionf32(rest, 8, Self::runlength_modifier(), Op::Multiply)",
         writer = "Self::runlength_writer(&self.srl)"
     )]
     pub srl: Option<f32>,
@@ -479,7 +483,7 @@ pub struct RadarPlotCharacteristics {
     #[deku(
         skip,
         cond = "is_fspec(0b1_0000, fspec, 0)",
-        reader = "Self::runlength_reader(rest)",
+        reader = "read::bits_to_optionf32(rest, 8, Self::runlength_modifier(), Op::Multiply)",
         writer = "Self::runlength_writer(&self.prl)"
     )]
     pub prl: Option<f32>,
@@ -488,14 +492,14 @@ pub struct RadarPlotCharacteristics {
     #[deku(
         skip,
         cond = "is_fspec(0b100, fspec, 0)",
-        reader = "Self::nm_reader(rest)",
+        reader = "read::bits_to_optionf32(rest, 8, Self::nm_modifier(), Op::Multiply)",
         writer = "Self::nm_writer(&self.rpd)"
     )]
     pub rpd: Option<f32>,
     #[deku(
         skip,
         cond = "is_fspec(0b100, fspec, 0)",
-        reader = "Self::apd_reader(rest)",
+        reader = "read::bits_to_optionf32(rest, 8, Self::apd_modifier(), Op::Multiply)",
         writer = "Self::apd_writer(&self.apd)"
     )]
     pub apd: Option<f32>,
@@ -507,13 +511,6 @@ impl RadarPlotCharacteristics {
 
     fn runlength_modifier() -> f32 {
         360.0 / 2_u16.pow(13) as f32
-    }
-
-    fn runlength_reader(
-        rest: &BitSlice<Msb0, u8>,
-    ) -> Result<(&BitSlice<Msb0, u8>, Option<f32>), DekuError> {
-        let (rest, value) = u8::read(rest, Self::CTX)?;
-        Ok((rest, Some(f32::from(value) * Self::runlength_modifier())))
     }
 
     fn runlength_writer(srl: &Option<f32>) -> Result<BitVec<Msb0, u8>, DekuError> {
@@ -529,13 +526,6 @@ impl RadarPlotCharacteristics {
         1.0 / 256.0
     }
 
-    fn nm_reader(
-        rest: &BitSlice<Msb0, u8>,
-    ) -> Result<(&BitSlice<Msb0, u8>, Option<f32>), DekuError> {
-        let (rest, value) = u8::read(rest, Self::CTX)?;
-        Ok((rest, Some(f32::from(value) * Self::nm_modifier())))
-    }
-
     fn nm_writer(nm: &Option<f32>) -> Result<BitVec<Msb0, u8>, DekuError> {
         if let Some(nm) = nm {
             let value = (*nm / Self::nm_modifier()) as u16;
@@ -547,13 +537,6 @@ impl RadarPlotCharacteristics {
 
     fn apd_modifier() -> f32 {
         360.0 / 2_u16.pow(14) as f32
-    }
-
-    fn apd_reader(
-        rest: &BitSlice<Msb0, u8>,
-    ) -> Result<(&BitSlice<Msb0, u8>, Option<f32>), DekuError> {
-        let (rest, value) = u8::read(rest, Self::CTX)?;
-        Ok((rest, Some(f32::from(value) * Self::apd_modifier())))
     }
 
     fn apd_writer(apd: &Option<f32>) -> Result<BitVec<Msb0, u8>, DekuError> {
