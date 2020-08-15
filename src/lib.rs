@@ -450,7 +450,7 @@ pub struct RadarPlotCharacteristics {
 
 impl RadarPlotCharacteristics {
     fn runlength_modifier() -> f32 {
-        360.0 / 2_u16.pow(13) as f32
+        360.0 / f32::from(2_u16.pow(13))
     }
 
     fn nm_modifier() -> f32 {
@@ -458,6 +458,6 @@ impl RadarPlotCharacteristics {
     }
 
     fn apd_modifier() -> f32 {
-        360.0 / 2_u16.pow(14) as f32
+        360.0 / f32::from(2_u16.pow(14))
     }
 }

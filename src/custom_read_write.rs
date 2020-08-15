@@ -30,7 +30,7 @@ pub mod read {
         modifier_op: Op,
     ) -> Result<(&BitSlice<Msb0, u8>, f32), DekuError> {
         let (rest, value) = i16::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(bits)))?;
-        op(rest, value as f32, modifier, modifier_op)
+        op(rest, f32::from(value), modifier, modifier_op)
     }
 
     fn op(
