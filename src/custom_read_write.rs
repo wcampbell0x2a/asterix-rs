@@ -54,6 +54,55 @@ pub mod read {
         modifier: f32,
         modifier_op: Op,
     ) -> Result<(&BitSlice<Msb0, u8>, Option<f32>), DekuError> {
-        bits_to_f32(rest, bits, modifier, modifier_op).map(|(rest, f32)| (rest, Some(f32)))
+        bits_to_f32(rest, bits, modifier, modifier_op).map(|(rest, f)| (rest, Some(f)))
+    }
+}
+
+pub mod write {
+    use super::*;
+
+    pub fn f32_u32(
+        value: &f32,
+        bits: usize,
+        modifier: f32,
+        modifier_op: Op,
+    ) -> Result<BitVec<Msb0, u8>, DekuError> {
+        let value = match modifier_op {
+            Op::Multiply => *value * modifier,
+            Op::Divide => *value / modifier,
+            Op::Add => *value + modifier,
+            Op::Subtract => *value - modifier,
+        };
+        let value = value as u32;
+        value.write((deku::ctx::Endian::Big, deku::ctx::BitSize(bits)))
+    }
+
+    pub fn f32_optionu32(
+        value: &Option<f32>,
+        bits: usize,
+        modifier: f32,
+        modifier_op: Op,
+    ) -> Result<BitVec<Msb0, u8>, DekuError> {
+        if let Some(value) = value {
+            f32_u32(value, bits, modifier, modifier_op)
+        } else {
+            Ok(BitVec::new())
+        }
+    }
+
+    pub fn f32_i32(
+        value: &f32,
+        bits: usize,
+        modifier: f32,
+        modifier_op: Op,
+    ) -> Result<BitVec<Msb0, u8>, DekuError> {
+        let value = match modifier_op {
+            Op::Multiply => *value * modifier,
+            Op::Divide => *value / modifier,
+            Op::Add => *value + modifier,
+            Op::Subtract => *value - modifier,
+        };
+        let value = value as i32;
+        value.write((deku::ctx::Endian::Big, deku::ctx::BitSize(bits)))
     }
 }

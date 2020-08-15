@@ -4,7 +4,7 @@ mod types;
 pub use crate::types::*;
 
 mod custom_read_write;
-use custom_read_write::{read, Op};
+use custom_read_write::{read, write, Op};
 
 //TODO add Units for read/write
 
@@ -106,20 +106,13 @@ pub struct DataSourceIdentifier {
 pub struct TimeOfDay {
     #[deku(
         reader = "read::bits_to_f32(rest, 24, Self::MODIFIER, Op::Divide)",
-        writer = "Self::write(&self.time)"
+        writer = "write::f32_u32(&self.time, 24, Self::MODIFIER, Op::Multiply)"
     )]
     pub time: f32,
 }
 
 impl TimeOfDay {
-    const CTX: (deku::ctx::Endian, deku::ctx::BitSize) =
-        (deku::ctx::Endian::Big, deku::ctx::BitSize(24_usize));
     const MODIFIER: f32 = 128.0;
-
-    fn write(time: &f32) -> Result<BitVec<Msb0, u8>, DekuError> {
-        let value = (*time * Self::MODIFIER) as u32;
-        value.write(Self::CTX)
-    }
 }
 
 /// Data Item I048/020, Target Report Descriptor
@@ -140,32 +133,19 @@ pub struct TargetReportDescriptor {
 pub struct MeasuredPositionInPolarCoordinates {
     #[deku(
         reader = "read::bits_to_f32(rest, 16, Self::RHO_MODIFIER, Op::Multiply)",
-        writer = "Self::write_rho(&self.rho)"
+        writer = "write::f32_u32(&self.rho, 16, Self::RHO_MODIFIER, Op::Divide)"
     )]
     pub rho: f32,
     #[deku(
         reader = "read::bits_to_f32(rest, 16, Self::THETA_MODIFIER, Op::Multiply)",
-        writer = "Self::write_theta(&self.theta)"
+        writer = "write::f32_u32(&self.theta, 16, Self::THETA_MODIFIER, Op::Divide)"
     )]
     pub theta: f32,
 }
 
 impl MeasuredPositionInPolarCoordinates {
-    const CTX: (deku::ctx::Endian, deku::ctx::BitSize) =
-        (deku::ctx::Endian::Big, deku::ctx::BitSize(16_usize));
-
     const RHO_MODIFIER: f32 = 1.0 / 256.0;
     const THETA_MODIFIER: f32 = 360.0 / 65536.0;
-
-    fn write_rho(rho: &f32) -> Result<BitVec<Msb0, u8>, DekuError> {
-        let value = (*rho / (1.0 / 256.0)) as u16;
-        value.write(Self::CTX)
-    }
-
-    fn write_theta(rho: &f32) -> Result<BitVec<Msb0, u8>, DekuError> {
-        let value = (*rho / (360.0 / 65536.0)) as u16;
-        value.write(Self::CTX)
-    }
 }
 
 /// Data Item I048/070, Mode-3/A Code in Octal Representation.
@@ -344,25 +324,18 @@ pub struct TrackNumber {
 pub struct CalculatedPositionCartesianCorr {
     #[deku(
         reader = "read::bits_i16_to_f32(rest, 16, Self::MODIFIER, Op::Multiply)",
-        writer = "Self::write(&self.x)"
+        writer = "write::f32_i32(&self.x, 16, Self::MODIFIER, Op::Divide)"
     )]
     pub x: f32,
     #[deku(
         reader = "read::bits_i16_to_f32(rest, 16, Self::MODIFIER, Op::Multiply)",
-        writer = "Self::write(&self.y)"
+        writer = "write::f32_i32(&self.y, 16, Self::MODIFIER, Op::Divide)"
     )]
     pub y: f32,
 }
 
 impl CalculatedPositionCartesianCorr {
-    const CTX: (deku::ctx::Endian, deku::ctx::BitSize) =
-        (deku::ctx::Endian::Big, deku::ctx::BitSize(16_usize));
     const MODIFIER: f32 = 1.0 / 128.0;
-
-    fn write(val: &f32) -> Result<BitVec<Msb0, u8>, DekuError> {
-        let value = (*val / (1.0 / 128.0)) as i16;
-        value.write(Self::CTX)
-    }
 }
 
 /// Data Item I048/200, Calculated Track Velocity in Polar Co-ordinates.
@@ -371,48 +344,23 @@ impl CalculatedPositionCartesianCorr {
 pub struct CalculatedTrackVelocity {
     #[deku(
         reader = "read::bits_to_f32(rest, 16, Self::groundspeed_modifier(), Op::Multiply)",
-        writer = "Self::write_groundspeed(&self.groundspeed)"
+        writer = "write::f32_u32(&self.groundspeed, 16, Self::groundspeed_modifier(), Op::Divide)"
     )]
     pub groundspeed: f32,
     #[deku(
-        reader = "Self::read_heading(rest)",
-        writer = "Self::write_heading(self.heading)"
+        reader = "read::bits_to_f32(rest, 16, Self::heading_modifier(), Op::Multiply)",
+        writer = "write::f32_u32(&self.heading, 16, Self::heading_modifier(), Op::Divide)"
     )]
     pub heading: f32,
 }
 
 impl CalculatedTrackVelocity {
-    const CTX: (deku::ctx::Endian, deku::ctx::BitSize) =
-        (deku::ctx::Endian::Big, deku::ctx::BitSize(16_usize));
-
     fn groundspeed_modifier() -> f32 {
         2_f32.powf(-14.0)
     }
 
-    fn read_groundspeed(
-        rest: &BitSlice<Msb0, u8>,
-    ) -> Result<(&BitSlice<Msb0, u8>, f32), DekuError> {
-        let (rest, value) = u16::read(rest, Self::CTX)?;
-        Ok((rest, f32::from(value) * Self::groundspeed_modifier()))
-    }
-
-    fn write_groundspeed(groundspeed: &f32) -> Result<BitVec<Msb0, u8>, DekuError> {
-        let value = (*groundspeed / Self::groundspeed_modifier()) as u16;
-        value.write(Self::CTX)
-    }
-
     fn heading_modifier() -> f32 {
         360.0 / 2_f32.powf(16.0)
-    }
-
-    fn read_heading(rest: &BitSlice<Msb0, u8>) -> Result<(&BitSlice<Msb0, u8>, f32), DekuError> {
-        let (rest, value) = u16::read(rest, Self::CTX)?;
-        Ok((rest, f32::from(value) * Self::heading_modifier()))
-    }
-
-    fn write_heading(heading: f32) -> Result<BitVec<Msb0, u8>, DekuError> {
-        let value = (heading / Self::heading_modifier()) as u16;
-        value.write(Self::CTX)
     }
 }
 
@@ -468,7 +416,7 @@ pub struct RadarPlotCharacteristics {
         skip,
         cond = "is_fspec(0b1000_0000, fspec, 0)",
         reader = "read::bits_to_optionf32(rest, 8, Self::runlength_modifier(), Op::Multiply)",
-        writer = "Self::runlength_writer(&self.srl)"
+        writer = "write::f32_optionu32(&self.srl, 8, Self::runlength_modifier(), Op::Divide)"
     )]
     pub srl: Option<f32>,
     #[deku(skip, cond = "is_fspec(0b100_0000, fspec, 0)", bytes = "1")]
@@ -479,7 +427,7 @@ pub struct RadarPlotCharacteristics {
         skip,
         cond = "is_fspec(0b1_0000, fspec, 0)",
         reader = "read::bits_to_optionf32(rest, 8, Self::runlength_modifier(), Op::Multiply)",
-        writer = "Self::runlength_writer(&self.prl)"
+        writer = "write::f32_optionu32(&self.prl, 8, Self::runlength_modifier(), Op::Divide)"
     )]
     pub prl: Option<f32>,
     #[deku(skip, cond = "is_fspec(0b1000, fspec, 0)", bytes = "1")]
@@ -488,58 +436,28 @@ pub struct RadarPlotCharacteristics {
         skip,
         cond = "is_fspec(0b100, fspec, 0)",
         reader = "read::bits_to_optionf32(rest, 8, Self::nm_modifier(), Op::Multiply)",
-        writer = "Self::nm_writer(&self.rpd)"
+        writer = "write::f32_optionu32(&self.rpd, 8, Self::nm_modifier(), Op::Divide)"
     )]
     pub rpd: Option<f32>,
     #[deku(
         skip,
         cond = "is_fspec(0b100, fspec, 0)",
         reader = "read::bits_to_optionf32(rest, 8, Self::apd_modifier(), Op::Multiply)",
-        writer = "Self::apd_writer(&self.apd)"
+        writer = "write::f32_optionu32(&self.apd, 8, Self::apd_modifier(), Op::Divide)"
     )]
     pub apd: Option<f32>,
 }
 
 impl RadarPlotCharacteristics {
-    const CTX: (deku::ctx::Endian, deku::ctx::BitSize) =
-        (deku::ctx::Endian::Big, deku::ctx::BitSize(8_usize));
-
     fn runlength_modifier() -> f32 {
         360.0 / 2_u16.pow(13) as f32
-    }
-
-    fn runlength_writer(srl: &Option<f32>) -> Result<BitVec<Msb0, u8>, DekuError> {
-        if let Some(srl) = srl {
-            let value = (*srl / Self::runlength_modifier()) as u16;
-            value.write(Self::CTX)
-        } else {
-            Ok(BitVec::new())
-        }
     }
 
     fn nm_modifier() -> f32 {
         1.0 / 256.0
     }
 
-    fn nm_writer(nm: &Option<f32>) -> Result<BitVec<Msb0, u8>, DekuError> {
-        if let Some(nm) = nm {
-            let value = (*nm / Self::nm_modifier()) as u16;
-            value.write(Self::CTX)
-        } else {
-            Ok(BitVec::new())
-        }
-    }
-
     fn apd_modifier() -> f32 {
         360.0 / 2_u16.pow(14) as f32
-    }
-
-    fn apd_writer(apd: &Option<f32>) -> Result<BitVec<Msb0, u8>, DekuError> {
-        if let Some(apd) = apd {
-            let value = (*apd / Self::apd_modifier()) as u16;
-            value.write(Self::CTX)
-        } else {
-            Ok(BitVec::new())
-        }
     }
 }
