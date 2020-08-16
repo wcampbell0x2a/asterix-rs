@@ -8,6 +8,9 @@ mod custom_read_write;
 mod fourty_eight;
 use fourty_eight::Cat48;
 
+mod thirty_four;
+use thirty_four::Cat34;
+
 pub mod data_item;
 mod fspec;
 
@@ -28,4 +31,6 @@ pub struct AsterixPacket {
 pub enum AsterixMessage {
     #[deku(id = "48")]
     Cat48(Cat48),
+    #[deku(id = "34")]
+    Cat34(Cat34),
 }

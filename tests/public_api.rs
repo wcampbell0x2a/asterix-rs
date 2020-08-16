@@ -1,7 +1,7 @@
 use asterix_deku::data_item::MBData;
 use asterix_deku::types::{
-    AIC, ARC, CDM, CNF, COM, DOU, FX, G, GHO, L, MAH, MSSC, RAB, RAD, RDP, SI, SIM, SPI, STAT, SUP,
-    TCC, TRE, TYP, V,
+    AIC, ARC, CDM, CNF, COM, DOU, FX, G, GHO, L, MAH, MSSC, MTYPE, RAB, RAD, RDP, SI, SIM, SPI,
+    STAT, SUP, TCC, TRE, TYP, V,
 };
 use asterix_deku::{AsterixMessage, AsterixPacket};
 use deku::DekuContainerRead;
@@ -284,6 +284,38 @@ fn third_packet() {
         assert_eq!(communications_capability_flight_status.b1b, 5);
     } else {
         unreachable!("Message is not CAT48");
+    }
+    assert_eq!(packet.to_bytes(), Ok(bytes));
+}
+
+#[test]
+fn test_34() {
+    let bytes = vec![
+        0x22, 0x00, 0x0b, 0xf0, 0x19, 0x0d, 0x02, 0x35, 0x6d, 0xfa, 0x60,
+    ];
+    let (_, packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
+
+    assert_eq!(packet.category, 34);
+    assert_eq!(packet.length, 11);
+
+    // TODO check NONE values after more are implemented
+    if let AsterixMessage::Cat34(ref message) = packet.message {
+        assert_eq!(message.fspec, &[0xf0]);
+
+        let data_source_identifier = message.data_source_identifier.as_ref().unwrap();
+        assert_eq!(data_source_identifier.sac, 25);
+        assert_eq!(data_source_identifier.sic, 13);
+
+        let message_type = message.message_type.as_ref().unwrap();
+        assert_eq!(message_type.t, MTYPE::SectorCrossing);
+
+        let time_of_day = message.time_of_day.as_ref().unwrap();
+        assert_eq!(time_of_day.time, 27355.953);
+
+        let sector_number = message.sector_number.as_ref().unwrap();
+        assert_eq!(sector_number.num, 135);
+    } else {
+        unreachable!("Not Cat 34");
     }
     assert_eq!(packet.to_bytes(), Ok(bytes));
 }

@@ -1,8 +1,8 @@
 use crate::custom_read_write::{read, write, Op};
 use crate::fspec::{is_fspec, read_fspec};
 use crate::types::{
-    AIC, ARC, CDM, CNF, COM, DOU, FX, G, GHO, L, MAH, MSSC, RAB, RAD, RDP, SI, SIM, SPI, STAT, SUP,
-    TCC, TRE, TYP, V,
+    AIC, ARC, CDM, CNF, COM, DOU, FX, G, GHO, L, MAH, MSSC, MTYPE, RAB, RAD, RDP, SI, SIM, SPI,
+    STAT, SUP, TCC, TRE, TYP, V,
 };
 use deku::prelude::*;
 
@@ -97,6 +97,7 @@ impl FlightLevelInBinaryRepresentation {
         let (rest, value) = u16::read(rest, Self::CTX)?;
         Ok((rest, value / 4))
     }
+
     fn write(flight_level: &u16) -> Result<BitVec<Msb0, u8>, DekuError> {
         let value = *flight_level * 4;
         value.write(Self::CTX)
@@ -384,5 +385,39 @@ impl RadarPlotCharacteristics {
 
     fn apd_modifier() -> f32 {
         360.0 / f32::from(2_u16.pow(14))
+    }
+}
+
+/// Data Item I034/000, Message Type
+#[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+#[deku(ctx = "_: deku::ctx::Endian")]
+pub struct MessageType {
+    pub t: MTYPE,
+}
+
+/// Data Item I034/020, Sector Number
+#[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+#[deku(ctx = "_: deku::ctx::Endian")]
+pub struct SectorNumber {
+    #[deku(reader = "Self::read(rest)", writer = "Self::write(&self.num)")]
+    pub num: u16,
+}
+
+impl SectorNumber {
+    const CTX: (deku::ctx::Endian, deku::ctx::BitSize) =
+        (deku::ctx::Endian::Big, deku::ctx::BitSize(8_usize));
+
+    fn modifier() -> f32 {
+        360.0 / 2_f32.powi(8)
+    }
+
+    fn read(rest: &BitSlice<Msb0, u8>) -> Result<(&BitSlice<Msb0, u8>, u16), DekuError> {
+        let (rest, value) = u16::read(rest, Self::CTX)?;
+        Ok((rest, (value as f32 * Self::modifier()) as u16))
+    }
+
+    fn write(num: &u16) -> Result<BitVec<Msb0, u8>, DekuError> {
+        let value = (*num as f32 / Self::modifier()) as u8;
+        value.write(Self::CTX)
     }
 }

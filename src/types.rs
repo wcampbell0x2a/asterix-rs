@@ -255,3 +255,16 @@ pub enum AIC {
     #[deku(id = "0x01")]
     Yes,
 }
+
+#[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+#[deku(id_type = "u8", id_bits = "8")]
+pub enum MTYPE {
+    #[deku(id = "0x01")]
+    NorthMarker,
+    #[deku(id = "0x02")]
+    SectorCrossing,
+    #[deku(id = "0x03")]
+    GeographicaFiltering,
+    #[deku(id = "0x04")]
+    JammingStrobe,
+}
