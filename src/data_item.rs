@@ -413,11 +413,11 @@ impl SectorNumber {
 
     fn read(rest: &BitSlice<Msb0, u8>) -> Result<(&BitSlice<Msb0, u8>, u16), DekuError> {
         let (rest, value) = u16::read(rest, Self::CTX)?;
-        Ok((rest, (value as f32 * Self::modifier()) as u16))
+        Ok((rest, (f32::from(value) * Self::modifier()) as u16))
     }
 
     fn write(num: &u16) -> Result<BitVec<Msb0, u8>, DekuError> {
-        let value = (*num as f32 / Self::modifier()) as u8;
+        let value = (f32::from(*num) / Self::modifier()) as u8;
         value.write(Self::CTX)
     }
 }
