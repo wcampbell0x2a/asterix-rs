@@ -9,8 +9,8 @@ use custom_read_write::{read, write, Op};
 mod fourty_eight;
 use fourty_eight::Cat48;
 
-mod fspec;
 pub mod data_item;
+mod fspec;
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(endian = "big")]
@@ -30,4 +30,3 @@ pub enum AsterixMessage {
     #[deku(id = "48")]
     Cat48(Cat48),
 }
-

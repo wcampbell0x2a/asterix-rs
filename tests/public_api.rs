@@ -1,6 +1,6 @@
-use asterix_deku::{AsterixMessage, AsterixPacket};
 use asterix_deku::data_item::*;
 use asterix_deku::types::*;
+use asterix_deku::{AsterixMessage, AsterixPacket};
 use deku::DekuContainerRead;
 use deku::DekuContainerWrite;
 

@@ -1,8 +1,8 @@
 use deku::prelude::*;
 
-use crate::fspec::{read_fspec, is_fspec};
-use crate::data_item::*;
 use crate::custom_read_write::{read, write, Op};
+use crate::data_item::*;
+use crate::fspec::{is_fspec, read_fspec};
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(endian = "big")]

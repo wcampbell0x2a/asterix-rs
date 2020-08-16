@@ -26,4 +26,3 @@ pub fn is_fspec(dataitem_fspec: u8, fspec: &[u8], pos: usize) -> bool {
         true
     }
 }
-

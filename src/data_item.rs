@@ -1,7 +1,7 @@
-use deku::prelude::*;
-use crate::fspec::{read_fspec, is_fspec};
-use crate::types::*;
 use crate::custom_read_write::{read, write, Op};
+use crate::fspec::{is_fspec, read_fspec};
+use crate::types::*;
+use deku::prelude::*;
 
 /// Data Item I048/010, Data Source Identifier
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
