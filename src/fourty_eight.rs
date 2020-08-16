@@ -1,7 +1,7 @@
 use deku::prelude::*;
 
-use crate::custom_read_write::{read, write, Op};
-use crate::data_item::*;
+
+use crate::data_item::{AircraftAddress, AircraftIdentification, CalculatedPositionCartesianCorr, CalculatedTrackVelocity, CommunicationsCapabilityFlightStatus, DataSourceIdentifier, FlightLevelInBinaryRepresentation, MeasuredPositionInPolarCoordinates, Mode3ACodeInOctalRepresentation, ModeSMBData, RadarPlotCharacteristics, TargetReportDescriptor, TimeOfDay, TrackNumber, TrackStatus};
 use crate::fspec::{is_fspec, read_fspec};
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
