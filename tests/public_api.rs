@@ -1,7 +1,6 @@
-use asterix_deku::{
-    AsterixMessage, AsterixPacket, MBData, AIC, ARC, CDM, CNF, COM, DOU, FX, G, GHO, L, MAH, MSSC,
-    RAB, RAD, RDP, SI, SIM, SPI, STAT, SUP, TCC, TRE, TYP, V,
-};
+use asterix_deku::{AsterixMessage, AsterixPacket};
+use asterix_deku::data_item::*;
+use asterix_deku::types::*;
 use deku::DekuContainerRead;
 use deku::DekuContainerWrite;
 
