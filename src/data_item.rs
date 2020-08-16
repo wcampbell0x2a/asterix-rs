@@ -1,6 +1,9 @@
 use crate::custom_read_write::{read, write, Op};
 use crate::fspec::{is_fspec, read_fspec};
-use crate::types::{AIC, ARC, CDM, CNF, COM, DOU, FX, G, GHO, L, MAH, MSSC, RAB, RAD, RDP, SI, SIM, SPI, STAT, SUP, TCC, TRE, TYP, V};
+use crate::types::{
+    AIC, ARC, CDM, CNF, COM, DOU, FX, G, GHO, L, MAH, MSSC, RAB, RAD, RDP, SI, SIM, SPI, STAT, SUP,
+    TCC, TRE, TYP, V,
+};
 use deku::prelude::*;
 
 /// Data Item I048/010, Data Source Identifier

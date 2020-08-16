@@ -5,7 +5,6 @@ pub use crate::types::*;
 
 mod custom_read_write;
 
-
 mod fourty_eight;
 use fourty_eight::Cat48;
 
