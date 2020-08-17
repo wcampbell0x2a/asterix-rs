@@ -3,6 +3,10 @@ name = "asterix"
 version = "0.1.0"
 authors = ["wcampbell"]
 edition = "2018"
+categories = ["encoding", "parsing"]
+keywords = ["asterix", "radar", "aviation", "network", "protocol"]
+license = "MIT"
+readme = "README.md"
 
 [dependencies]
 deku = "0.7.1"
