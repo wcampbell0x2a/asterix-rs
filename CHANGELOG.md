@@ -6,5 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1] - 2020-08-16
+-  Add License file (MIT) and prepare Cargo.toml file for release
+
 ## [0.1.0] - 2020-08-16
 -  Initial Release for most of CAT048 and CAT034
