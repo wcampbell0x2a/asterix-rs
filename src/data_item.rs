@@ -1,3 +1,5 @@
+//! Defined Data Items that are used for formal parsing of data structs in categories
+
 use crate::custom_read_write::{read, write, Op};
 use crate::fspec::{is_fspec, read_fspec};
 use crate::types::{

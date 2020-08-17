@@ -1,3 +1,5 @@
+//! Encode/Decode the ASTERIX protocol
+
 use deku::prelude::*;
 
 pub mod types;
@@ -70,6 +72,7 @@ impl AsterixPacket {
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(id = "category", ctx = "_: deku::ctx::Endian, category: u8")]
+/// Union of Asterix categories
 pub enum AsterixMessage {
     #[deku(id = "48")]
     Cat48(Cat48),

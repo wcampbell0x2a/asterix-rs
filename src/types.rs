@@ -1,3 +1,5 @@
+//! Enums used for providing common meaning for bits in a `data_item`
+
 use deku::prelude::*;
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
