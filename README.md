@@ -1,4 +1,4 @@
-# Asterix Encode/Decoder Library
+# Asterix Encode/Decode Library
 
 Currently supported:
 - Most of CAT048
