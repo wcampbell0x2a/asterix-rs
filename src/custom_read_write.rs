@@ -1,6 +1,7 @@
 /// Several helpers for deku reading of certain types into certain types
 use deku::prelude::*;
 
+#[allow(dead_code)]
 pub enum Op {
     Multiply,
     Divide,
