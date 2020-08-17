@@ -1,4 +1,4 @@
-//! Encode/Decode the ASTERIX protocol
+//! Encode/Decode for ASTERIX protocol using the deku library
 
 use deku::prelude::*;
 
