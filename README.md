@@ -2,7 +2,7 @@
 
 Currently supported:
 - Most of CAT048
-- Most of CAT032
+- Most of CAT034
 
 # Usage
 
