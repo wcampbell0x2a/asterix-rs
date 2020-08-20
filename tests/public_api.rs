@@ -21,7 +21,7 @@ fn it_works() {
     assert_eq!(packet.length, 48);
 
     // TODO check NONE values after more are implemented
-    if let AsterixMessage::Cat48(ref message) = packet.messages[0] {
+    if let AsterixMessage::Cat48(ref mut message) = packet.messages[0] {
         assert_eq!(message.fspec, &[0xfd, 0xf7, 0x02]);
 
         let data_source_identifier = message.data_source_identifier.as_ref().unwrap();

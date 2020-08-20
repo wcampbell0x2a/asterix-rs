@@ -18,6 +18,10 @@ pub struct DataSourceIdentifier {
     pub sic: u8,
 }
 
+impl DataSourceIdentifier {
+    pub const FSPEC: u8 = 0b1000_0000;
+}
+
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct TimeOfDay {
@@ -29,6 +33,7 @@ pub struct TimeOfDay {
 }
 
 impl TimeOfDay {
+    pub const FSPEC: u8 = 0b100_0000;
     const MODIFIER: f32 = 128.0;
 }
 
@@ -42,6 +47,10 @@ pub struct TargetReportDescriptor {
     pub spi: SPI,
     pub rab: RAB,
     pub fx: FX,
+}
+
+impl TargetReportDescriptor {
+    pub const FSPEC: u8 = 0b10_0000;
 }
 
 /// Data Item I048/040, Measured Position in Polar Co-ordinates
@@ -61,6 +70,7 @@ pub struct MeasuredPositionInPolarCoordinates {
 }
 
 impl MeasuredPositionInPolarCoordinates {
+    pub const FSPEC: u8 = 0b1_0000;
     const RHO_MODIFIER: f32 = 1.0 / 256.0;
     const THETA_MODIFIER: f32 = 360.0 / 65536.0;
 }
@@ -78,6 +88,10 @@ pub struct Mode3ACodeInOctalRepresentation {
     pub reply: u16,
 }
 
+impl Mode3ACodeInOctalRepresentation {
+    pub const FSPEC: u8 = 0b1000;
+}
+
 /// Data Item I048/090, Flight Level in Binary Representation.
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
@@ -92,6 +106,7 @@ pub struct FlightLevelInBinaryRepresentation {
 }
 
 impl FlightLevelInBinaryRepresentation {
+    pub const FSPEC: u8 = 0b100;
     const CTX: (deku::ctx::Endian, deku::ctx::BitSize) =
         (deku::ctx::Endian::Big, deku::ctx::BitSize(14_usize));
 
@@ -114,6 +129,10 @@ pub struct AircraftAddress {
     pub address: u32,
 }
 
+impl AircraftAddress {
+    pub const FSPEC: u8 = 0b1000_0000;
+}
+
 /// Data Item I048/240, Aircraft Identification
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
@@ -127,6 +146,7 @@ pub struct AircraftIdentification {
 }
 
 impl AircraftIdentification {
+    pub const FSPEC: u8 = 0b100_0000;
     /// Read and convert to String
     fn read(rest: &BitSlice<Msb0, u8>) -> Result<(&BitSlice<Msb0, u8>, String), DekuError> {
         let (rest, one) = u8::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)))?;
@@ -220,6 +240,10 @@ pub struct ModeSMBData {
     pub bds2: u8,
 }
 
+impl ModeSMBData {
+    pub const FSPEC: u8 = 0b10_0000;
+}
+
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 pub struct MBData {
     #[deku(count = "7")]
@@ -234,6 +258,10 @@ pub struct TrackNumber {
     pub reserved: u8,
     #[deku(bits = "12", endian = "big")]
     pub number: u16,
+}
+
+impl TrackNumber {
+    pub const FSPEC: u8 = 0b1_0000;
 }
 
 /// Data Item I048/042, Calculated Position in Cartesian Co-ordinates
@@ -253,6 +281,7 @@ pub struct CalculatedPositionCartesianCorr {
 }
 
 impl CalculatedPositionCartesianCorr {
+    pub const FSPEC: u8 = 0b1000;
     const MODIFIER: f32 = 1.0 / 128.0;
 }
 
@@ -273,6 +302,7 @@ pub struct CalculatedTrackVelocity {
 }
 
 impl CalculatedTrackVelocity {
+    pub const FSPEC: u8 = 0b100;
     fn groundspeed_modifier() -> f32 {
         2_f32.powi(-14)
     }
@@ -306,6 +336,10 @@ pub struct TrackStatus {
     pub fx2: Option<FX>,
 }
 
+impl TrackStatus {
+    pub const FSPEC: u8 = 0b10;
+}
+
 /// Data Item I048/210, Track Quality
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
@@ -314,6 +348,10 @@ pub struct TrackQuality {
     vertical_stddev: u8,
     groundspeed_stddev: u8,
     heading_stddev: f32,
+}
+
+impl TrackQuality {
+    pub const FSPEC: u8 = 0b1000_0000;
 }
 
 /// Data Item I048/230, Communications/ACAS Capability and Flight Status.
@@ -332,6 +370,10 @@ pub struct CommunicationsCapabilityFlightStatus {
     pub b1a: u8,
     #[deku(bits = "4")]
     pub b1b: u8,
+}
+
+impl CommunicationsCapabilityFlightStatus {
+    pub const FSPEC: u8 = 0b10;
 }
 
 /// Data Item I048/130, Radar Plot Characteristics
@@ -377,6 +419,8 @@ pub struct RadarPlotCharacteristics {
 }
 
 impl RadarPlotCharacteristics {
+    pub const FSPEC: u8 = 0b10;
+
     fn runlength_modifier() -> f32 {
         360.0 / f32::from(2_u16.pow(13))
     }
@@ -397,6 +441,10 @@ pub struct MessageType {
     pub t: MTYPE,
 }
 
+impl MessageType {
+    pub const FSPEC: u8 = 0b100_0000;
+}
+
 /// Data Item I034/020, Sector Number
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
@@ -406,6 +454,7 @@ pub struct SectorNumber {
 }
 
 impl SectorNumber {
+    pub const FSPEC: u8 = 0b1_0000;
     const CTX: (deku::ctx::Endian, deku::ctx::BitSize) =
         (deku::ctx::Endian::Big, deku::ctx::BitSize(8_usize));
 
