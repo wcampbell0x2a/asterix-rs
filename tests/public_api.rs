@@ -4,8 +4,7 @@ use asterix::types::{
     STAT, SUP, TCC, TRE, TYP, V,
 };
 use asterix::{AsterixMessage, AsterixPacket};
-use deku::DekuContainerRead;
-use deku::DekuContainerWrite;
+use deku::{DekuContainerRead, DekuContainerWrite, DekuUpdate};
 
 #[test]
 fn it_works() {
@@ -16,7 +15,7 @@ fn it_works() {
         0x00, 0x01, 0xc0, 0x78, 0x00, 0x31, 0xbc, 0x00, 0x00, 0x40, 0x0d, 0xeb, 0x07, 0xb9, 0x58,
         0x2e, 0x41, 0x00, 0x20, 0xf5,
     ];
-    let (_, packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
+    let (_, mut packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
 
     assert_eq!(packet.category, 48);
     assert_eq!(packet.length, 48);
@@ -129,6 +128,8 @@ fn it_works() {
         unreachable!("Message is not CAT48");
     }
 
+    packet.update().unwrap();
+
     // Confirm packet back to bytes
     assert_eq!(packet.to_bytes(), Ok(bytes));
 }
@@ -142,7 +143,7 @@ fn it_works_only_two_fspec() {
         0x02, 0x00, 0x05, 0x28, 0x3c, 0x66, 0x0c, 0x10, 0xc2, 0x36, 0xd4, 0x18, 0x00, 0x01, 0xc0,
         0x78, 0x00, 0x31, 0xbc, 0x00, 0x00, 0x40, 0x0d, 0xeb, 0x07, 0xb9, 0x58, 0x2e, 0x41, 0x00,
     ];
-    let (_, packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
+    let (_, mut packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
 
     assert_eq!(packet.category, 48);
     assert_eq!(packet.length, 45);
@@ -154,6 +155,8 @@ fn it_works_only_two_fspec() {
     } else {
         unreachable!("Message is not CAT48");
     }
+
+    packet.update().unwrap();
 
     // Confirm packet back to bytes
     assert_eq!(packet.to_bytes(), Ok(bytes));
@@ -168,7 +171,7 @@ fn third_packet() {
         0xf6, 0xc3, 0x04, 0x08, 0x1e, 0xbb, 0x73, 0x40, 0x20, 0xf5,
     ];
     // TODO: Add CAT034
-    let (_, packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
+    let (_, mut packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
     assert_eq!(packet.category, 48);
     assert_eq!(packet.length, 55);
 
@@ -283,6 +286,7 @@ fn third_packet() {
     } else {
         unreachable!("Message is not CAT48");
     }
+    packet.update().unwrap();
     assert_eq!(packet.to_bytes(), Ok(bytes));
 }
 
@@ -291,7 +295,7 @@ fn test_34() {
     let bytes = vec![
         0x22, 0x00, 0x0b, 0xf0, 0x19, 0x0d, 0x02, 0x35, 0x6d, 0xfa, 0x60,
     ];
-    let (_, packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
+    let (_, mut packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
 
     assert_eq!(packet.category, 34);
     assert_eq!(packet.length, 11);
@@ -315,6 +319,7 @@ fn test_34() {
     } else {
         unreachable!("Not Cat 34");
     }
+    packet.update().unwrap();
     assert_eq!(packet.to_bytes(), Ok(bytes));
 }
 
@@ -339,8 +344,10 @@ fn test_four_messages() {
         0xe2, 0x78, 0x40, 0x20, 0xf6, // Cat 034
         0x22, 0x00, 0x0b, 0xf0, 0x19, 0x0d, 0x02, 0x35, 0x6e, 0x0e, 0x68,
     ];
-    let (rest, packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
+    let (rest, mut packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
+    packet.update().unwrap();
     assert_eq!(packet.category, 48);
-    let (_, packet) = AsterixPacket::from_bytes(rest).unwrap();
+    let (_, mut packet) = AsterixPacket::from_bytes(rest).unwrap();
+    packet.update().unwrap();
     assert_eq!(packet.category, 34);
 }

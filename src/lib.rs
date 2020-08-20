@@ -21,7 +21,7 @@ mod fspec;
 pub struct AsterixPacket {
     #[deku(bytes = "1")]
     pub category: u8,
-    #[deku(bytes = "2")]
+    #[deku(bytes = "2", update = "Self::update_len(&self.messages)")]
     pub length: u16,
     #[deku(
         reader = "Self::read_messages(rest, *category, *length)",
@@ -67,6 +67,15 @@ impl AsterixPacket {
             acc.extend(bits);
         }
         Ok(acc)
+    }
+
+    fn update_len(messages: &Vec<AsterixMessage>) -> u16 {
+        let mut len: u16 = 0;
+        for message in messages {
+            let bits = message.write((deku::ctx::Endian::Big, 0)).unwrap();
+            len += (bits.len() / 8) as u16 + 3
+        }
+        len
     }
 }
 
