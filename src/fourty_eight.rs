@@ -66,49 +66,49 @@ impl Cat48 {
         let mut fspec = vec![0x00, 0x00, 0x00, 0x00];
         // add Data Items fspecs where they are Some
         if self.data_source_identifier.is_some() {
-            fspec[0] = fspec[0] | DataSourceIdentifier::FRN_48;
+            fspec[0] |= DataSourceIdentifier::FRN_48;
         }
         if self.time_of_day.is_some() {
-            fspec[0] = fspec[0] | TimeOfDay::FRN_48;
+            fspec[0] |= TimeOfDay::FRN_48;
         }
         if self.target_report_descriptor.is_some() {
-            fspec[0] = fspec[0] | TargetReportDescriptor::FRN_48;
+            fspec[0] |= TargetReportDescriptor::FRN_48;
         }
         if self.measured_position_in_polar_coordinates.is_some() {
-            fspec[0] = fspec[0] | MeasuredPositionInPolarCoordinates::FRN_48;
+            fspec[0] |= MeasuredPositionInPolarCoordinates::FRN_48;
         }
         if self.mode_3_a_code_in_octal_representation.is_some() {
-            fspec[0] = fspec[0] | Mode3ACodeInOctalRepresentation::FRN_48;
+            fspec[0] |= Mode3ACodeInOctalRepresentation::FRN_48;
         }
         if self.flight_level_in_binary_repre.is_some() {
-            fspec[0] = fspec[0] | FlightLevelInBinaryRepresentation::FRN_48;
+            fspec[0] |= FlightLevelInBinaryRepresentation::FRN_48;
         }
         if self.radar_plot_characteristics.is_some() {
-            fspec[0] = fspec[0] | RadarPlotCharacteristics::FRN_48;
+            fspec[0] |= RadarPlotCharacteristics::FRN_48;
         }
         if self.aircraft_address.is_some() {
-            fspec[1] = fspec[1] | AircraftAddress::FRN_48;
+            fspec[1] |= AircraftAddress::FRN_48;
         }
         if self.aircraft_identification.is_some() {
-            fspec[1] = fspec[1] | AircraftIdentification::FRN_48;
+            fspec[1] |= AircraftIdentification::FRN_48;
         }
         if self.mode_smb_data.is_some() {
-            fspec[1] = fspec[1] | ModeSMBData::FRN_48;
+            fspec[1] |= ModeSMBData::FRN_48;
         }
         if self.track_number.is_some() {
-            fspec[1] = fspec[1] | TrackNumber::FRN_48;
+            fspec[1] |= TrackNumber::FRN_48;
         }
         if self.calculated_position_cartesian_coor.is_some() {
-            fspec[1] = fspec[1] | CalculatedPositionCartesianCorr::FRN_48;
+            fspec[1] |= CalculatedPositionCartesianCorr::FRN_48;
         }
         if self.calculated_track_velocity.is_some() {
-            fspec[1] = fspec[1] | CalculatedTrackVelocity::FRN_48;
+            fspec[1] |= CalculatedTrackVelocity::FRN_48;
         }
         if self.track_status.is_some() {
-            fspec[1] = fspec[1] | TrackStatus::FRN_48;
+            fspec[1] |= TrackStatus::FRN_48;
         }
         if self.communications_capability_flight_status.is_some() {
-            fspec[2] = fspec[2] | CommunicationsCapabilityFlightStatus::FRN_48;
+            fspec[2] |= CommunicationsCapabilityFlightStatus::FRN_48;
         }
         // Remove trailing fspecs
         // - find last item in fspec that isn't 00...
@@ -128,7 +128,7 @@ impl Cat48 {
             if n == fspec_len - 1 {
                 break;
             }
-            *f = *f | 0b0000_0001
+            *f |= 0b0000_0001
         }
         self.fspec = fspec;
     }

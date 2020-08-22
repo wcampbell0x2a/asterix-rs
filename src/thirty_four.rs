@@ -23,16 +23,16 @@ impl Cat34 {
         let mut fspec = vec![0x00];
         // add Data Items fspecs where they are Some
         if self.data_source_identifier.is_some() {
-            fspec[0] = fspec[0] | DataSourceIdentifier::FRN_34;
+            fspec[0] |= DataSourceIdentifier::FRN_34;
         }
         if self.message_type.is_some() {
-            fspec[0] = fspec[0] | MessageType::FRN_34;
+            fspec[0] |= MessageType::FRN_34;
         }
         if self.time_of_day.is_some() {
-            fspec[0] = fspec[0] | TimeOfDay::FRN_34;
+            fspec[0] |= TimeOfDay::FRN_34;
         }
         if self.sector_number.is_some() {
-            fspec[0] = fspec[0] | SectorNumber::FRN_34;
+            fspec[0] |= SectorNumber::FRN_34;
         }
         // Remove trailing fspecs
         // - find last item in fspec that isn't 00...
@@ -52,7 +52,7 @@ impl Cat34 {
             if n == fspec_len - 1 {
                 break;
             }
-            *f = *f | 0b0000_0001
+            *f |= 0b0000_0001
         }
         self.fspec = fspec;
     }
