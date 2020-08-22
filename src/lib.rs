@@ -83,7 +83,7 @@ pub struct AsterixPacket {
 impl AsterixPacket {
     /// Update fspec and len
     pub fn finalize(&mut self) -> Result<(), DekuError> {
-        for message in self.messages.iter_mut() {
+        for message in &mut self.messages {
             message.update_fspec();
         }
         self.update()?;
