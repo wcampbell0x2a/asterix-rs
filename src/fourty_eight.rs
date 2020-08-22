@@ -9,7 +9,8 @@ use crate::data_item::{
 };
 use crate::fspec::{is_fspec, read_fspec};
 
-#[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+// TODO: use const fspecs
+#[derive(Debug, Default, PartialEq, DekuRead, DekuWrite)]
 #[deku(endian = "big")]
 pub struct Cat48 {
     #[deku(reader = "read_fspec(rest)")]
@@ -57,4 +58,78 @@ pub struct Cat48 {
     #[deku(skip, cond = "is_fspec(0b10, fspec, 2)")]
     pub communications_capability_flight_status: Option<CommunicationsCapabilityFlightStatus>,
     //TODO fpsec = 3
+}
+
+impl Cat48 {
+    pub fn update_fspec(&mut self) {
+        // Start with max fpsec
+        let mut fspec = vec![0x00, 0x00, 0x00, 0x00];
+        // add Data Items fspecs where they are Some
+        if self.data_source_identifier.is_some() {
+            fspec[0] |= DataSourceIdentifier::FRN_48;
+        }
+        if self.time_of_day.is_some() {
+            fspec[0] |= TimeOfDay::FRN_48;
+        }
+        if self.target_report_descriptor.is_some() {
+            fspec[0] |= TargetReportDescriptor::FRN_48;
+        }
+        if self.measured_position_in_polar_coordinates.is_some() {
+            fspec[0] |= MeasuredPositionInPolarCoordinates::FRN_48;
+        }
+        if self.mode_3_a_code_in_octal_representation.is_some() {
+            fspec[0] |= Mode3ACodeInOctalRepresentation::FRN_48;
+        }
+        if self.flight_level_in_binary_repre.is_some() {
+            fspec[0] |= FlightLevelInBinaryRepresentation::FRN_48;
+        }
+        if self.radar_plot_characteristics.is_some() {
+            fspec[0] |= RadarPlotCharacteristics::FRN_48;
+        }
+        if self.aircraft_address.is_some() {
+            fspec[1] |= AircraftAddress::FRN_48;
+        }
+        if self.aircraft_identification.is_some() {
+            fspec[1] |= AircraftIdentification::FRN_48;
+        }
+        if self.mode_smb_data.is_some() {
+            fspec[1] |= ModeSMBData::FRN_48;
+        }
+        if self.track_number.is_some() {
+            fspec[1] |= TrackNumber::FRN_48;
+        }
+        if self.calculated_position_cartesian_coor.is_some() {
+            fspec[1] |= CalculatedPositionCartesianCorr::FRN_48;
+        }
+        if self.calculated_track_velocity.is_some() {
+            fspec[1] |= CalculatedTrackVelocity::FRN_48;
+        }
+        if self.track_status.is_some() {
+            fspec[1] |= TrackStatus::FRN_48;
+        }
+        if self.communications_capability_flight_status.is_some() {
+            fspec[2] |= CommunicationsCapabilityFlightStatus::FRN_48;
+        }
+        // Remove trailing fspecs
+        // - find last item in fspec that isn't 00...
+        let mut remove_indicies = vec![];
+        for (n, f) in fspec.iter().rev().enumerate() {
+            if *f != 0x00 {
+                break;
+            }
+            remove_indicies.push(fspec.len() - n);
+        }
+        for i in &remove_indicies {
+            fspec.remove(*i - 1);
+        }
+        // Add FX bits
+        let fspec_len = fspec.len();
+        for (n, f) in fspec[..fspec_len].iter_mut().enumerate() {
+            if n == fspec_len - 1 {
+                break;
+            }
+            *f |= 0b0000_0001
+        }
+        self.fspec = fspec;
+    }
 }
