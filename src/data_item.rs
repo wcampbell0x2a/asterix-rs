@@ -19,7 +19,8 @@ pub struct DataSourceIdentifier {
 }
 
 impl DataSourceIdentifier {
-    pub const FSPEC: u8 = 0b1000_0000;
+    pub const FRN_34: u8 = 0b1000_0000;
+    pub const FRN_48: u8 = 0b1000_0000;
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
@@ -33,7 +34,8 @@ pub struct TimeOfDay {
 }
 
 impl TimeOfDay {
-    pub const FSPEC: u8 = 0b100_0000;
+    pub const FRN_34: u8 = 0b10_0000;
+    pub const FRN_48: u8 = 0b100_0000;
     const MODIFIER: f32 = 128.0;
 }
 
@@ -50,7 +52,7 @@ pub struct TargetReportDescriptor {
 }
 
 impl TargetReportDescriptor {
-    pub const FSPEC: u8 = 0b10_0000;
+    pub const FRN_48: u8 = 0b10_0000;
 }
 
 /// Data Item I048/040, Measured Position in Polar Co-ordinates
@@ -70,7 +72,7 @@ pub struct MeasuredPositionInPolarCoordinates {
 }
 
 impl MeasuredPositionInPolarCoordinates {
-    pub const FSPEC: u8 = 0b1_0000;
+    pub const FRN_48: u8 = 0b1_0000;
     const RHO_MODIFIER: f32 = 1.0 / 256.0;
     const THETA_MODIFIER: f32 = 360.0 / 65536.0;
 }
@@ -89,7 +91,7 @@ pub struct Mode3ACodeInOctalRepresentation {
 }
 
 impl Mode3ACodeInOctalRepresentation {
-    pub const FSPEC: u8 = 0b1000;
+    pub const FRN_48: u8 = 0b1000;
 }
 
 /// Data Item I048/090, Flight Level in Binary Representation.
@@ -106,7 +108,7 @@ pub struct FlightLevelInBinaryRepresentation {
 }
 
 impl FlightLevelInBinaryRepresentation {
-    pub const FSPEC: u8 = 0b100;
+    pub const FRN_48: u8 = 0b100;
     const CTX: (deku::ctx::Endian, deku::ctx::BitSize) =
         (deku::ctx::Endian::Big, deku::ctx::BitSize(14_usize));
 
@@ -130,7 +132,7 @@ pub struct AircraftAddress {
 }
 
 impl AircraftAddress {
-    pub const FSPEC: u8 = 0b1000_0000;
+    pub const FRN_48: u8 = 0b1000_0000;
 }
 
 /// Data Item I048/240, Aircraft Identification
@@ -146,7 +148,7 @@ pub struct AircraftIdentification {
 }
 
 impl AircraftIdentification {
-    pub const FSPEC: u8 = 0b100_0000;
+    pub const FRN_48: u8 = 0b100_0000;
     /// Read and convert to String
     fn read(rest: &BitSlice<Msb0, u8>) -> Result<(&BitSlice<Msb0, u8>, String), DekuError> {
         let (rest, one) = u8::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)))?;
@@ -241,7 +243,7 @@ pub struct ModeSMBData {
 }
 
 impl ModeSMBData {
-    pub const FSPEC: u8 = 0b10_0000;
+    pub const FRN_48: u8 = 0b10_0000;
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
@@ -261,7 +263,7 @@ pub struct TrackNumber {
 }
 
 impl TrackNumber {
-    pub const FSPEC: u8 = 0b1_0000;
+    pub const FRN_48: u8 = 0b1_0000;
 }
 
 /// Data Item I048/042, Calculated Position in Cartesian Co-ordinates
@@ -281,7 +283,7 @@ pub struct CalculatedPositionCartesianCorr {
 }
 
 impl CalculatedPositionCartesianCorr {
-    pub const FSPEC: u8 = 0b1000;
+    pub const FRN_48: u8 = 0b1000;
     const MODIFIER: f32 = 1.0 / 128.0;
 }
 
@@ -302,7 +304,7 @@ pub struct CalculatedTrackVelocity {
 }
 
 impl CalculatedTrackVelocity {
-    pub const FSPEC: u8 = 0b100;
+    pub const FRN_48: u8 = 0b100;
     fn groundspeed_modifier() -> f32 {
         2_f32.powi(-14)
     }
@@ -337,7 +339,7 @@ pub struct TrackStatus {
 }
 
 impl TrackStatus {
-    pub const FSPEC: u8 = 0b10;
+    pub const FRN_48: u8 = 0b10;
 }
 
 /// Data Item I048/210, Track Quality
@@ -351,7 +353,7 @@ pub struct TrackQuality {
 }
 
 impl TrackQuality {
-    pub const FSPEC: u8 = 0b1000_0000;
+    pub const FRN_48: u8 = 0b1000_0000;
 }
 
 /// Data Item I048/230, Communications/ACAS Capability and Flight Status.
@@ -373,7 +375,7 @@ pub struct CommunicationsCapabilityFlightStatus {
 }
 
 impl CommunicationsCapabilityFlightStatus {
-    pub const FSPEC: u8 = 0b10;
+    pub const FRN_48: u8 = 0b10;
 }
 
 /// Data Item I048/130, Radar Plot Characteristics
@@ -419,7 +421,7 @@ pub struct RadarPlotCharacteristics {
 }
 
 impl RadarPlotCharacteristics {
-    pub const FSPEC: u8 = 0b10;
+    pub const FRN_48: u8 = 0b10;
 
     fn runlength_modifier() -> f32 {
         360.0 / f32::from(2_u16.pow(13))
@@ -442,7 +444,8 @@ pub struct MessageType {
 }
 
 impl MessageType {
-    pub const FSPEC: u8 = 0b100_0000;
+    pub const FRN_34: u8 = 0b100_0000;
+    pub const FRN_48: u8 = 0b100_0000;
 }
 
 /// Data Item I034/020, Sector Number
@@ -454,7 +457,8 @@ pub struct SectorNumber {
 }
 
 impl SectorNumber {
-    pub const FSPEC: u8 = 0b1_0000;
+    pub const FRN_34: u8 = 0b1_0000;
+    pub const FRN_48: u8 = 0b1_0000;
     const CTX: (deku::ctx::Endian, deku::ctx::BitSize) =
         (deku::ctx::Endian::Big, deku::ctx::BitSize(8_usize));
 

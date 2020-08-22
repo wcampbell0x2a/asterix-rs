@@ -1,9 +1,9 @@
-use asterix::data_item::MBData;
+use asterix::data_item::{DataSourceIdentifier, MBData, MessageType, SectorNumber, TimeOfDay};
 use asterix::types::{
     AIC, ARC, CDM, CNF, COM, DOU, FX, G, GHO, L, MAH, MSSC, MTYPE, RAB, RAD, RDP, SI, SIM, SPI,
     STAT, SUP, TCC, TRE, TYP, V,
 };
-use asterix::{AsterixMessage, AsterixPacket};
+use asterix::{AsterixMessage, AsterixPacket, Cat34, Cat48};
 use deku::{DekuContainerRead, DekuContainerWrite, DekuUpdate};
 
 #[test]
@@ -128,7 +128,7 @@ fn it_works() {
         unreachable!("Message is not CAT48");
     }
 
-    packet.update().unwrap();
+    packet.finalize().unwrap();
 
     // Confirm packet back to bytes
     assert_eq!(packet.to_bytes(), Ok(bytes));
@@ -156,7 +156,7 @@ fn it_works_only_two_fspec() {
         unreachable!("Message is not CAT48");
     }
 
-    packet.update().unwrap();
+    packet.finalize().unwrap();
 
     // Confirm packet back to bytes
     assert_eq!(packet.to_bytes(), Ok(bytes));
@@ -286,7 +286,7 @@ fn third_packet() {
     } else {
         unreachable!("Message is not CAT48");
     }
-    packet.update().unwrap();
+    packet.finalize().unwrap();
     assert_eq!(packet.to_bytes(), Ok(bytes));
 }
 
@@ -319,7 +319,7 @@ fn test_34() {
     } else {
         unreachable!("Not Cat 34");
     }
-    packet.update().unwrap();
+    packet.finalize().unwrap();
     assert_eq!(packet.to_bytes(), Ok(bytes));
 }
 
@@ -345,9 +345,29 @@ fn test_four_messages() {
         0x22, 0x00, 0x0b, 0xf0, 0x19, 0x0d, 0x02, 0x35, 0x6e, 0x0e, 0x68,
     ];
     let (rest, mut packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
-    packet.update().unwrap();
+    packet.finalize().unwrap();
     assert_eq!(packet.category, 48);
     let (_, mut packet) = AsterixPacket::from_bytes(rest).unwrap();
-    packet.update().unwrap();
+    packet.finalize().unwrap();
     assert_eq!(packet.category, 34);
+}
+
+#[test]
+fn test_not_from_bytes() {
+    let mut thirty_eight = Cat34::default();
+    thirty_eight.data_source_identifier = Some(DataSourceIdentifier { sac: 25, sic: 13 });
+    thirty_eight.message_type = Some(MessageType {
+        t: MTYPE::SectorCrossing,
+    });
+    thirty_eight.time_of_day = Some(TimeOfDay { time: 27355.953 });
+    thirty_eight.sector_number = Some(SectorNumber { num: 135 });
+
+    let mut packet = AsterixPacket::default();
+    packet.category = 34;
+    packet.messages = vec![asterix::AsterixMessage::Cat34(thirty_eight)];
+    packet.finalize().unwrap();
+    let exp_bytes = vec![
+        0x22, 0x00, 0x0b, 0xf0, 0x19, 0x0d, 0x02, 0x35, 0x6d, 0xfa, 0x60,
+    ];
+    assert_eq!(packet.to_bytes().unwrap(), exp_bytes)
 }
