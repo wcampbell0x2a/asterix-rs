@@ -3,8 +3,8 @@ use asterix::types::{
     AIC, ARC, CDM, CNF, COM, DOU, FX, G, GHO, L, MAH, MSSC, MTYPE, RAB, RAD, RDP, SI, SIM, SPI,
     STAT, SUP, TCC, TRE, TYP, V,
 };
-use asterix::{AsterixMessage, AsterixPacket, Cat34, Cat48};
-use deku::{DekuContainerRead, DekuContainerWrite, DekuUpdate};
+use asterix::{AsterixMessage, AsterixPacket, Cat34};
+use deku::{DekuContainerRead, DekuContainerWrite};
 
 #[test]
 fn it_works() {
