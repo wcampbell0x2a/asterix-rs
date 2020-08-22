@@ -116,7 +116,7 @@ impl AsterixPacket {
     }
 
     fn write_messages(
-        messages: &Vec<AsterixMessage>,
+        messages: &[AsterixMessage],
         category: u8,
     ) -> Result<BitVec<Msb0, u8>, DekuError> {
         let mut acc: BitVec<Msb0, u8> = BitVec::new();
