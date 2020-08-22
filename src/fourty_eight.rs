@@ -7,7 +7,7 @@ use crate::data_item::{
     Mode3ACodeInOctalRepresentation, ModeSMBData, RadarPlotCharacteristics, TargetReportDescriptor,
     TimeOfDay, TrackNumber, TrackStatus,
 };
-use crate::fspec::{is_fspec, read_fspec};
+use crate::fspec::{add_fx, is_fspec, read_fspec, trim_fspec};
 
 // TODO: use const fspecs
 #[derive(Debug, Default, PartialEq, DekuRead, DekuWrite)]
@@ -110,26 +110,8 @@ impl Cat48 {
         if self.communications_capability_flight_status.is_some() {
             fspec[2] |= CommunicationsCapabilityFlightStatus::FRN_48;
         }
-        // Remove trailing fspecs
-        // - find last item in fspec that isn't 00...
-        let mut remove_indicies = vec![];
-        for (n, f) in fspec.iter().rev().enumerate() {
-            if *f != 0x00 {
-                break;
-            }
-            remove_indicies.push(fspec.len() - n);
-        }
-        for i in &remove_indicies {
-            fspec.remove(*i - 1);
-        }
-        // Add FX bits
-        let fspec_len = fspec.len();
-        for (n, f) in fspec[..fspec_len].iter_mut().enumerate() {
-            if n == fspec_len - 1 {
-                break;
-            }
-            *f |= 0b0000_0001
-        }
+        trim_fspec(&mut fspec);
+        add_fx(&mut fspec);
         self.fspec = fspec;
     }
 }
