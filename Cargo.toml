@@ -1,6 +1,6 @@
 [package]
 name = "asterix"
-version = "0.1.1"
+version = "0.2.0"
 authors = ["wcampbell"]
 edition = "2018"
 categories = ["encoding", "parsing"]
@@ -8,6 +8,7 @@ keywords = ["asterix", "radar", "aviation", "network", "protocol"]
 license = "MIT"
 readme = "README.md"
 description = "Encode/Decode for ASTERIX protocol using the deku library"
+repository = "https://github.com/wcampbell0x2a/asterix-rs"
 
 [dependencies]
 deku = "0.7.1"
