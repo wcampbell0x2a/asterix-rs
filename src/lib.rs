@@ -54,7 +54,6 @@ use deku::prelude::*;
 
 pub mod types;
 
-
 mod custom_read_write;
 
 mod fourty_eight;
