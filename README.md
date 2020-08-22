@@ -9,7 +9,7 @@ Currently supported:
 
 # Usage
 
-See `tests/public_api.rs` for example usage.
+See `tests/public_api.rs` and the docs for example usage.
 
 ## Changelog
 
