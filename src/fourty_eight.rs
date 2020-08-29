@@ -5,7 +5,7 @@ use crate::data_item::{
     CalculatedTrackVelocity, CommunicationsCapabilityFlightStatus, DataSourceIdentifier,
     FlightLevelInBinaryRepresentation, MeasuredPositionInPolarCoordinates,
     Mode3ACodeInOctalRepresentation, ModeSMBData, RadarPlotCharacteristics, TargetReportDescriptor,
-    TimeOfDay, TrackNumber, TrackStatus,
+    TimeOfDay, TrackNumber, TrackQuality, TrackStatus,
 };
 use crate::fspec::{add_fx, is_fspec, read_fspec, trim_fspec};
 
@@ -43,8 +43,8 @@ pub struct Cat48 {
     pub calculated_track_velocity: Option<CalculatedTrackVelocity>,
     #[deku(skip, cond = "is_fspec(0b10, fspec, 1)")]
     pub track_status: Option<TrackStatus>,
-    //#[deku(skip, cond = "is_fspec(0b1000_0000, fspec, 2")]
-    //pub track_quality = Option<TrackQuality>,
+    #[deku(skip, cond = "is_fspec(0b1000_0000, fspec, 2)")]
+    pub track_quality: Option<TrackQuality>,
     //#[deku(skip, cond = "is_fspec(0b100_0000, fspec, 2")]
     //pub warning_error_con_target_class = Option<WarningErrorConditionsTargetClass>,
     //#[deku(skip, cond = "is_fspec(0b10_0000, fspec, 2")]
@@ -106,6 +106,9 @@ impl Cat48 {
         }
         if self.track_status.is_some() {
             fspec[1] |= TrackStatus::FRN_48;
+        }
+        if self.track_quality.is_some() {
+            fspec[2] |= TrackQuality::FRN_48;
         }
         if self.communications_capability_flight_status.is_some() {
             fspec[2] |= CommunicationsCapabilityFlightStatus::FRN_48;

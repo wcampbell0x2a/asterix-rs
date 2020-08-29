@@ -1,9 +1,11 @@
-use asterix::data_item::{DataSourceIdentifier, MBData, MessageType, SectorNumber, TimeOfDay};
+use asterix::data_item::{
+    DataSourceIdentifier, MBData, MessageType, SectorNumber, TimeOfDay, TrackQuality,
+};
 use asterix::types::{
     AIC, ARC, CDM, CNF, COM, DOU, FX, G, GHO, L, MAH, MSSC, MTYPE, RAB, RAD, RDP, SI, SIM, SPI,
     STAT, SUP, TCC, TRE, TYP, V,
 };
-use asterix::{AsterixMessage, AsterixPacket, Cat34};
+use asterix::{AsterixMessage, AsterixPacket, Cat34, Cat48};
 use deku::{DekuContainerRead, DekuContainerWrite};
 
 #[test]
@@ -370,4 +372,60 @@ fn test_not_from_bytes() {
         0x22, 0x00, 0x0b, 0xf0, 0x19, 0x0d, 0x02, 0x35, 0x6d, 0xfa, 0x60,
     ];
     assert_eq!(packet.to_bytes().unwrap(), exp_bytes)
+}
+
+// The following data items don't have pcap captures, and are my own testing
+
+#[test]
+fn test_48_track_quality() {
+    let mut fourty_eight = Cat48::default();
+    fourty_eight.track_quality = Some(TrackQuality {
+        horizontal_stddev: 0.0,
+        vertical_stddev: 0.0,
+        groundspeed_stddev: 0.0,
+        heading_stddev: 0.0,
+    });
+    let mut packet = AsterixPacket::default();
+    packet.category = 48;
+    packet.messages = vec![asterix::AsterixMessage::Cat48(fourty_eight)];
+    packet.finalize().unwrap();
+    let exp_bytes = vec![
+        0x30,
+        0x00,
+        0x0a,
+        0x01,
+        0x01,
+        0b1000_0000,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+    ];
+    assert_eq!(packet.to_bytes().unwrap(), exp_bytes);
+
+    let mut fourty_eight = Cat48::default();
+    fourty_eight.track_quality = Some(TrackQuality {
+        horizontal_stddev: 27355.953,
+        vertical_stddev: 27355.953,
+        groundspeed_stddev: 0.120,
+        heading_stddev: 124.002,
+    });
+    let mut packet = AsterixPacket::default();
+    packet.category = 48;
+    packet.messages = vec![asterix::AsterixMessage::Cat48(fourty_eight)];
+    packet.finalize().unwrap();
+    let exp_bytes = vec![
+        0x30,
+        0x00,
+        0x0a,
+        0x01,
+        0x01,
+        0b1000_0000,
+        0xd5,
+        0xd5,
+        0xae,
+        0x20,
+    ];
+    println!("{:#?}", packet);
+    assert_eq!(packet.to_bytes().unwrap(), exp_bytes);
 }

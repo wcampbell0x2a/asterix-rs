@@ -55,6 +55,7 @@ use deku::prelude::*;
 pub mod types;
 
 mod custom_read_write;
+mod modifier;
 
 mod fourty_eight;
 pub use fourty_eight::Cat48;

@@ -2,6 +2,7 @@
 
 use crate::custom_read_write::{read, write, Op};
 use crate::fspec::{is_fspec, read_fspec};
+use crate::modifier;
 use crate::types::{
     AIC, ARC, CDM, CNF, COM, DOU, FX, G, GHO, L, MAH, MSSC, MTYPE, RAB, RAD, RDP, SI, SIM, SPI,
     STAT, SUP, TCC, TRE, TYP, V,
@@ -292,26 +293,19 @@ impl CalculatedPositionCartesianCorr {
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct CalculatedTrackVelocity {
     #[deku(
-        reader = "read::bits_to_f32(rest, 16, Self::groundspeed_modifier(), Op::Multiply)",
-        writer = "write::f32_u32(&self.groundspeed, 16, Self::groundspeed_modifier(), Op::Divide)"
+        reader = "read::bits_to_f32(rest, 16, modifier::groundspeed(), Op::Multiply)",
+        writer = "write::f32_u32(&self.groundspeed, 16, modifier::groundspeed(), Op::Divide)"
     )]
     pub groundspeed: f32,
     #[deku(
-        reader = "read::bits_to_f32(rest, 16, Self::heading_modifier(), Op::Multiply)",
-        writer = "write::f32_u32(&self.heading, 16, Self::heading_modifier(), Op::Divide)"
+        reader = "read::bits_to_f32(rest, 16, modifier::heading(), Op::Multiply)",
+        writer = "write::f32_u32(&self.heading, 16, modifier::heading(), Op::Divide)"
     )]
     pub heading: f32,
 }
 
 impl CalculatedTrackVelocity {
     pub const FRN_48: u8 = 0b100;
-    fn groundspeed_modifier() -> f32 {
-        2_f32.powi(-14)
-    }
-
-    fn heading_modifier() -> f32 {
-        360.0 / 2_f32.powi(16)
-    }
 }
 
 /// Data Item I048/170, Track Status
@@ -346,14 +340,31 @@ impl TrackStatus {
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct TrackQuality {
-    horizontal_stddev: u8,
-    vertical_stddev: u8,
-    groundspeed_stddev: u8,
-    heading_stddev: f32,
+    #[deku(
+        reader = "read::bits_to_f32(rest, 8, Self::MODIFIER, Op::Multiply)",
+        writer = "write::f32_u32(&self.horizontal_stddev, 8, Self::MODIFIER, Op::Divide)"
+    )]
+    pub horizontal_stddev: f32,
+    #[deku(
+        reader = "read::bits_to_f32(rest, 8, Self::MODIFIER, Op::Multiply)",
+        writer = "write::f32_u32(&self.vertical_stddev, 8, Self::MODIFIER, Op::Divide)"
+    )]
+    pub vertical_stddev: f32,
+    #[deku(
+        reader = "read::bits_to_f32(rest, 8, modifier::groundspeed(), Op::Multiply)",
+        writer = "write::f32_u32(&self.groundspeed_stddev, 8, modifier::groundspeed(), Op::Divide)"
+    )]
+    pub groundspeed_stddev: f32,
+    #[deku(
+        reader = "read::bits_to_f32(rest, 8, modifier::groundspeed(), Op::Multiply)",
+        writer = "write::f32_u32(&self.heading_stddev, 8, modifier::groundspeed(), Op::Divide)"
+    )]
+    pub heading_stddev: f32,
 }
 
 impl TrackQuality {
     pub const FRN_48: u8 = 0b1000_0000;
+    const MODIFIER: f32 = 128.0;
 }
 
 /// Data Item I048/230, Communications/ACAS Capability and Flight Status.
