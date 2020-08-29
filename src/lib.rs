@@ -68,10 +68,13 @@ mod fspec;
 #[derive(Debug, Default, PartialEq, DekuRead, DekuWrite)]
 #[deku(endian = "big")]
 pub struct AsterixPacket {
+    /// Category of all `messages`
     #[deku(bytes = "1")]
     pub category: u8,
+    /// Total length of `AsterixPacket`
     #[deku(bytes = "2", update = "Self::update_len(&mut self.messages)")]
     pub length: u16,
+    /// Asterix Messages
     #[deku(
         reader = "Self::read_messages(rest, *category, *length)",
         writer = "Self::write_messages(&self.messages, *category)"
