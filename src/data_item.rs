@@ -142,7 +142,6 @@ impl FlightLevelInBinaryRepresentation {
     }
 }
 
-
 /// Aircraft address (24-bits Mode S address) assigned uniquely to
 /// each aircraft
 ///

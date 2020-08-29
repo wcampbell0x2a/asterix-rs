@@ -21,11 +21,20 @@ pub struct Cat48 {
     pub time_of_day: Option<TimeOfDay>,
     #[deku(skip, cond = "is_fspec(TargetReportDescriptor::FRN_48, fspec, 0)")]
     pub target_report_descriptor: Option<TargetReportDescriptor>,
-    #[deku(skip, cond = "is_fspec(MeasuredPositionInPolarCoordinates::FRN_48, fspec, 0)")]
+    #[deku(
+        skip,
+        cond = "is_fspec(MeasuredPositionInPolarCoordinates::FRN_48, fspec, 0)"
+    )]
     pub measured_position_in_polar_coordinates: Option<MeasuredPositionInPolarCoordinates>,
-    #[deku(skip, cond = "is_fspec(Mode3ACodeInOctalRepresentation::FRN_48, fspec, 0)")]
+    #[deku(
+        skip,
+        cond = "is_fspec(Mode3ACodeInOctalRepresentation::FRN_48, fspec, 0)"
+    )]
     pub mode_3_a_code_in_octal_representation: Option<Mode3ACodeInOctalRepresentation>,
-    #[deku(skip, cond = "is_fspec(FlightLevelInBinaryRepresentation::FRN_48, fspec, 0)")]
+    #[deku(
+        skip,
+        cond = "is_fspec(FlightLevelInBinaryRepresentation::FRN_48, fspec, 0)"
+    )]
     pub flight_level_in_binary_repre: Option<FlightLevelInBinaryRepresentation>,
     #[deku(skip, cond = "is_fspec(RadarPlotCharacteristics::FRN_48, fspec, 0)")]
     pub radar_plot_characteristics: Option<RadarPlotCharacteristics>,
@@ -37,7 +46,10 @@ pub struct Cat48 {
     pub mode_smb_data: Option<ModeSMBData>,
     #[deku(skip, cond = "is_fspec(TrackNumber::FRN_48, fspec, 1)")]
     pub track_number: Option<TrackNumber>,
-    #[deku(skip, cond = "is_fspec(CalculatedPositionCartesianCorr::FRN_48, fspec, 1)")]
+    #[deku(
+        skip,
+        cond = "is_fspec(CalculatedPositionCartesianCorr::FRN_48, fspec, 1)"
+    )]
     pub calculated_position_cartesian_coor: Option<CalculatedPositionCartesianCorr>,
     #[deku(skip, cond = "is_fspec(CalculatedTrackVelocity::FRN_48, fspec, 1)")]
     pub calculated_track_velocity: Option<CalculatedTrackVelocity>,
@@ -48,14 +60,18 @@ pub struct Cat48 {
     //#[deku(skip, cond = "is_fspec(0b100_0000, fspec, 2")]
     //pub warning_error_con_target_class = Option<WarningErrorConditionsTargetClass>,
     //#[deku(skip, cond = "is_fspec(0b10_0000, fspec, 2")]
+    //#[deku(skip, cond = "is_fspec(0b10_0000, fspec, 2)")]
     //pub mode3a_code_confidence_indicator = Option<Mode3ACodeConfidenceIndicator>,
-    //#[deku(skip, cond = "is_fspec(0b1_0000, fspec, 2")]
+    //#[deku(skip, cond = "is_fspec(0b1_0000, fspec, 2)")]
     //pub modec_code_and_confidence_indicator = Option<ModeCCodeAndConfidenceIndicator>,
-    //#[deku(skip, cond = "is_fspec(0b1000, fspec, 2")]
+    //#[deku(skip, cond = "is_fspec(0b1000, fspec, 2)")]
     //pub height_measured_by_3d_radar = Option<HeightMeasuredBy3dRadar>,
-    //#[deku(skip, cond = "is_fspec(0b100, fspec, 2")]
+    //#[deku(skip, cond = "is_fspec(0b100, fspec, 2)")]
     //pub radial_doppler_speed = Option<RadialDopplerSpeed>,
-    #[deku(skip, cond = "is_fspec(CommunicationsCapabilityFlightStatus::FRN_48, fspec, 2)")]
+    #[deku(
+        skip,
+        cond = "is_fspec(CommunicationsCapabilityFlightStatus::FRN_48, fspec, 2)"
+    )]
     pub communications_capability_flight_status: Option<CommunicationsCapabilityFlightStatus>,
     //TODO fpsec = 3
 }
