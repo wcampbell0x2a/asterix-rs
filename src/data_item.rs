@@ -9,12 +9,16 @@ use crate::types::{
 };
 use deku::prelude::*;
 
-/// Data Item I048/010, Data Source Identifier
+/// Identification of the radar station from which the data is received
+///
+/// Data Item I048/010
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct DataSourceIdentifier {
+    /// System Area Code
     #[deku(bytes = "1")]
     pub sac: u8,
+    /// System Identification Code
     #[deku(bytes = "1")]
     pub sic: u8,
 }
@@ -24,6 +28,9 @@ impl DataSourceIdentifier {
     pub const FRN_48: u8 = 0b1000_0000;
 }
 
+/// Absolute time stamping expressed as Co-ordinated Universal Time (UTC)
+///
+/// Data Item I048/140
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct TimeOfDay {
@@ -40,7 +47,11 @@ impl TimeOfDay {
     const MODIFIER: f32 = 128.0;
 }
 
-/// Data Item I048/020, Target Report Descriptor
+/// Type and properties of the target report
+///
+/// Data Item I048/040
+///
+/// TODO: This can extend with FX bit.
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct TargetReportDescriptor {
@@ -56,7 +67,9 @@ impl TargetReportDescriptor {
     pub const FRN_48: u8 = 0b10_0000;
 }
 
-/// Data Item I048/040, Measured Position in Polar Co-ordinates
+/// Measured position of an aircraft in local polar co-ordinates
+///
+/// Data Item I048/040
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct MeasuredPositionInPolarCoordinates {
@@ -78,7 +91,9 @@ impl MeasuredPositionInPolarCoordinates {
     const THETA_MODIFIER: f32 = 360.0 / 65536.0;
 }
 
-/// Data Item I048/070, Mode-3/A Code in Octal Representation.
+/// Mode-3/A code converted into octal representation
+///
+/// Data Item I048/070
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct Mode3ACodeInOctalRepresentation {
@@ -87,6 +102,7 @@ pub struct Mode3ACodeInOctalRepresentation {
     pub l: L,
     #[deku(bits = "1")]
     pub reserved: u8,
+    /// Mode-3/A reply in octal representation
     #[deku(bits = "12", endian = "big")]
     pub reply: u16,
 }
@@ -95,7 +111,9 @@ impl Mode3ACodeInOctalRepresentation {
     pub const FRN_48: u8 = 0b1000;
 }
 
-/// Data Item I048/090, Flight Level in Binary Representation.
+/// Flight Level converted into binary representation
+///
+/// Data Item I048/090
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct FlightLevelInBinaryRepresentation {
@@ -124,7 +142,11 @@ impl FlightLevelInBinaryRepresentation {
     }
 }
 
-/// Data Item I048/220, Aircraft Address
+
+/// Aircraft address (24-bits Mode S address) assigned uniquely to
+/// each aircraft
+///
+/// Data Item I048/220
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct AircraftAddress {
@@ -136,7 +158,10 @@ impl AircraftAddress {
     pub const FRN_48: u8 = 0b1000_0000;
 }
 
-/// Data Item I048/240, Aircraft Identification
+/// Aircraft identification (in 8 characters) obtained from an aircraft
+/// equipped with a Mode S transponder
+///
+/// Data Item I048/240
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct AircraftIdentification {
@@ -229,6 +254,9 @@ impl AircraftIdentification {
     }
 }
 
+/// Mode S Comm B data as extracted from the aircraft
+/// transponder
+///
 /// Data Item I048/250, Mode S MB Data
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
@@ -253,7 +281,10 @@ pub struct MBData {
     pub data: Vec<u8>,
 }
 
-/// Data Item I048/161, Track Number
+/// An integer value representing a unique reference to a track
+/// record within a particular track file
+///
+/// Data Item I048/161
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct TrackNumber {
@@ -267,7 +298,9 @@ impl TrackNumber {
     pub const FRN_48: u8 = 0b1_0000;
 }
 
-/// Data Item I048/042, Calculated Position in Cartesian Co-ordinates
+/// Calculated position of an aircraft in Cartesian co-ordinates
+///
+/// Data Item I048/042
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct CalculatedPositionCartesianCorr {
@@ -288,7 +321,9 @@ impl CalculatedPositionCartesianCorr {
     const MODIFIER: f32 = 1.0 / 128.0;
 }
 
-/// Data Item I048/200, Calculated Track Velocity in Polar Co-ordinates.
+/// Calculated track velocity expressed in polar co-ordinates
+///
+/// Data Item I048/200
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct CalculatedTrackVelocity {
@@ -308,7 +343,9 @@ impl CalculatedTrackVelocity {
     pub const FRN_48: u8 = 0b100;
 }
 
-/// Data Item I048/170, Track Status
+/// Status of monoradar track (PSR and/or SSR updated)
+///
+/// Data Item I048/170
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct TrackStatus {
@@ -336,7 +373,9 @@ impl TrackStatus {
     pub const FRN_48: u8 = 0b10;
 }
 
-/// Data Item I048/210, Track Quality
+/// Track quality in the form of a vector of standard deviations
+///
+/// Data Item I048/210
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct TrackQuality {
@@ -367,7 +406,10 @@ impl TrackQuality {
     const MODIFIER: f32 = 128.0;
 }
 
-/// Data Item I048/230, Communications/ACAS Capability and Flight Status.
+/// Communications capability of the transponder, capability of the onboard ACAS equipment and
+/// flight status
+///
+/// Data Item I048/230
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct CommunicationsCapabilityFlightStatus {
@@ -389,7 +431,9 @@ impl CommunicationsCapabilityFlightStatus {
     pub const FRN_48: u8 = 0b10;
 }
 
-/// Data Item I048/130, Radar Plot Characteristics
+/// Additional information on the quality of the target report
+///
+/// Data Item I048/130
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct RadarPlotCharacteristics {
@@ -447,7 +491,11 @@ impl RadarPlotCharacteristics {
     }
 }
 
-/// Data Item I034/000, Message Type
+/// This Data Item allows for a more convenient handling of the
+/// messages at the receiver side by further defining the type of
+/// transaction
+///
+/// Data Item I034/000
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct MessageType {
@@ -456,10 +504,12 @@ pub struct MessageType {
 
 impl MessageType {
     pub const FRN_34: u8 = 0b100_0000;
-    pub const FRN_48: u8 = 0b100_0000;
 }
 
-/// Data Item I034/020, Sector Number
+/// Eight most significant bits of the antenna azimuth defining a
+/// particular azimuth sector
+///
+/// Data Item I034/020
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct SectorNumber {

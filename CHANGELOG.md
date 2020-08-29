@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 - Add TrackQuality for Category 48
+- Update Data Item docs
 
 ## [0.2.0] - 2020-08-21
 -  add AsterixPacket::finalize() for updating the packet to the correct fspec and len after
