@@ -402,13 +402,15 @@ fn test_48_track_quality() {
         0x00,
     ];
     assert_eq!(packet.to_bytes().unwrap(), exp_bytes);
+    let (rest, mut exp_packet) = AsterixPacket::from_bytes((&exp_bytes, 0)).unwrap();
+    assert_eq!(packet, exp_packet);
 
     let mut fourty_eight = Cat48::default();
     fourty_eight.track_quality = Some(TrackQuality {
-        horizontal_stddev: 27355.953,
-        vertical_stddev: 27355.953,
-        groundspeed_stddev: 0.120,
-        heading_stddev: 124.002,
+        horizontal_stddev: 32000.0,
+        vertical_stddev: 32000.0,
+        groundspeed_stddev: 0.015563965,
+        heading_stddev: 22.412109375,
     });
     let mut packet = AsterixPacket::default();
     packet.category = 48;
@@ -421,11 +423,12 @@ fn test_48_track_quality() {
         0x01,
         0x01,
         0b1000_0000,
-        0xd5,
-        0xd5,
-        0xae,
-        0x20,
+        0xfa,
+        0xfa,
+        0xff,
+        0xff,
     ];
-    println!("{:#?}", packet);
     assert_eq!(packet.to_bytes().unwrap(), exp_bytes);
+    let (rest, mut exp_packet) = AsterixPacket::from_bytes((&exp_bytes, 0)).unwrap();
+    assert_eq!(packet, exp_packet);
 }

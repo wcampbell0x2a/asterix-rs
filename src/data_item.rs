@@ -403,7 +403,7 @@ pub struct TrackQuality {
 
 impl TrackQuality {
     pub const FRN_48: u8 = 0b1000_0000;
-    const MODIFIER: f32 = 128.0;
+    const MODIFIER: f32 = 1.0/128.0;
 }
 
 /// Communications capability of the transponder, capability of the onboard ACAS equipment and
