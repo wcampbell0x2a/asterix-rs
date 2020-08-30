@@ -631,3 +631,30 @@ fn test_mode1code_octal_representation() {
         assert_eq!(field.data, 0x01);
     }
 }
+
+#[test]
+fn test_mode2code_octal_representation() {
+    let bytes = vec![
+        0x30,
+        0x00,
+        0x09,
+        0x01,
+        0x01,
+        0x01,
+        0b0010_0000,
+        0b0000_0000,
+        0b0000_0001,
+    ];
+    let (_, packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
+    assert_eq!(packet.to_bytes().unwrap(), bytes);
+
+    if let AsterixMessage::Cat48(ref message) = packet.messages[0] {
+        assert_eq!(message.fspec, &[0x01, 0x01, 0x01, 0b0010_0000]);
+
+        let field = message.mode_2_code_octal_representation.as_ref().unwrap();
+        assert_eq!(field.v, V::CodeValidated);
+        assert_eq!(field.g, G::Default);
+        assert_eq!(field.l, L::Mode3CodeDerivedFromTheReplyOfTheTransponder);
+        assert_eq!(field.data, 0x01);
+    }
+}

@@ -723,3 +723,22 @@ pub struct Mode1CodeOctalRepresentation {
 impl Mode1CodeOctalRepresentation {
     pub const FRN_48: u8 = 0b100_0000;
 }
+
+/// Reply to Mode-2 interrogation
+///
+/// Data Item I048/050
+#[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+#[deku(ctx = "_: deku::ctx::Endian")]
+pub struct Mode2CodeOctalRepresentation {
+    pub v: V,
+    pub g: G,
+    pub l: L,
+    #[deku(bits = "1", endian = "big")]
+    pub spare: u8,
+    #[deku(bits = "12", endian = "big")]
+    pub data: u16,
+}
+
+impl Mode2CodeOctalRepresentation {
+    pub const FRN_48: u8 = 0b10_0000;
+}

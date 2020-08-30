@@ -4,7 +4,7 @@ use crate::data_item::{
     ACASResolutionAdvisoryReport, AircraftAddress, AircraftIdentification,
     CalculatedPositionCartesianCorr, CalculatedTrackVelocity, CommunicationsCapabilityFlightStatus,
     DataSourceIdentifier, FlightLevelInBinaryRepresentation, HeightMeasuredBy3dRadar,
-    MeasuredPositionInPolarCoordinates, Mode1CodeOctalRepresentation,
+    MeasuredPositionInPolarCoordinates, Mode1CodeOctalRepresentation, Mode2CodeOctalRepresentation,
     Mode3ACodeConfidenceIndicator, Mode3ACodeInOctalRepresentation,
     ModeCCodeAndConfidenceIndicator, ModeSMBData, RadarPlotCharacteristics, RadialDopplerSpeed,
     TargetReportDescriptor, TimeOfDay, TrackNumber, TrackQuality, TrackStatus,
@@ -117,6 +117,11 @@ pub struct Cat48 {
         cond = "is_fspec(Mode1CodeOctalRepresentation::FRN_48, fspec, 3)"
     )]
     pub mode_1_code_octal_representation: Option<Mode1CodeOctalRepresentation>,
+    #[deku(
+        skip,
+        cond = "is_fspec(Mode2CodeOctalRepresentation::FRN_48, fspec, 3)"
+    )]
+    pub mode_2_code_octal_representation: Option<Mode2CodeOctalRepresentation>,
     // FRN 23
     // FRN 24
     // FRN 25
@@ -198,6 +203,9 @@ impl Cat48 {
         }
         if self.mode_1_code_octal_representation.is_some() {
             fspec[3] |= Mode1CodeOctalRepresentation::FRN_48;
+        }
+        if self.mode_2_code_octal_representation.is_some() {
+            fspec[3] |= Mode2CodeOctalRepresentation::FRN_48;
         }
         trim_fspec(&mut fspec);
         add_fx(&mut fspec);
