@@ -604,7 +604,8 @@ fn test_acas_resolution() {
         0x06,
         0x07,
     ];
-    let (_, packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
+    let (_, mut packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
+    packet.finalize().unwrap();
     assert_eq!(packet.to_bytes().unwrap(), bytes);
 
     if let AsterixMessage::Cat48(ref message) = packet.messages[0] {
@@ -618,7 +619,8 @@ fn test_acas_resolution() {
 #[test]
 fn test_mode1code_octal_representation() {
     let bytes = vec![0x30, 0x00, 0x08, 0x01, 0x01, 0x01, 0b0100_0000, 0b0000_0001];
-    let (_, packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
+    let (_, mut packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
+    packet.finalize().unwrap();
     assert_eq!(packet.to_bytes().unwrap(), bytes);
 
     if let AsterixMessage::Cat48(ref message) = packet.messages[0] {
@@ -645,7 +647,8 @@ fn test_mode2code_octal_representation() {
         0b0000_0000,
         0b0000_0001,
     ];
-    let (_, packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
+    let (_, mut packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
+    packet.finalize().unwrap();
     assert_eq!(packet.to_bytes().unwrap(), bytes);
 
     if let AsterixMessage::Cat48(ref message) = packet.messages[0] {
@@ -662,7 +665,8 @@ fn test_mode2code_octal_representation() {
 #[test]
 fn test_mode1codeconfidence() {
     let bytes = vec![0x30, 0x00, 0x08, 0x01, 0x01, 0x01, 0b0001_0000, 0x01];
-    let (_, packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
+    let (_, mut packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
+    packet.finalize().unwrap();
     assert_eq!(packet.to_bytes().unwrap(), bytes);
 
     if let AsterixMessage::Cat48(ref message) = packet.messages[0] {
@@ -676,7 +680,8 @@ fn test_mode1codeconfidence() {
 #[test]
 fn test_mode2codeconfidence() {
     let bytes = vec![0x30, 0x00, 0x09, 0x01, 0x01, 0x01, 0b0000_1000, 0x00, 0x01];
-    let (_, packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
+    let (_, mut packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
+    packet.finalize().unwrap();
     assert_eq!(packet.to_bytes().unwrap(), bytes);
 
     if let AsterixMessage::Cat48(ref message) = packet.messages[0] {

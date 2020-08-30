@@ -216,6 +216,12 @@ impl Cat48 {
         if self.mode_2_code_octal_representation.is_some() {
             fspec[3] |= Mode2CodeOctalRepresentation::FRN_48;
         }
+        if self.mode_1_code_confidence.is_some() {
+            fspec[3] |= Mode1CodeConfidenceIndicator::FRN_48;
+        }
+        if self.mode_2_code_confidence.is_some() {
+            fspec[3] |= Mode2CodeConfidenceIndicator::FRN_48;
+        }
         trim_fspec(&mut fspec);
         add_fx(&mut fspec);
         self.fspec = fspec;
