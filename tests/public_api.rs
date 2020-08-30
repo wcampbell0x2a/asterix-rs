@@ -691,3 +691,18 @@ fn test_mode2codeconfidence() {
         assert_eq!(field.data, 0x01);
     }
 }
+
+#[test]
+fn test_34_antenna_rotation_speed() {
+    let bytes = vec![0x22, 0x00, 0x06, 0b0000_1000, 0x00, 0x01];
+    let (_, mut packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
+    packet.finalize().unwrap();
+    assert_eq!(packet.to_bytes().unwrap(), bytes);
+
+    if let AsterixMessage::Cat34(ref message) = packet.messages[0] {
+        assert_eq!(message.fspec, &[0b0000_1000]);
+
+        let field = message.antenna_rotation_speed.as_ref().unwrap();
+        assert_eq!(field.period, 1.0 / 128f32);
+    }
+}

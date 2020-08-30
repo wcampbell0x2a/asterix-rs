@@ -776,3 +776,22 @@ pub struct Mode2CodeConfidenceIndicator {
 impl Mode2CodeConfidenceIndicator {
     pub const FRN_48: u8 = 0b1000;
 }
+
+/// Antenna rotation period as measured between two consecutive
+/// North crossings or as averaged during a period of time
+///
+/// Data Item I034/041
+#[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+#[deku(ctx = "_: deku::ctx::Endian")]
+pub struct AntennaRotationSpeed {
+    #[deku(
+        reader = "read::bits_to_f32(rest, 16, Self::MODIFIER, Op::Divide)",
+        writer = "write::f32_u32(&self.period, 16, Self::MODIFIER, Op::Multiply)"
+    )]
+    pub period: f32,
+}
+
+impl AntennaRotationSpeed {
+    pub const FRN_34: u8 = 0b1000;
+    const MODIFIER: f32 = 128.0;
+}
