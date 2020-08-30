@@ -1,6 +1,6 @@
 [package]
 name = "asterix"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["wcampbell"]
 edition = "2018"
 categories = ["encoding", "parsing"]
