@@ -410,8 +410,8 @@ fn test_48_track_quality() {
     fourty_eight.track_quality = Some(TrackQuality {
         horizontal_stddev: 32000.0,
         vertical_stddev: 32000.0,
-        groundspeed_stddev: 0.015563965,
-        heading_stddev: 22.412109375,
+        groundspeed_stddev: 0.015_563_965,
+        heading_stddev: 22.412_11,
     });
     let mut packet = AsterixPacket::default();
     packet.category = 48;
