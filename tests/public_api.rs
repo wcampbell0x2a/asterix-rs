@@ -585,3 +585,32 @@ fn test_48_radial_dopplerspeed() {
     let (_, packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
     assert_eq!(packet.to_bytes().unwrap(), bytes);
 }
+
+#[test]
+fn test_acas_resolution() {
+    let bytes = vec![
+        0x30,
+        0x00,
+        0x0e,
+        0x01,
+        0x01,
+        0x01,
+        0b1000_0000,
+        0x01,
+        0x02,
+        0x03,
+        0x04,
+        0x05,
+        0x06,
+        0x07,
+    ];
+    let (_, packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
+    assert_eq!(packet.to_bytes().unwrap(), bytes);
+
+    if let AsterixMessage::Cat48(ref message) = packet.messages[0] {
+        assert_eq!(message.fspec, &[0x01, 0x01, 0x01, 0b1000_0000]);
+
+        let field = message.acas_resolution_advisory_report.as_ref().unwrap();
+        assert_eq!(&field.mb_data, &[0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07]);
+    }
+}

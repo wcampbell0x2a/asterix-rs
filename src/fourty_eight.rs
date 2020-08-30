@@ -7,7 +7,7 @@ use crate::data_item::{
     Mode3ACodeConfidenceIndicator, Mode3ACodeInOctalRepresentation,
     ModeCCodeAndConfidenceIndicator, ModeSMBData, RadarPlotCharacteristics, RadialDopplerSpeed,
     TargetReportDescriptor, TimeOfDay, TrackNumber, TrackQuality, TrackStatus,
-    WarningErrorConditionsTargetClass,
+    WarningErrorConditionsTargetClass, ACASResolutionAdvisoryReport,
 };
 use crate::fspec::{add_fx, is_fspec, read_fspec, trim_fspec};
 
@@ -83,7 +83,19 @@ pub struct Cat48 {
         cond = "is_fspec(CommunicationsCapabilityFlightStatus::FRN_48, fspec, 2)"
     )]
     pub communications_capability_flight_status: Option<CommunicationsCapabilityFlightStatus>,
-    //TODO fpsec = 3
+    /// FRN 21
+    #[deku(
+        skip,
+        cond = "is_fspec(ACASResolutionAdvisoryReport::FRN_48, fspec, 3)"
+    )]
+    pub acas_resolution_advisory_report: Option<ACASResolutionAdvisoryReport>,
+    // FRN 22
+    // FRN 23
+    // FRN 24
+    // FRN 25
+    // FRN 26
+    // FRN 27
+    // FRN 28
 }
 
 impl Cat48 {
@@ -153,6 +165,9 @@ impl Cat48 {
         }
         if self.communications_capability_flight_status.is_some() {
             fspec[2] |= CommunicationsCapabilityFlightStatus::FRN_48;
+        }
+        if self.acas_resolution_advisory_report.is_some() {
+            fspec[3] |= ACASResolutionAdvisoryReport::FRN_48;
         }
         trim_fspec(&mut fspec);
         add_fx(&mut fspec);
