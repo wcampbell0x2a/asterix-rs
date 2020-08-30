@@ -709,3 +709,17 @@ pub struct ACASResolutionAdvisoryReport {
 impl ACASResolutionAdvisoryReport {
     pub const FRN_48: u8 = 0b1000_0000;
 }
+
+#[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+#[deku(ctx = "_: deku::ctx::Endian")]
+pub struct Mode1CodeOctalRepresentation {
+    pub v: V,
+    pub g: G,
+    pub l: L,
+    #[deku(bits = "5", endian = "big")]
+    pub data: u8,
+}
+
+impl Mode1CodeOctalRepresentation {
+    pub const FRN_48: u8 = 0b100_0000;
+}

@@ -4,10 +4,11 @@ use crate::data_item::{
     ACASResolutionAdvisoryReport, AircraftAddress, AircraftIdentification,
     CalculatedPositionCartesianCorr, CalculatedTrackVelocity, CommunicationsCapabilityFlightStatus,
     DataSourceIdentifier, FlightLevelInBinaryRepresentation, HeightMeasuredBy3dRadar,
-    MeasuredPositionInPolarCoordinates, Mode3ACodeConfidenceIndicator,
-    Mode3ACodeInOctalRepresentation, ModeCCodeAndConfidenceIndicator, ModeSMBData,
-    RadarPlotCharacteristics, RadialDopplerSpeed, TargetReportDescriptor, TimeOfDay, TrackNumber,
-    TrackQuality, TrackStatus, WarningErrorConditionsTargetClass,
+    MeasuredPositionInPolarCoordinates, Mode1CodeOctalRepresentation,
+    Mode3ACodeConfidenceIndicator, Mode3ACodeInOctalRepresentation,
+    ModeCCodeAndConfidenceIndicator, ModeSMBData, RadarPlotCharacteristics, RadialDopplerSpeed,
+    TargetReportDescriptor, TimeOfDay, TrackNumber, TrackQuality, TrackStatus,
+    WarningErrorConditionsTargetClass,
 };
 use crate::fspec::{add_fx, is_fspec, read_fspec, trim_fspec};
 
@@ -110,7 +111,12 @@ pub struct Cat48 {
         cond = "is_fspec(ACASResolutionAdvisoryReport::FRN_48, fspec, 3)"
     )]
     pub acas_resolution_advisory_report: Option<ACASResolutionAdvisoryReport>,
-    // FRN 22
+    /// FRN 22
+    #[deku(
+        skip,
+        cond = "is_fspec(Mode1CodeOctalRepresentation::FRN_48, fspec, 3)"
+    )]
+    pub mode_1_code_octal_representation: Option<Mode1CodeOctalRepresentation>,
     // FRN 23
     // FRN 24
     // FRN 25
@@ -189,6 +195,9 @@ impl Cat48 {
         }
         if self.acas_resolution_advisory_report.is_some() {
             fspec[3] |= ACASResolutionAdvisoryReport::FRN_48;
+        }
+        if self.mode_1_code_octal_representation.is_some() {
+            fspec[3] |= Mode1CodeOctalRepresentation::FRN_48;
         }
         trim_fspec(&mut fspec);
         add_fx(&mut fspec);
