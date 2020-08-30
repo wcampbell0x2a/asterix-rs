@@ -759,3 +759,20 @@ pub struct Mode1CodeConfidenceIndicator {
 impl Mode1CodeConfidenceIndicator {
     pub const FRN_48: u8 = 0b1_0000;
 }
+
+/// Confidence level for each bit of a Mode-2 reply as provided by
+/// a monopulse SSR station
+///
+/// Data Item I048/060
+#[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+#[deku(ctx = "_: deku::ctx::Endian")]
+pub struct Mode2CodeConfidenceIndicator {
+    #[deku(bits = "4", endian = "big")]
+    pub spare: u8,
+    #[deku(bits = "12", endian = "big")]
+    pub data: u16,
+}
+
+impl Mode2CodeConfidenceIndicator {
+    pub const FRN_48: u8 = 0b1000;
+}

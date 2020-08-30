@@ -672,3 +672,17 @@ fn test_mode1codeconfidence() {
         assert_eq!(field.data, 0x01);
     }
 }
+
+#[test]
+fn test_mode2codeconfidence() {
+    let bytes = vec![0x30, 0x00, 0x09, 0x01, 0x01, 0x01, 0b0000_1000, 0x00, 0x01];
+    let (_, packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
+    assert_eq!(packet.to_bytes().unwrap(), bytes);
+
+    if let AsterixMessage::Cat48(ref message) = packet.messages[0] {
+        assert_eq!(message.fspec, &[0x01, 0x01, 0x01, 0b0000_1000]);
+
+        let field = message.mode_2_code_confidence.as_ref().unwrap();
+        assert_eq!(field.data, 0x01);
+    }
+}

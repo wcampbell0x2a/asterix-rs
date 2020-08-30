@@ -5,10 +5,10 @@ use crate::data_item::{
     CalculatedPositionCartesianCorr, CalculatedTrackVelocity, CommunicationsCapabilityFlightStatus,
     DataSourceIdentifier, FlightLevelInBinaryRepresentation, HeightMeasuredBy3dRadar,
     MeasuredPositionInPolarCoordinates, Mode1CodeConfidenceIndicator, Mode1CodeOctalRepresentation,
-    Mode2CodeOctalRepresentation, Mode3ACodeConfidenceIndicator, Mode3ACodeInOctalRepresentation,
-    ModeCCodeAndConfidenceIndicator, ModeSMBData, RadarPlotCharacteristics, RadialDopplerSpeed,
-    TargetReportDescriptor, TimeOfDay, TrackNumber, TrackQuality, TrackStatus,
-    WarningErrorConditionsTargetClass,
+    Mode2CodeConfidenceIndicator, Mode2CodeOctalRepresentation, Mode3ACodeConfidenceIndicator,
+    Mode3ACodeInOctalRepresentation, ModeCCodeAndConfidenceIndicator, ModeSMBData,
+    RadarPlotCharacteristics, RadialDopplerSpeed, TargetReportDescriptor, TimeOfDay, TrackNumber,
+    TrackQuality, TrackStatus, WarningErrorConditionsTargetClass,
 };
 use crate::fspec::{add_fx, is_fspec, read_fspec, trim_fspec};
 
@@ -105,32 +105,36 @@ pub struct Cat48 {
         cond = "is_fspec(CommunicationsCapabilityFlightStatus::FRN_48, fspec, 2)"
     )]
     pub communications_capability_flight_status: Option<CommunicationsCapabilityFlightStatus>,
-    /// FRN 21
+    /// FRN 22
     #[deku(
         skip,
         cond = "is_fspec(ACASResolutionAdvisoryReport::FRN_48, fspec, 3)"
     )]
     pub acas_resolution_advisory_report: Option<ACASResolutionAdvisoryReport>,
-    /// FRN 22
+    /// FRN 23
     #[deku(
         skip,
         cond = "is_fspec(Mode1CodeOctalRepresentation::FRN_48, fspec, 3)"
     )]
     pub mode_1_code_octal_representation: Option<Mode1CodeOctalRepresentation>,
+    /// FRN 24
     #[deku(
         skip,
         cond = "is_fspec(Mode2CodeOctalRepresentation::FRN_48, fspec, 3)"
     )]
     pub mode_2_code_octal_representation: Option<Mode2CodeOctalRepresentation>,
-    /// FRN 23
+    /// FRN 25
     #[deku(
         skip,
         cond = "is_fspec(Mode1CodeConfidenceIndicator::FRN_48, fspec, 3)"
     )]
     pub mode_1_code_confidence: Option<Mode1CodeConfidenceIndicator>,
-    // FRN 24
-    // FRN 25
-    // FRN 26
+    /// FRN 26
+    #[deku(
+        skip,
+        cond = "is_fspec(Mode2CodeConfidenceIndicator::FRN_48, fspec, 3)"
+    )]
+    pub mode_2_code_confidence: Option<Mode2CodeConfidenceIndicator>,
     // FRN 27
     // FRN 28
 }
