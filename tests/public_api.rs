@@ -1,6 +1,7 @@
 use asterix::data_item::{
-    CodeFx, DataSourceIdentifier, MBData, MessageType, Mode3ACodeConfidenceIndicator, SectorNumber,
-    TimeOfDay, TrackQuality, WarningErrorConditionsTargetClass,
+    CodeFx, DataSourceIdentifier, MBData, MessageType, Mode3ACodeConfidenceIndicator,
+    ModeCCodeAndConfidenceIndicator, SectorNumber, TimeOfDay, TrackQuality,
+    WarningErrorConditionsTargetClass,
 };
 use asterix::types::{
     AIC, ARC, CDM, CNF, CODE, COM, DOU, FX, G, GHO, L, MAH, MSSC, MTYPE, RAB, RAD, RDP, SI, SIM,
@@ -484,7 +485,31 @@ fn test_48_mode_3a_code_confidence_indicator() {
     packet.category = 48;
     packet.messages = vec![asterix::AsterixMessage::Cat48(fourty_eight)];
     packet.finalize().unwrap();
-    let exp_bytes = vec![0x30, 0x00, 0x08, 0x01, 0x01, 0b10_0000, 0x00, 1];
+    let exp_bytes = vec![0x30, 0x00, 0x08, 0x01, 0x01, 0b10_0000, 0x00, 0x01];
+    assert_eq!(packet.to_bytes().unwrap(), exp_bytes);
+    let (_, exp_packet) = AsterixPacket::from_bytes((&exp_bytes, 0)).unwrap();
+    assert_eq!(packet, exp_packet);
+}
+
+#[test]
+fn test_48_mode_c_code_confidence() {
+    let mut fourty_eight = Cat48::default();
+    let confidence = ModeCCodeAndConfidenceIndicator {
+        v: V::CodeValidated,
+        g: G::Default,
+        reserved0: 0,
+        mode_c_gray_notation: 0x01,
+        reserved1: 0,
+        confidence: 0x01,
+    };
+    fourty_eight.modec_code_and_confidence_indicator = Some(confidence);
+    let mut packet = AsterixPacket::default();
+    packet.category = 48;
+    packet.messages = vec![asterix::AsterixMessage::Cat48(fourty_eight)];
+    packet.finalize().unwrap();
+    let exp_bytes = vec![
+        0x30, 0x00, 0x0a, 0x01, 0x01, 0b1_0000, 0x00, 0x01, 0x00, 0x01,
+    ];
     assert_eq!(packet.to_bytes().unwrap(), exp_bytes);
     let (_, exp_packet) = AsterixPacket::from_bytes((&exp_bytes, 0)).unwrap();
     assert_eq!(packet, exp_packet);

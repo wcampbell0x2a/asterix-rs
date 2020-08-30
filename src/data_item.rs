@@ -572,6 +572,7 @@ pub struct CodeFx {
     pub code: CODE,
     pub fx: FX,
 }
+
 /// Confidence level for each bit of a Mode-3/A reply as provided
 /// by a monopulse SSR station
 ///
@@ -587,4 +588,28 @@ pub struct Mode3ACodeConfidenceIndicator {
 
 impl Mode3ACodeConfidenceIndicator {
     pub const FRN_48: u8 = 0b10_0000;
+}
+
+/// Mode-C height in Gray notation as received from the
+/// transponder together with the confidence level for each reply bit
+/// as provided by a MSSR/Mode S station
+///
+/// Data Item I048/100
+#[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+#[deku(ctx = "_: deku::ctx::Endian")]
+pub struct ModeCCodeAndConfidenceIndicator {
+    pub v: V,
+    pub g: G,
+    #[deku(bits = "2", endian = "big")]
+    pub reserved0: u8,
+    #[deku(bits = "12", endian = "big")]
+    pub mode_c_gray_notation: u16,
+    #[deku(bits = "4", endian = "big")]
+    pub reserved1: u8,
+    #[deku(bits = "12", endian = "big")]
+    pub confidence: u16,
+}
+
+impl ModeCCodeAndConfidenceIndicator {
+    pub const FRN_48: u8 = 0b1_0000;
 }

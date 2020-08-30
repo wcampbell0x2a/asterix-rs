@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cat48: Add TrackQuality
 - Cat48: Add WarningErrorConditionsTargetClass
 - Cat48: Add Mode3ACodeConfidenceIndicator
+- Cat48: Add ModeCCodeAndConfidenceIndicator
 - Update Data Item docs
 
 ## [0.2.0] - 2020-08-21
