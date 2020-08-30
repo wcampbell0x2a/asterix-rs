@@ -339,3 +339,12 @@ pub enum CODE {
     #[deku(id = "31")]
     DuplicatedMode5PairNoPinDetected,
 }
+
+#[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
+#[deku(id_type = "u8", id_bits = "1")]
+pub enum D {
+    #[deku(id = "0")]
+    Valid,
+    #[deku(id = "1")]
+    Doubtful,
+}

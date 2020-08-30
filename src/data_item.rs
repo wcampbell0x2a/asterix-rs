@@ -4,7 +4,7 @@ use crate::custom_read_write::{read, write, Op};
 use crate::fspec::{is_fspec, read_fspec};
 use crate::modifier;
 use crate::types::{
-    AIC, ARC, CDM, CNF, CODE, COM, DOU, FX, G, GHO, L, MAH, MSSC, MTYPE, RAB, RAD, RDP, SI, SIM,
+    AIC, ARC, CDM, CNF, CODE, COM, D, DOU, FX, G, GHO, L, MAH, MSSC, MTYPE, RAB, RAD, RDP, SI, SIM,
     SPI, STAT, SUP, TCC, TRE, TYP, V,
 };
 use deku::prelude::*;
@@ -642,4 +642,55 @@ impl HeightMeasuredBy3dRadar {
         let value = height / Self::MODIFIER;
         value.write(Self::CTX)
     }
+}
+
+/// Information on the Doppler Speed of the target report
+///
+/// Data Item I048/120
+#[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+#[deku(ctx = "_: deku::ctx::Endian")]
+pub struct RadialDopplerSpeed {
+    #[deku(bits = "1", endian = "big")]
+    pub cal: u8,
+    #[deku(bits = "1", endian = "big")]
+    pub rds: u8,
+    #[deku(bits = "6", endian = "big")]
+    pub spare: u8,
+    #[deku(skip, endian = "big", cond = "*cal == 0")]
+    pub calculated_doppler_speed: Option<CalculatedDopplerSpeed>,
+    #[deku(skip, endian = "big", cond = "*rds == 0")]
+    pub raw_doppler_speed: Option<RawDopplerSpeed>,
+}
+
+impl RadialDopplerSpeed {
+    pub const FRN_48: u8 = 0b100;
+}
+
+/// Subfield of `HeightMeasuredBy3dRadar`
+#[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+#[deku(ctx = "_: deku::ctx::Endian")]
+pub struct CalculatedDopplerSpeed {
+    pub d: D,
+    #[deku(bits = "5", endian = "big")]
+    pub spare: u8,
+    #[deku(bits = "10", endian = "big")]
+    pub cal: u16,
+}
+
+/// Subfield of `HeightMeasuredBy3dRadar`
+#[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+#[deku(ctx = "_: deku::ctx::Endian")]
+pub struct RawDopplerSpeed {
+    /// Repetition Factor
+    #[deku(endian = "big")]
+    pub rep: u8,
+    /// Doppler Speed: 1 m/sec
+    #[deku(endian = "big")]
+    pub dop: u16,
+    /// Ambiquity Range: 1 m/sec
+    #[deku(endian = "big")]
+    pub amb: u16,
+    /// Transmitter Frequency: 1 Mhz
+    #[deku(endian = "big")]
+    pub frq: u16,
 }

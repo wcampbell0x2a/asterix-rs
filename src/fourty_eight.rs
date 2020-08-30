@@ -5,8 +5,9 @@ use crate::data_item::{
     CalculatedTrackVelocity, CommunicationsCapabilityFlightStatus, DataSourceIdentifier,
     FlightLevelInBinaryRepresentation, HeightMeasuredBy3dRadar, MeasuredPositionInPolarCoordinates,
     Mode3ACodeConfidenceIndicator, Mode3ACodeInOctalRepresentation,
-    ModeCCodeAndConfidenceIndicator, ModeSMBData, RadarPlotCharacteristics, TargetReportDescriptor,
-    TimeOfDay, TrackNumber, TrackQuality, TrackStatus, WarningErrorConditionsTargetClass,
+    ModeCCodeAndConfidenceIndicator, ModeSMBData, RadarPlotCharacteristics, RadialDopplerSpeed,
+    TargetReportDescriptor, TimeOfDay, TrackNumber, TrackQuality, TrackStatus,
+    WarningErrorConditionsTargetClass,
 };
 use crate::fspec::{add_fx, is_fspec, read_fspec, trim_fspec};
 
@@ -75,8 +76,8 @@ pub struct Cat48 {
     pub modec_code_and_confidence_indicator: Option<ModeCCodeAndConfidenceIndicator>,
     #[deku(skip, cond = "is_fspec(HeightMeasuredBy3dRadar::FRN_48, fspec, 2)")]
     pub height_measured_by_3d_radar: Option<HeightMeasuredBy3dRadar>,
-    //#[deku(skip, cond = "is_fspec(0b100, fspec, 2)")]
-    //pub radial_doppler_speed = Option<RadialDopplerSpeed>,
+    #[deku(skip, cond = "is_fspec(RadialDopplerSpeed::FRN_48, fspec, 2)")]
+    pub radial_doppler_speed: Option<RadialDopplerSpeed>,
     #[deku(
         skip,
         cond = "is_fspec(CommunicationsCapabilityFlightStatus::FRN_48, fspec, 2)"
@@ -146,6 +147,9 @@ impl Cat48 {
         }
         if self.height_measured_by_3d_radar.is_some() {
             fspec[2] |= HeightMeasuredBy3dRadar::FRN_48;
+        }
+        if self.radial_doppler_speed.is_some() {
+            fspec[2] |= RadialDopplerSpeed::FRN_48;
         }
         if self.communications_capability_flight_status.is_some() {
             fspec[2] |= CommunicationsCapabilityFlightStatus::FRN_48;

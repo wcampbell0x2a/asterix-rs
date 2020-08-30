@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cat48: Add Mode3ACodeConfidenceIndicator
 - Cat48: Add ModeCCodeAndConfidenceIndicator
 - Cat48: Add HeightMeasuredBy3dRadar
+- Cat48: Add RadialDopplerSpeed
 - Update Data Item docs
 
 ## [0.2.0] - 2020-08-21

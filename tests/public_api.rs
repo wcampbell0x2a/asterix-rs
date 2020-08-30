@@ -547,3 +547,41 @@ fn test_48_height_3d() {
     let (_, exp_packet) = AsterixPacket::from_bytes((&exp_bytes, 0)).unwrap();
     assert_eq!(packet, exp_packet);
 }
+
+#[test]
+fn test_48_radial_dopplerspeed() {
+    // test the first subfield
+    let bytes = vec![
+        0x30,
+        0x00,
+        0x09,
+        0x01,
+        0x01,
+        0b100,
+        0b1000_0000,
+        0b1000_0000,
+        0b0000_0001,
+    ];
+    let (_, packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
+    assert_eq!(packet.to_bytes().unwrap(), bytes);
+
+    // test the second subfield
+    let bytes = vec![
+        0x30,
+        0x00,
+        0x0e,
+        0x01,
+        0x01,
+        0b100,
+        0b0100_0000,
+        0x01,
+        0x00,
+        0x01,
+        0x00,
+        0x01,
+        0x00,
+        0x01,
+    ];
+    let (_, packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
+    assert_eq!(packet.to_bytes().unwrap(), bytes);
+}
