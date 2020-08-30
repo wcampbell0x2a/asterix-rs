@@ -4,6 +4,7 @@ use crate::data_item::{
 use crate::fspec::{add_fx, is_fspec, read_fspec, trim_fspec};
 use deku::prelude::*;
 
+/// Transmission of Monoradar Service Messages
 #[derive(Debug, Default, PartialEq, DekuRead, DekuWrite)]
 #[deku(endian = "big")]
 pub struct Cat34 {
