@@ -4,8 +4,9 @@ use crate::data_item::{
     AircraftAddress, AircraftIdentification, CalculatedPositionCartesianCorr,
     CalculatedTrackVelocity, CommunicationsCapabilityFlightStatus, DataSourceIdentifier,
     FlightLevelInBinaryRepresentation, MeasuredPositionInPolarCoordinates,
-    Mode3ACodeInOctalRepresentation, ModeSMBData, RadarPlotCharacteristics, TargetReportDescriptor,
-    TimeOfDay, TrackNumber, TrackQuality, TrackStatus, WarningErrorConditionsTargetClass,
+    Mode3ACodeConfidenceIndicator, Mode3ACodeInOctalRepresentation, ModeSMBData,
+    RadarPlotCharacteristics, TargetReportDescriptor, TimeOfDay, TrackNumber, TrackQuality,
+    TrackStatus, WarningErrorConditionsTargetClass,
 };
 use crate::fspec::{add_fx, is_fspec, read_fspec, trim_fspec};
 
@@ -62,8 +63,11 @@ pub struct Cat48 {
         cond = "is_fspec(WarningErrorConditionsTargetClass::FRN_48, fspec, 2)"
     )]
     pub warning_error_con_target_class: Option<WarningErrorConditionsTargetClass>,
-    //#[deku(skip, cond = "is_fspec(0b10_0000, fspec, 2)")]
-    //pub mode3a_code_confidence_indicator = Option<Mode3ACodeConfidenceIndicator>,
+    #[deku(
+        skip,
+        cond = "is_fspec(Mode3ACodeConfidenceIndicator::FRN_48, fspec, 2)"
+    )]
+    pub mode3a_code_confidence_indicator: Option<Mode3ACodeConfidenceIndicator>,
     //#[deku(skip, cond = "is_fspec(0b1_0000, fspec, 2)")]
     //pub modec_code_and_confidence_indicator = Option<ModeCCodeAndConfidenceIndicator>,
     //#[deku(skip, cond = "is_fspec(0b1000, fspec, 2)")]
@@ -130,6 +134,9 @@ impl Cat48 {
         }
         if self.warning_error_con_target_class.is_some() {
             fspec[2] |= WarningErrorConditionsTargetClass::FRN_48;
+        }
+        if self.mode3a_code_confidence_indicator.is_some() {
+            fspec[2] |= Mode3ACodeConfidenceIndicator::FRN_48;
         }
         if self.communications_capability_flight_status.is_some() {
             fspec[2] |= CommunicationsCapabilityFlightStatus::FRN_48;

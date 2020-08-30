@@ -1,10 +1,10 @@
 use asterix::data_item::{
-    CodeFx, DataSourceIdentifier, MBData, MessageType, SectorNumber, TimeOfDay, TrackQuality,
-    WarningErrorConditionsTargetClass,
+    CodeFx, DataSourceIdentifier, MBData, MessageType, Mode3ACodeConfidenceIndicator, SectorNumber,
+    TimeOfDay, TrackQuality, WarningErrorConditionsTargetClass,
 };
 use asterix::types::{
-    AIC, ARC, CDM, CODE, CNF, COM, DOU, FX, G, GHO, L, MAH, MSSC, MTYPE, RAB, RAD, RDP, SI, SIM, SPI,
-    STAT, SUP, TCC, TRE, TYP, V,
+    AIC, ARC, CDM, CNF, CODE, COM, DOU, FX, G, GHO, L, MAH, MSSC, MTYPE, RAB, RAD, RDP, SI, SIM,
+    SPI, STAT, SUP, TCC, TRE, TYP, V,
 };
 use asterix::{AsterixMessage, AsterixPacket, Cat34, Cat48};
 use deku::{DekuContainerRead, DekuContainerWrite};
@@ -466,6 +466,25 @@ fn test_48_warning_error_con_target_class() {
         0x5 << 1 | 0x01,
         0x5 << 1,
     ];
+    assert_eq!(packet.to_bytes().unwrap(), exp_bytes);
+    let (_, exp_packet) = AsterixPacket::from_bytes((&exp_bytes, 0)).unwrap();
+    assert_eq!(packet, exp_packet);
+}
+
+#[test]
+fn test_48_mode_3a_code_confidence_indicator() {
+    let mut fourty_eight = Cat48::default();
+
+    let confidence = Mode3ACodeConfidenceIndicator {
+        reserved: 0,
+        confidence: 0b0000_0001,
+    };
+    fourty_eight.mode3a_code_confidence_indicator = Some(confidence);
+    let mut packet = AsterixPacket::default();
+    packet.category = 48;
+    packet.messages = vec![asterix::AsterixMessage::Cat48(fourty_eight)];
+    packet.finalize().unwrap();
+    let exp_bytes = vec![0x30, 0x00, 0x08, 0x01, 0x01, 0b10_0000, 0x00, 1];
     assert_eq!(packet.to_bytes().unwrap(), exp_bytes);
     let (_, exp_packet) = AsterixPacket::from_bytes((&exp_bytes, 0)).unwrap();
     assert_eq!(packet, exp_packet);

@@ -4,8 +4,8 @@ use crate::custom_read_write::{read, write, Op};
 use crate::fspec::{is_fspec, read_fspec};
 use crate::modifier;
 use crate::types::{
-    AIC, ARC, CDM, CODE, CNF, COM, DOU, FX, G, GHO, L, MAH, MSSC, MTYPE, RAB, RAD, RDP, SI, SIM, SPI,
-    STAT, SUP, TCC, TRE, TYP, V,
+    AIC, ARC, CDM, CNF, CODE, COM, DOU, FX, G, GHO, L, MAH, MSSC, MTYPE, RAB, RAD, RDP, SI, SIM,
+    SPI, STAT, SUP, TCC, TRE, TYP, V,
 };
 use deku::prelude::*;
 
@@ -571,4 +571,20 @@ impl WarningErrorConditionsTargetClass {
 pub struct CodeFx {
     pub code: CODE,
     pub fx: FX,
+}
+/// Confidence level for each bit of a Mode-3/A reply as provided
+/// by a monopulse SSR station
+///
+/// Data Item I048/080
+#[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+#[deku(ctx = "_: deku::ctx::Endian")]
+pub struct Mode3ACodeConfidenceIndicator {
+    #[deku(bits = "4", endian = "big")]
+    pub reserved: u8,
+    #[deku(bits = "12", endian = "big")]
+    pub confidence: u16,
+}
+
+impl Mode3ACodeConfidenceIndicator {
+    pub const FRN_48: u8 = 0b10_0000;
 }
