@@ -135,8 +135,8 @@ pub struct Cat48 {
         cond = "is_fspec(Mode2CodeConfidenceIndicator::FRN_48, fspec, 3)"
     )]
     pub mode_2_code_confidence: Option<Mode2CodeConfidenceIndicator>,
-    // FRN 27
-    // FRN 28
+    // FRN 27: Special Purpose Field
+    // FRN 28: Reserved Expansion Field
 }
 
 impl Cat48 {
