@@ -3,7 +3,7 @@ use deku::prelude::*;
 use crate::data_item::{
     AircraftAddress, AircraftIdentification, CalculatedPositionCartesianCorr,
     CalculatedTrackVelocity, CommunicationsCapabilityFlightStatus, DataSourceIdentifier,
-    FlightLevelInBinaryRepresentation, MeasuredPositionInPolarCoordinates,
+    FlightLevelInBinaryRepresentation, HeightMeasuredBy3dRadar, MeasuredPositionInPolarCoordinates,
     Mode3ACodeConfidenceIndicator, Mode3ACodeInOctalRepresentation,
     ModeCCodeAndConfidenceIndicator, ModeSMBData, RadarPlotCharacteristics, TargetReportDescriptor,
     TimeOfDay, TrackNumber, TrackQuality, TrackStatus, WarningErrorConditionsTargetClass,
@@ -73,8 +73,8 @@ pub struct Cat48 {
         cond = "is_fspec(ModeCCodeAndConfidenceIndicator::FRN_48, fspec, 2)"
     )]
     pub modec_code_and_confidence_indicator: Option<ModeCCodeAndConfidenceIndicator>,
-    //#[deku(skip, cond = "is_fspec(0b1000, fspec, 2)")]
-    //pub height_measured_by_3d_radar = Option<HeightMeasuredBy3dRadar>,
+    #[deku(skip, cond = "is_fspec(HeightMeasuredBy3dRadar::FRN_48, fspec, 2)")]
+    pub height_measured_by_3d_radar: Option<HeightMeasuredBy3dRadar>,
     //#[deku(skip, cond = "is_fspec(0b100, fspec, 2)")]
     //pub radial_doppler_speed = Option<RadialDopplerSpeed>,
     #[deku(
@@ -143,6 +143,9 @@ impl Cat48 {
         }
         if self.modec_code_and_confidence_indicator.is_some() {
             fspec[2] |= ModeCCodeAndConfidenceIndicator::FRN_48;
+        }
+        if self.height_measured_by_3d_radar.is_some() {
+            fspec[2] |= HeightMeasuredBy3dRadar::FRN_48;
         }
         if self.communications_capability_flight_status.is_some() {
             fspec[2] |= CommunicationsCapabilityFlightStatus::FRN_48;

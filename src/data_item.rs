@@ -613,3 +613,33 @@ pub struct ModeCCodeAndConfidenceIndicator {
 impl ModeCCodeAndConfidenceIndicator {
     pub const FRN_48: u8 = 0b1_0000;
 }
+
+/// Height of a target as measured by a 3D radar. The height shall
+/// use mean sea level as the zero reference level
+///
+/// Data Item I048/110
+#[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+#[deku(ctx = "_: deku::ctx::Endian")]
+pub struct HeightMeasuredBy3dRadar {
+    #[deku(bits = "2", endian = "big")]
+    pub reserved: u8,
+    #[deku(reader = "Self::read(rest)", writer = "Self::write(&self.height)")]
+    pub height: i32,
+}
+
+impl HeightMeasuredBy3dRadar {
+    pub const FRN_48: u8 = 0b1000;
+    const CTX: (deku::ctx::Endian, deku::ctx::BitSize) =
+        (deku::ctx::Endian::Big, deku::ctx::BitSize(14_usize));
+    pub const MODIFIER: i32 = 25;
+
+    fn read(rest: &BitSlice<Msb0, u8>) -> Result<(&BitSlice<Msb0, u8>, i32), DekuError> {
+        let (rest, value) = i32::read(rest, Self::CTX)?;
+        Ok((rest, (value * Self::MODIFIER) as i32))
+    }
+
+    fn write(height: &i32) -> Result<BitVec<Msb0, u8>, DekuError> {
+        let value = height / Self::MODIFIER;
+        value.write(Self::CTX)
+    }
+}
