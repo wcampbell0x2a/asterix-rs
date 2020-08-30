@@ -4,7 +4,7 @@ use crate::custom_read_write::{read, write, Op};
 use crate::fspec::{is_fspec, read_fspec};
 use crate::modifier;
 use crate::types::{
-    AIC, ARC, CDM, CNF, COM, DOU, FX, G, GHO, L, MAH, MSSC, MTYPE, RAB, RAD, RDP, SI, SIM, SPI,
+    AIC, ARC, CDM, CODE, CNF, COM, DOU, FX, G, GHO, L, MAH, MSSC, MTYPE, RAB, RAD, RDP, SI, SIM, SPI,
     STAT, SUP, TCC, TRE, TYP, V,
 };
 use deku::prelude::*;
@@ -332,8 +332,8 @@ pub struct CalculatedTrackVelocity {
     )]
     pub groundspeed: f32,
     #[deku(
-        reader = "read::bits_to_f32(rest, 16, modifier::heading(), Op::Multiply)",
-        writer = "write::f32_u32(&self.heading, 16, modifier::heading(), Op::Divide)"
+        reader = "read::bits_to_f32(rest, 16, modifier::heading1(), Op::Multiply)",
+        writer = "write::f32_u32(&self.heading, 16, modifier::heading1(), Op::Divide)"
     )]
     pub heading: f32,
 }
@@ -379,13 +379,13 @@ impl TrackStatus {
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct TrackQuality {
     #[deku(
-        reader = "read::bits_to_f32(rest, 8, Self::MODIFIER, Op::Multiply)",
-        writer = "write::f32_u32(&self.horizontal_stddev, 8, Self::MODIFIER, Op::Divide)"
+        reader = "read::bits_to_f32(rest, 8, Self::MODIFIER, Op::Divide)",
+        writer = "write::f32_u32(&self.horizontal_stddev, 8, Self::MODIFIER, Op::Multiply)"
     )]
     pub horizontal_stddev: f32,
     #[deku(
-        reader = "read::bits_to_f32(rest, 8, Self::MODIFIER, Op::Multiply)",
-        writer = "write::f32_u32(&self.vertical_stddev, 8, Self::MODIFIER, Op::Divide)"
+        reader = "read::bits_to_f32(rest, 8, Self::MODIFIER, Op::Divide)",
+        writer = "write::f32_u32(&self.vertical_stddev, 8, Self::MODIFIER, Op::Multiply)"
     )]
     pub vertical_stddev: f32,
     #[deku(
@@ -394,15 +394,15 @@ pub struct TrackQuality {
     )]
     pub groundspeed_stddev: f32,
     #[deku(
-        reader = "read::bits_to_f32(rest, 8, modifier::groundspeed(), Op::Multiply)",
-        writer = "write::f32_u32(&self.heading_stddev, 8, modifier::groundspeed(), Op::Divide)"
+        reader = "read::bits_to_f32(rest, 8, modifier::heading2(), Op::Multiply)",
+        writer = "write::f32_u32(&self.heading_stddev, 8, modifier::heading2(), Op::Divide)"
     )]
     pub heading_stddev: f32,
 }
 
 impl TrackQuality {
     pub const FRN_48: u8 = 0b1000_0000;
-    const MODIFIER: f32 = 1.0/128.0;
+    const MODIFIER: f32 = 1.0 / 128.0;
 }
 
 /// Communications capability of the transponder, capability of the onboard ACAS equipment and
@@ -535,4 +535,40 @@ impl SectorNumber {
         let value = (f32::from(*num) / Self::modifier()) as u8;
         value.write(Self::CTX)
     }
+}
+
+/// Warning/error conditions detected by a radar station for the target
+/// report involved. Target Classification information for the target
+/// involved
+///
+/// Data Item I048/030
+#[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+#[deku(ctx = "_: deku::ctx::Endian")]
+pub struct WarningErrorConditionsTargetClass {
+    #[deku(reader = "Self::read(rest)")]
+    pub codefxs: Vec<CodeFx>,
+}
+
+impl WarningErrorConditionsTargetClass {
+    pub const FRN_48: u8 = 0b100_0000;
+
+    fn read(rest: &BitSlice<Msb0, u8>) -> Result<(&BitSlice<Msb0, u8>, Vec<CodeFx>), DekuError> {
+        let mut codefxs = vec![];
+        let mut inner_rest = rest;
+        loop {
+            let (rest, codefx) = CodeFx::read(inner_rest, ()).unwrap();
+            inner_rest = rest;
+            codefxs.push(codefx);
+            if codefx.fx == FX::EndOfDataItem {
+                break;
+            }
+        }
+        Ok((inner_rest, codefxs))
+    }
+}
+
+#[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
+pub struct CodeFx {
+    pub code: CODE,
+    pub fx: FX,
 }

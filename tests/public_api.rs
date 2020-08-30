@@ -1,8 +1,9 @@
 use asterix::data_item::{
-    DataSourceIdentifier, MBData, MessageType, SectorNumber, TimeOfDay, TrackQuality,
+    CodeFx, DataSourceIdentifier, MBData, MessageType, SectorNumber, TimeOfDay, TrackQuality,
+    WarningErrorConditionsTargetClass,
 };
 use asterix::types::{
-    AIC, ARC, CDM, CNF, COM, DOU, FX, G, GHO, L, MAH, MSSC, MTYPE, RAB, RAD, RDP, SI, SIM, SPI,
+    AIC, ARC, CDM, CODE, CNF, COM, DOU, FX, G, GHO, L, MAH, MSSC, MTYPE, RAB, RAD, RDP, SI, SIM, SPI,
     STAT, SUP, TCC, TRE, TYP, V,
 };
 use asterix::{AsterixMessage, AsterixPacket, Cat34, Cat48};
@@ -402,7 +403,7 @@ fn test_48_track_quality() {
         0x00,
     ];
     assert_eq!(packet.to_bytes().unwrap(), exp_bytes);
-    let (rest, mut exp_packet) = AsterixPacket::from_bytes((&exp_bytes, 0)).unwrap();
+    let (_, exp_packet) = AsterixPacket::from_bytes((&exp_bytes, 0)).unwrap();
     assert_eq!(packet, exp_packet);
 
     let mut fourty_eight = Cat48::default();
@@ -429,6 +430,43 @@ fn test_48_track_quality() {
         0xff,
     ];
     assert_eq!(packet.to_bytes().unwrap(), exp_bytes);
-    let (rest, mut exp_packet) = AsterixPacket::from_bytes((&exp_bytes, 0)).unwrap();
+    let (_, exp_packet) = AsterixPacket::from_bytes((&exp_bytes, 0)).unwrap();
+    assert_eq!(packet, exp_packet);
+}
+
+#[test]
+fn test_48_warning_error_con_target_class() {
+    let mut fourty_eight = Cat48::default();
+
+    let warning = WarningErrorConditionsTargetClass {
+        codefxs: vec![
+            CodeFx {
+                code: CODE::Angel,
+                fx: FX::ExtensionIntoFirstExtent,
+            },
+            CodeFx {
+                code: CODE::Angel,
+                fx: FX::EndOfDataItem,
+            },
+        ],
+    };
+
+    fourty_eight.warning_error_con_target_class = Some(warning);
+    let mut packet = AsterixPacket::default();
+    packet.category = 48;
+    packet.messages = vec![asterix::AsterixMessage::Cat48(fourty_eight)];
+    packet.finalize().unwrap();
+    let exp_bytes = vec![
+        0x30,
+        0x00,
+        0x08,
+        0x01,
+        0x01,
+        0b100_0000,
+        0x5 << 1 | 0x01,
+        0x5 << 1,
+    ];
+    assert_eq!(packet.to_bytes().unwrap(), exp_bytes);
+    let (_, exp_packet) = AsterixPacket::from_bytes((&exp_bytes, 0)).unwrap();
     assert_eq!(packet, exp_packet);
 }

@@ -59,7 +59,7 @@ pub enum RAB {
     ReportFromFieldMonitor,
 }
 
-#[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+#[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
 #[deku(id_type = "u8", id_bits = "1")]
 pub enum FX {
     #[deku(id = "0x00")]
@@ -269,4 +269,73 @@ pub enum MTYPE {
     GeographicaFiltering,
     #[deku(id = "0x04")]
     JammingStrobe,
+}
+
+#[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
+#[deku(id_type = "u16", id_bits = "7")]
+pub enum CODE {
+    #[deku(id = "0")]
+    NotDefined,
+    #[deku(id = "1")]
+    MultipathReply,
+    #[deku(id = "2")]
+    ReplySidelobeInterrogationReception,
+    #[deku(id = "3")]
+    SplitPlot,
+    #[deku(id = "4")]
+    SecondTimeAroundReply,
+    #[deku(id = "5")]
+    Angel,
+    #[deku(id = "6")]
+    SlowMovingTarget,
+    #[deku(id = "7")]
+    FixedPSRPlot,
+    #[deku(id = "8")]
+    SlowPSRPlot,
+    #[deku(id = "9")]
+    LowQualityPSRPlot,
+    #[deku(id = "10")]
+    PhantomSSRPlot,
+    #[deku(id = "11")]
+    NonMatchingMode3ACode,
+    #[deku(id = "12")]
+    ModeCCodeModeSAbnormal,
+    #[deku(id = "13")]
+    TargetInClutter,
+    #[deku(id = "14")]
+    MaximumDopplerREsponseInZeroFilter,
+    #[deku(id = "15")]
+    TransponderAnomalyDetected,
+    #[deku(id = "16")]
+    DuplicatedOrIllegalModeSAircraftAddress,
+    #[deku(id = "17")]
+    ModeSErrorCorrectionApplied,
+    #[deku(id = "18")]
+    UndecodableModeCSCode,
+    #[deku(id = "19")]
+    Birds,
+    #[deku(id = "20")]
+    FlockOfBirds,
+    #[deku(id = "21")]
+    Mode1PresentOriginalReply,
+    #[deku(id = "22")]
+    Mode2PresentOriginalReply,
+    #[deku(id = "23")]
+    PlotCausedByWindTurbine,
+    #[deku(id = "24")]
+    Helicopter,
+    #[deku(id = "25")]
+    MaxiumumNumberInterrogationsSurveillance,
+    #[deku(id = "26")]
+    MaxiumumNumberInterrogationsBDS,
+    #[deku(id = "27")]
+    BDSOverlayIncoherence,
+    #[deku(id = "28")]
+    PotentialBDSSwapDetected,
+    #[deku(id = "29")]
+    TrackUpdateZenithalGap,
+    #[deku(id = "30")]
+    ModeSTrackReAquired,
+    #[deku(id = "31")]
+    DuplicatedMode5PairNoPinDetected,
 }
