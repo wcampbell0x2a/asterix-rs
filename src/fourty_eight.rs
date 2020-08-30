@@ -1,13 +1,13 @@
 use deku::prelude::*;
 
 use crate::data_item::{
-    AircraftAddress, AircraftIdentification, CalculatedPositionCartesianCorr,
-    CalculatedTrackVelocity, CommunicationsCapabilityFlightStatus, DataSourceIdentifier,
-    FlightLevelInBinaryRepresentation, HeightMeasuredBy3dRadar, MeasuredPositionInPolarCoordinates,
-    Mode3ACodeConfidenceIndicator, Mode3ACodeInOctalRepresentation,
-    ModeCCodeAndConfidenceIndicator, ModeSMBData, RadarPlotCharacteristics, RadialDopplerSpeed,
-    TargetReportDescriptor, TimeOfDay, TrackNumber, TrackQuality, TrackStatus,
-    WarningErrorConditionsTargetClass, ACASResolutionAdvisoryReport,
+    ACASResolutionAdvisoryReport, AircraftAddress, AircraftIdentification,
+    CalculatedPositionCartesianCorr, CalculatedTrackVelocity, CommunicationsCapabilityFlightStatus,
+    DataSourceIdentifier, FlightLevelInBinaryRepresentation, HeightMeasuredBy3dRadar,
+    MeasuredPositionInPolarCoordinates, Mode3ACodeConfidenceIndicator,
+    Mode3ACodeInOctalRepresentation, ModeCCodeAndConfidenceIndicator, ModeSMBData,
+    RadarPlotCharacteristics, RadialDopplerSpeed, TargetReportDescriptor, TimeOfDay, TrackNumber,
+    TrackQuality, TrackStatus, WarningErrorConditionsTargetClass,
 };
 use crate::fspec::{add_fx, is_fspec, read_fspec, trim_fspec};
 
