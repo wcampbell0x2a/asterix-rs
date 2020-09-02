@@ -66,6 +66,9 @@ pub use thirty_four::Cat34;
 pub mod data_item;
 mod fspec;
 
+/// Size of category + length in bytes
+const ASTERIX_HEADER_SIZE: u16 = 3;
+
 #[derive(Debug, Default, PartialEq, DekuRead, DekuWrite)]
 #[deku(endian = "big")]
 pub struct AsterixPacket {
@@ -103,7 +106,7 @@ impl AsterixPacket {
         let mut messages = vec![];
 
         // The finish len is the bytes subtracted by the length - 3 (header bytes)
-        let finish_len = (inside_rest.len() / 8) - usize::from(length - 3);
+        let finish_len = (inside_rest.len() / 8) - usize::from(length - ASTERIX_HEADER_SIZE);
 
         // loop until the correct number of bytes have been read, then return Vec
         loop {
@@ -134,7 +137,7 @@ impl AsterixPacket {
         let mut len: u16 = 0;
         for message in messages.iter_mut() {
             let bits = message.write((deku::ctx::Endian::Big, 0)).unwrap();
-            len += (bits.len() / 8) as u16 + 3
+            len += (bits.len() / 8) as u16 + ASTERIX_HEADER_SIZE
         }
         len
     }
