@@ -108,8 +108,7 @@ impl AsterixPacket {
         // loop until the correct number of bytes have been read, then return Vec
         loop {
             let (new_rest, value) =
-                DekuRead::read(inside_rest, (deku::ctx::Endian::Big, category))?;
-            let value: AsterixMessage = Result::<_, DekuError>::Ok(value)?;
+                AsterixMessage::read(inside_rest, (deku::ctx::Endian::Big, category))?;
             messages.push(value);
             inside_rest = new_rest;
             if inside_rest.len() / 8 == finish_len {
