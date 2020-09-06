@@ -16,10 +16,8 @@ use deku::prelude::*;
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct DataSourceIdentifier {
     /// System Area Code
-    #[deku(bytes = "1")]
     pub sac: u8,
     /// System Identification Code
-    #[deku(bytes = "1")]
     pub sic: u8,
 }
 
