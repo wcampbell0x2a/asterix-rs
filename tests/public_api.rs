@@ -703,6 +703,6 @@ fn test_34_antenna_rotation_speed() {
         assert_eq!(message.fspec, &[0b0000_1000]);
 
         let field = message.antenna_rotation_speed.as_ref().unwrap();
-        assert_eq!(field.period, 1.0 / 128f32);
+        assert_eq!(field.period, 1.0 / 128_f32);
     }
 }
