@@ -76,7 +76,7 @@ pub struct AsterixPacket {
     #[deku(bytes = "1")]
     pub category: u8,
     /// Total length of `AsterixPacket`
-    #[deku(bytes = "2", update = "Self::update_len(&mut self.messages)")]
+    #[deku(update = "Self::update_len(&mut self.messages)")]
     pub length: u16,
     /// Asterix Messages
     #[deku(
