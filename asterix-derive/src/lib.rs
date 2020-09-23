@@ -1,6 +1,6 @@
 use proc_macro::TokenStream;
+use quote::quote;
 use syn::{parse_macro_input, Data, DeriveInput, Fields};
-use quote::{quote};
 
 #[proc_macro_derive(UpdateFspec)]
 pub fn derive_answer_fn(input: TokenStream) -> TokenStream {
@@ -16,7 +16,7 @@ pub fn derive_answer_fn(input: TokenStream) -> TokenStream {
             for field in f.named.iter() {
                 // check if first fspec field in struct, skip
                 let ident = field.ident.as_ref().unwrap();
-                if ident  == "fspec" {
+                if ident == "fspec" {
                     continue;
                 }
                 // check if doc ident, we don't need that one
@@ -42,14 +42,14 @@ pub fn derive_answer_fn(input: TokenStream) -> TokenStream {
         }
     }
 
-    let mut quotes = quote!{};
+    let mut quotes = quote! {};
 
     for data_item in data_items {
         let ident = syn::Ident::new(&format!("{}", &data_item.0), syn::export::Span::call_site());
         let fspec_num = data_item.1.parse::<usize>().unwrap();
         let frn = data_item.2;
         let frn = syn::parse_str::<syn::Expr>(&frn).unwrap();
-        quotes = quote!{
+        quotes = quote! {
             #quotes
             if self.#ident.is_some() {
                 fspec[#fspec_num] |= #frn;

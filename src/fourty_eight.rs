@@ -1,5 +1,3 @@
-use asterix_derive::UpdateFspec;
-use deku::prelude::*;
 use crate::data_item::{
     ACASResolutionAdvisoryReport, AircraftAddress, AircraftIdentification,
     CalculatedPositionCartesianCorr, CalculatedTrackVelocity, CommunicationsCapabilityFlightStatus,
@@ -11,6 +9,8 @@ use crate::data_item::{
     TrackQuality, TrackStatus, WarningErrorConditionsTargetClass,
 };
 use crate::fspec::{add_fx, is_fspec, read_fspec, trim_fspec};
+use asterix_derive::UpdateFspec;
+use deku::prelude::*;
 
 /// Transmission of Monoradar Target Reports
 #[derive(Debug, Default, PartialEq, DekuRead, DekuWrite, UpdateFspec)]
