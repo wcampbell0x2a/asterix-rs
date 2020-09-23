@@ -12,3 +12,4 @@ repository = "https://github.com/wcampbell0x2a/asterix-rs"
 
 [dependencies]
 deku = "0.7.1"
+asterix-derive = { path = "asterix-derive" }

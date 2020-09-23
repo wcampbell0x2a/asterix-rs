@@ -1,5 +1,5 @@
+use asterix_derive::UpdateFspec;
 use deku::prelude::*;
-
 use crate::data_item::{
     ACASResolutionAdvisoryReport, AircraftAddress, AircraftIdentification,
     CalculatedPositionCartesianCorr, CalculatedTrackVelocity, CommunicationsCapabilityFlightStatus,
@@ -13,7 +13,7 @@ use crate::data_item::{
 use crate::fspec::{add_fx, is_fspec, read_fspec, trim_fspec};
 
 /// Transmission of Monoradar Target Reports
-#[derive(Debug, Default, PartialEq, DekuRead, DekuWrite)]
+#[derive(Debug, Default, PartialEq, DekuRead, DekuWrite, UpdateFspec)]
 #[deku(endian = "big")]
 pub struct Cat48 {
     #[deku(reader = "read_fspec(rest)")]
@@ -137,93 +137,4 @@ pub struct Cat48 {
     pub mode_2_code_confidence: Option<Mode2CodeConfidenceIndicator>,
     // FRN 27: Special Purpose Field
     // FRN 28: Reserved Expansion Field
-}
-
-impl Cat48 {
-    pub fn update_fspec(&mut self) {
-        // Start with max fpsec
-        let mut fspec = vec![0x00, 0x00, 0x00, 0x00];
-        // add Data Items fspecs where they are Some
-        if self.data_source_identifier.is_some() {
-            fspec[0] |= DataSourceIdentifier::FRN_48;
-        }
-        if self.time_of_day.is_some() {
-            fspec[0] |= TimeOfDay::FRN_48;
-        }
-        if self.target_report_descriptor.is_some() {
-            fspec[0] |= TargetReportDescriptor::FRN_48;
-        }
-        if self.measured_position_in_polar_coordinates.is_some() {
-            fspec[0] |= MeasuredPositionInPolarCoordinates::FRN_48;
-        }
-        if self.mode_3_a_code_in_octal_representation.is_some() {
-            fspec[0] |= Mode3ACodeInOctalRepresentation::FRN_48;
-        }
-        if self.flight_level_in_binary_repre.is_some() {
-            fspec[0] |= FlightLevelInBinaryRepresentation::FRN_48;
-        }
-        if self.radar_plot_characteristics.is_some() {
-            fspec[0] |= RadarPlotCharacteristics::FRN_48;
-        }
-        if self.aircraft_address.is_some() {
-            fspec[1] |= AircraftAddress::FRN_48;
-        }
-        if self.aircraft_identification.is_some() {
-            fspec[1] |= AircraftIdentification::FRN_48;
-        }
-        if self.mode_smb_data.is_some() {
-            fspec[1] |= ModeSMBData::FRN_48;
-        }
-        if self.track_number.is_some() {
-            fspec[1] |= TrackNumber::FRN_48;
-        }
-        if self.calculated_position_cartesian_coor.is_some() {
-            fspec[1] |= CalculatedPositionCartesianCorr::FRN_48;
-        }
-        if self.calculated_track_velocity.is_some() {
-            fspec[1] |= CalculatedTrackVelocity::FRN_48;
-        }
-        if self.track_status.is_some() {
-            fspec[1] |= TrackStatus::FRN_48;
-        }
-        if self.track_quality.is_some() {
-            fspec[2] |= TrackQuality::FRN_48;
-        }
-        if self.warning_error_con_target_class.is_some() {
-            fspec[2] |= WarningErrorConditionsTargetClass::FRN_48;
-        }
-        if self.mode3a_code_confidence_indicator.is_some() {
-            fspec[2] |= Mode3ACodeConfidenceIndicator::FRN_48;
-        }
-        if self.modec_code_and_confidence_indicator.is_some() {
-            fspec[2] |= ModeCCodeAndConfidenceIndicator::FRN_48;
-        }
-        if self.height_measured_by_3d_radar.is_some() {
-            fspec[2] |= HeightMeasuredBy3dRadar::FRN_48;
-        }
-        if self.radial_doppler_speed.is_some() {
-            fspec[2] |= RadialDopplerSpeed::FRN_48;
-        }
-        if self.communications_capability_flight_status.is_some() {
-            fspec[2] |= CommunicationsCapabilityFlightStatus::FRN_48;
-        }
-        if self.acas_resolution_advisory_report.is_some() {
-            fspec[3] |= ACASResolutionAdvisoryReport::FRN_48;
-        }
-        if self.mode_1_code_octal_representation.is_some() {
-            fspec[3] |= Mode1CodeOctalRepresentation::FRN_48;
-        }
-        if self.mode_2_code_octal_representation.is_some() {
-            fspec[3] |= Mode2CodeOctalRepresentation::FRN_48;
-        }
-        if self.mode_1_code_confidence.is_some() {
-            fspec[3] |= Mode1CodeConfidenceIndicator::FRN_48;
-        }
-        if self.mode_2_code_confidence.is_some() {
-            fspec[3] |= Mode2CodeConfidenceIndicator::FRN_48;
-        }
-        trim_fspec(&mut fspec);
-        add_fx(&mut fspec);
-        self.fspec = fspec;
-    }
 }
