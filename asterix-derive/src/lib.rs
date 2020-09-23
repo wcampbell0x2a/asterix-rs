@@ -34,7 +34,7 @@ pub fn derive_answer_fn(input: TokenStream) -> TokenStream {
                     let fspec_pos = s.rfind(')').unwrap() - 1;
 
                     let frn = &s[lpos..comma];
-                    let fspec = &s[fspec_pos as usize..fspec_pos as usize + 1];
+                    let fspec = &s[fspec_pos as usize..=fspec_pos as usize];
 
                     data_items.push((ident.to_string(), fspec.to_string(), frn.to_string()));
                 }
@@ -45,7 +45,7 @@ pub fn derive_answer_fn(input: TokenStream) -> TokenStream {
     let mut quotes = quote! {};
 
     for data_item in data_items {
-        let ident = syn::Ident::new(&format!("{}", &data_item.0), syn::export::Span::call_site());
+        let ident = syn::Ident::new(&data_item.0.to_string(), syn::export::Span::call_site());
         let fspec_num = data_item.1.parse::<usize>().unwrap();
         let frn = data_item.2;
         let frn = syn::parse_str::<syn::Expr>(&frn).unwrap();
