@@ -1,0 +1,14 @@
+[package]
+name = "asterix-derive"
+version = "0.1.0"
+authors = ["wcampbell <wcampbell1995@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+syn = {version = "1.0.41" }#, features = ["extra-traits"]}
+quote = "1.0.7"
+
+[lib]
+proc-macro = true
