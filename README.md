@@ -4,7 +4,7 @@
 [![Rust Documentation](https://docs.rs/asterix/badge.svg)](https://docs.rs/asterix)
 
 Currently supported:
-- Most of CAT048
+- CAT048
 - Most of CAT034
 
 # Usage
