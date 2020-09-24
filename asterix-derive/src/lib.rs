@@ -2,7 +2,30 @@ use proc_macro::TokenStream;
 use quote::quote;
 use syn::{parse_macro_input, Data, DeriveInput, Fields};
 
+/// Generate syntax for updating the fspec from the deku style syntax that would be found
+/// in a ASTERIX category
+///
+/// This is mostly a `hack` in the true sense of the word. Although it works pretty well for
+/// the well defined deku derives.
+///
+/// Input:
+/// ```
+/// #[deku(skip, cond = "is_fspec(DataSourceIdentifier::FRN_48, fspec, 0)")]
+/// pub data_source_identifier: Option<DataSourceIdentifier>,
+/// ```
+///
+/// General Output:
+/// ```
+/// if self.data_source_identifier.is_some() {
+///     fspec[0] |= DataSourceIdentifier::FRN_48;
+/// }
+///
+/// ```
+///
+/// There are a few parts that are pre-pended and appended to the end of the above statements, with
+/// generation for the vec and cleaning up the fspec.
 #[proc_macro_derive(UpdateFspec)]
+#[doc(hidden)]
 pub fn derive_answer_fn(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
 
