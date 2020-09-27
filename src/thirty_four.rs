@@ -1,5 +1,6 @@
 use crate::data_item::{
-    AntennaRotationSpeed, DataSourceIdentifier, MessageType, SectorNumber, TimeOfDay,
+    AntennaRotationSpeed, DataSourceIdentifier, MessageType, SectorNumber,
+    SystemConfigurationAndStatus, SystemProcessingMode, TimeOfDay,
 };
 use crate::fspec::{add_fx, is_fspec, read_fspec, trim_fspec};
 use asterix_derive::UpdateFspec;
@@ -26,4 +27,13 @@ pub struct Cat34 {
     /// FRN 5
     #[deku(skip, cond = "is_fspec(AntennaRotationSpeed::FRN_34, fspec, 0)")]
     pub antenna_rotation_speed: Option<AntennaRotationSpeed>,
+    /// FRN 6
+    #[deku(
+        skip,
+        cond = "is_fspec(SystemConfigurationAndStatus::FRN_34, fspec, 0)"
+    )]
+    pub system_configuration_and_status: Option<SystemConfigurationAndStatus>,
+    /// FRN 7
+    #[deku(skip, cond = "is_fspec(SystemProcessingMode::FRN_34, fspec, 0)")]
+    pub system_processing_mode: Option<SystemProcessingMode>,
 }

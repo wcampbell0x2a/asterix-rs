@@ -4,8 +4,9 @@ use crate::custom_read_write::{read, write, Op};
 use crate::fspec::{is_fspec, read_fspec};
 use crate::modifier;
 use crate::types::{
-    AIC, ARC, CDM, CNF, CODE, COM, D, DOU, FX, G, GHO, L, MAH, MSSC, MTYPE, RAB, RAD, RDP, SI, SIM,
-    SPI, STAT, SUP, TCC, TRE, TYP, V,
+    AIC, ANT, ARC, CDM, CHAB, CLU, CNF, CODE, COM, D, DLF, DOU, FX, G, GHO, L, MAH, MSC, MSSC,
+    MTYPE, NOGO, OVL, POL, RAB, RAD, RDP, RDPC, RDPR, RED, SCF, SI, SIM, SPI, STAT, STC, SUP, TCC,
+    TRE, TSV, TYP, V,
 };
 use deku::prelude::*;
 
@@ -792,4 +793,142 @@ pub struct AntennaRotationSpeed {
 impl AntennaRotationSpeed {
     pub const FRN_34: u8 = 0b1000;
     const MODIFIER: f32 = 128.0;
+}
+
+/// Information concerning the configuration and status of a System
+///
+/// Data Item I034/050
+#[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+#[deku(ctx = "_: deku::ctx::Endian")]
+pub struct SystemConfigurationAndStatus {
+    #[deku(bits = "1")]
+    pub com_bit: u8,
+    #[deku(bits = "2")]
+    pub spare_bit0: u8,
+    #[deku(bits = "1")]
+    pub psr_bit: u8,
+    #[deku(bits = "1")]
+    pub ssr_bit: u8,
+    #[deku(bits = "1")]
+    pub mds_bit: u8,
+    #[deku(bits = "1")]
+    pub spare_bit1: u8,
+    pub fx_bit: FX,
+    #[deku(skip, cond = "*com_bit != 1")]
+    pub com: Option<ComSubField>,
+    #[deku(skip, cond = "*psr_bit != 1")]
+    pub psr: Option<Sensor>,
+    #[deku(skip, cond = "*ssr_bit != 1")]
+    pub ssr: Option<Sensor>,
+    #[deku(skip, cond = "*mds_bit != 1")]
+    pub mds: Option<MdsSubField>,
+}
+
+impl SystemConfigurationAndStatus {
+    pub const FRN_34: u8 = 0b0100;
+}
+
+#[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+pub struct ComSubField {
+    pub nogo: NOGO,
+    pub rdpc: RDPC,
+    pub rdpr: RDPR,
+    pub ovl_rdp: OVL,
+    pub olv_xmt: OVL,
+    pub msc: MSC,
+    pub tsv: TSV,
+    #[deku(bits = "1")]
+    pub spare: u8,
+}
+
+#[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+pub struct Sensor {
+    pub ant: ANT,
+    pub chab: CHAB,
+    pub ovl: OVL,
+    pub msc: MSC,
+    #[deku(bits = "3")]
+    pub spare: u8,
+}
+
+#[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+pub struct MdsSubField {
+    pub ant: ANT,
+    pub chab: CHAB,
+    pub ovl_sur: OVL,
+    pub msc: MSC,
+    pub scf: SCF,
+    pub dlf: DLF,
+    pub ovl_scf: OVL,
+    pub ovl_dlf: OVL,
+    #[deku(bits = "7")]
+    pub spare: u8,
+}
+
+/// Status concerning the processing options, in use during the last antenna revolution,
+/// for the various Sensors, composing the System
+///
+/// Data Item I034/060
+#[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+#[deku(ctx = "_: deku::ctx::Endian")]
+pub struct SystemProcessingMode {
+    #[deku(bits = "1")]
+    pub com_bit: u8,
+    #[deku(bits = "2")]
+    pub spare_bit0: u8,
+    #[deku(bits = "1")]
+    pub psr_bit: u8,
+    #[deku(bits = "1")]
+    pub ssr_bit: u8,
+    #[deku(bits = "1")]
+    pub mds_bit: u8,
+    #[deku(bits = "1")]
+    pub spare_bit1: u8,
+    pub fx_bit: FX,
+    #[deku(skip, cond = "*com_bit != 1")]
+    pub com: Option<ComSubField2>,
+    #[deku(skip, cond = "*psr_bit != 1")]
+    pub psr: Option<PsrSubField>,
+    #[deku(skip, cond = "*ssr_bit != 1")]
+    pub ssr: Option<SsrSubField>,
+    #[deku(skip, cond = "*mds_bit != 1")]
+    pub mds: Option<MdsSubField2>,
+}
+
+impl SystemProcessingMode {
+    pub const FRN_34: u8 = 0b0010;
+}
+
+#[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+pub struct ComSubField2 {
+    #[deku(bits = "1")]
+    pub spare0: u8,
+    pub red_rdp: RED,
+    pub red_xmt: RED,
+    #[deku(bits = "1")]
+    pub spare1: u8,
+}
+
+#[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+pub struct PsrSubField {
+    pub pol: POL,
+    pub red_rad: RED,
+    pub stc: STC,
+    #[deku(bits = "2")]
+    pub spare: u8,
+}
+
+#[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+pub struct SsrSubField {
+    pub red_rad: RED,
+    #[deku(bits = "5")]
+    pub spare: u8,
+}
+
+#[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+pub struct MdsSubField2 {
+    pub red_rad: RED,
+    pub clu: CLU,
+    #[deku(bits = "4")]
+    pub spare: u8,
 }

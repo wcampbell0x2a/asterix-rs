@@ -348,3 +348,160 @@ pub enum D {
     #[deku(id = "1")]
     Doubtful,
 }
+
+#[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
+#[deku(id_type = "u8", id_bits = "1")]
+/// Operational Release Status of the System
+pub enum NOGO {
+    #[deku(id = "0")]
+    SystemIsReleasedForOperationalUse,
+    #[deku(id = "1")]
+    OperationalUseOfSystemIsInhibited,
+}
+
+#[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
+#[deku(id_type = "u8", id_bits = "1")]
+/// Radar Data Processor Chain Selection Status
+pub enum RDPC {
+    #[deku(id = "0")]
+    RDPC1Selected,
+    #[deku(id = "1")]
+    RDPC2Selected,
+}
+
+#[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
+#[deku(id_type = "u8", id_bits = "1")]
+/// Event to signal a reset/restart of the selected Radar Data Processor Chain,
+/// i.e. expect a new assignment of track numbers
+pub enum RDPR {
+    #[deku(id = "0")]
+    DefaultSituation,
+    #[deku(id = "1")]
+    ResetOfRDPC,
+}
+
+#[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
+#[deku(id_type = "u8", id_bits = "1")]
+/// Monitoring System Connected Status
+pub enum MSC {
+    #[deku(id = "0")]
+    MonitoringSystemConnected,
+    #[deku(id = "1")]
+    MonitoringSystemDisconnected,
+}
+
+#[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
+#[deku(id_type = "u8", id_bits = "1")]
+/// Time Source Validity
+pub enum TSV {
+    #[deku(id = "0")]
+    Valid,
+    #[deku(id = "1")]
+    Invalid,
+}
+
+#[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
+#[deku(id_type = "u8", id_bits = "1")]
+/// Selected Antenna
+pub enum ANT {
+    #[deku(id = "0")]
+    Antenna1,
+    #[deku(id = "1")]
+    Antenna2,
+}
+
+#[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
+#[deku(id_type = "u8", id_bits = "2")]
+/// Channel A/B Selection Status
+pub enum CHAB {
+    #[deku(id = "0b00")]
+    NoChannelSelected,
+    #[deku(id = "0b01")]
+    ChannelAOnlySelected,
+    #[deku(id = "0b10")]
+    ChannelBOnlySelected,
+    #[deku(id = "0b11")]
+    DiversityMode,
+}
+
+#[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
+#[deku(id_type = "u8", id_bits = "1")]
+/// Overload Condition
+pub enum OVL {
+    #[deku(id = "0")]
+    NoOverload,
+    #[deku(id = "1")]
+    Overload,
+}
+
+#[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
+#[deku(id_type = "u8", id_bits = "1")]
+/// Channel A/B selection status for Surveillance Co-ordination Function
+pub enum SCF {
+    #[deku(id = "0")]
+    ChannelAInUse,
+    #[deku(id = "1")]
+    ChannelBInUse,
+}
+
+#[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
+#[deku(id_type = "u8", id_bits = "1")]
+/// Channel A/B selection status for Data Link Function
+pub enum DLF {
+    #[deku(id = "0")]
+    ChannelAInUse,
+    #[deku(id = "1")]
+    ChannelBInUse,
+}
+
+#[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
+#[deku(id_type = "u8", id_bits = "3")]
+pub enum RED {
+    #[deku(id = "0b000")]
+    NoReductionActive,
+    #[deku(id = "0b001")]
+    ReductionStep1Active,
+    #[deku(id = "0b010")]
+    ReductionStep2Active,
+    #[deku(id = "0b011")]
+    ReductionStep3Active,
+    #[deku(id = "0b100")]
+    ReductionStep4Active,
+    #[deku(id = "0b101")]
+    ReductionStep5Active,
+    #[deku(id = "0b110")]
+    ReductionStep6Active,
+    #[deku(id = "0b111")]
+    ReductionStep7Active,
+}
+
+#[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
+#[deku(id_type = "u8", id_bits = "1")]
+pub enum POL {
+    #[deku(id = "0")]
+    LinearPolarization,
+    #[deku(id = "1")]
+    CircularPolarization,
+}
+
+#[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
+#[deku(id_type = "u8", id_bits = "1")]
+pub enum STC {
+    #[deku(id = "0b00")]
+    STCMap1,
+    #[deku(id = "0b01")]
+    STCMap2,
+    #[deku(id = "0b10")]
+    STCMap3,
+    #[deku(id = "0b11")]
+    STCMap4,
+}
+
+#[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
+#[deku(id_type = "u8", id_bits = "1")]
+pub enum CLU {
+    #[deku(id = "0")]
+    Autonomous,
+    #[deku(id = "1")]
+    NotAutonomous,
+}

@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 - Introduce asterix-derive(UpdateFspec): Automatic update of Fspec from data_items generation.
+- Cat34: Finish FSPEC byte 1
 
 ## [0.2.1] - 2020-08-30
 - Cat48: Add TrackQuality
