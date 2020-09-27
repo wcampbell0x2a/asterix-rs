@@ -5,6 +5,7 @@ authors = ["wcampbell <wcampbell1995@gmail.com>"]
 edition = "2018"
 description = "proc-macro convenience with the deku library, for updating ASTERIX FSPECs"
 readme = "../README.md"
+license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
