@@ -1,6 +1,7 @@
 use crate::data_item::{
-    AntennaRotationSpeed, DataSourceIdentifier, MessageType, SectorNumber,
-    SystemConfigurationAndStatus, SystemProcessingMode, TimeOfDay,
+    AntennaRotationSpeed, CollimationError, DataFilter, DataSourceIdentifier, GenericPolarWindow,
+    MessageCountValues, MessageType, SectorNumber, SystemConfigurationAndStatus,
+    SystemProcessingMode, ThreeDPositionOfDataSource, TimeOfDay,
 };
 use crate::fspec::{add_fx, is_fspec, read_fspec, trim_fspec};
 use asterix_derive::UpdateFspec;
@@ -36,4 +37,21 @@ pub struct Cat34 {
     /// FRN 7
     #[deku(skip, cond = "is_fspec(SystemProcessingMode::FRN_34, fspec, 0)")]
     pub system_processing_mode: Option<SystemProcessingMode>,
+    /// FRN 8
+    #[deku(skip, cond = "is_fspec(MessageCountValues::FRN_34, fspec, 1)")]
+    pub message_count_values: Option<MessageCountValues>,
+    /// FRN 9
+    #[deku(skip, cond = "is_fspec(GenericPolarWindow::FRN_34, fspec, 1)")]
+    pub generic_polar_window: Option<GenericPolarWindow>,
+    /// FRN 10
+    #[deku(skip, cond = "is_fspec(DataFilter::FRN_34, fspec, 1)")]
+    pub data_filter: Option<DataFilter>,
+    /// FRN 11
+    #[deku(skip, cond = "is_fspec(ThreeDPositionOfDataSource::FRN_34, fspec, 1)")]
+    pub three_d_position_of_data_source: Option<ThreeDPositionOfDataSource>,
+    /// FRN 12
+    #[deku(skip, cond = "is_fspec(CollimationError::FRN_34, fspec, 1)")]
+    pub collimation_error: Option<CollimationError>,
+    // FRN 13: Reserved Expansion Field
+    // FRN 14: Special Purpose Field
 }

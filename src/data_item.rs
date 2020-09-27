@@ -4,11 +4,14 @@ use crate::custom_read_write::{read, write, Op};
 use crate::fspec::{is_fspec, read_fspec};
 use crate::modifier;
 use crate::types::{
-    AIC, ANT, ARC, CDM, CHAB, CLU, CNF, CODE, COM, D, DLF, DOU, FX, G, GHO, L, MAH, MSC, MSSC,
-    MTYPE, NOGO, OVL, POL, RAB, RAD, RDP, RDPC, RDPR, RED, SCF, SI, SIM, SPI, STAT, STC, SUP, TCC,
-    TRE, TSV, TYP, V,
+    DataFilterTYP, MessageCounterTYP, AIC, ANT, ARC, CDM, CHAB, CLU, CNF, CODE, COM, D, DLF, DOU,
+    FX, G, GHO, L, MAH, MSC, MSSC, MTYPE, NOGO, OVL, POL, RAB, RAD, RDP, RDPC, RDPR, RED, SCF, SI,
+    SIM, SPI, STAT, STC, SUP, TCC, TRE, TSV, TYP, V,
 };
 use deku::prelude::*;
+
+const RHO_MODIFIER: f32 = 1.0 / 256.0;
+const THETA_MODIFIER: f32 = 360.0 / 65536.0;
 
 /// Identification of the radar station from which the data is received
 ///
@@ -73,21 +76,19 @@ impl TargetReportDescriptor {
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct MeasuredPositionInPolarCoordinates {
     #[deku(
-        reader = "read::bits_to_f32(rest, 16, Self::RHO_MODIFIER, Op::Multiply)",
-        writer = "write::f32_u32(&self.rho, 16, Self::RHO_MODIFIER, Op::Divide)"
+        reader = "read::bits_to_f32(rest, 16, RHO_MODIFIER, Op::Multiply)",
+        writer = "write::f32_u32(&self.rho, 16, RHO_MODIFIER, Op::Divide)"
     )]
     pub rho: f32,
     #[deku(
-        reader = "read::bits_to_f32(rest, 16, Self::THETA_MODIFIER, Op::Multiply)",
-        writer = "write::f32_u32(&self.theta, 16, Self::THETA_MODIFIER, Op::Divide)"
+        reader = "read::bits_to_f32(rest, 16, THETA_MODIFIER, Op::Multiply)",
+        writer = "write::f32_u32(&self.theta, 16, THETA_MODIFIER, Op::Divide)"
     )]
     pub theta: f32,
 }
 
 impl MeasuredPositionInPolarCoordinates {
     pub const FRN_48: u8 = 0b1_0000;
-    const RHO_MODIFIER: f32 = 1.0 / 256.0;
-    const THETA_MODIFIER: f32 = 360.0 / 65536.0;
 }
 
 /// Mode-3/A code converted into octal representation
@@ -259,7 +260,7 @@ impl AircraftIdentification {
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct ModeSMBData {
-    #[deku(bytes = "1", update = "self.mb_data.len()")]
+    #[deku(update = "self.mb_data.len()")]
     pub count: u8,
     #[deku(count = "count")]
     pub mb_data: Vec<MBData>,
@@ -931,4 +932,126 @@ pub struct MdsSubField2 {
     pub clu: CLU,
     #[deku(bits = "4")]
     pub spare: u8,
+}
+
+/// Message Count values, according the various types of messages,
+/// for the last completed antenna revolution, counted between two
+/// North crossings
+///
+/// Data Item I034/070
+#[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+#[deku(ctx = "_: deku::ctx::Endian")]
+pub struct MessageCountValues {
+    #[deku(update = "self.counters.len()")]
+    pub count: u8,
+    #[deku(count = "count")]
+    pub counters: Vec<MessageCounter>,
+}
+
+#[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+pub struct MessageCounter {
+    pub typ: MessageCounterTYP,
+    #[deku(bits = "11")]
+    pub counter: u16,
+}
+
+impl MessageCountValues {
+    pub const FRN_34: u8 = 0b1000_0000;
+}
+
+/// Geographical window defined in polar co-ordinates.
+///
+/// Data Item I034/100
+#[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+#[deku(ctx = "_: deku::ctx::Endian")]
+pub struct GenericPolarWindow {
+    #[deku(
+        reader = "read::bits_to_f32(rest, 16, RHO_MODIFIER, Op::Multiply)",
+        writer = "write::f32_u32(&self.rho_start, 16, RHO_MODIFIER, Op::Divide)"
+    )]
+    pub rho_start: f32,
+    #[deku(
+        reader = "read::bits_to_f32(rest, 16, RHO_MODIFIER, Op::Multiply)",
+        writer = "write::f32_u32(&self.rho_end, 16, RHO_MODIFIER, Op::Divide)"
+    )]
+    pub rho_end: f32,
+    #[deku(
+        reader = "read::bits_to_f32(rest, 16, THETA_MODIFIER, Op::Multiply)",
+        writer = "write::f32_u32(&self.theta_start, 16, THETA_MODIFIER, Op::Divide)"
+    )]
+    pub theta_start: f32,
+    #[deku(
+        reader = "read::bits_to_f32(rest, 16, THETA_MODIFIER, Op::Multiply)",
+        writer = "write::f32_u32(&self.theta_end, 16, THETA_MODIFIER, Op::Divide)"
+    )]
+    pub theta_end: f32,
+}
+
+impl GenericPolarWindow {
+    pub const FRN_34: u8 = 0b0100_0000;
+}
+
+/// Data Filter, which allows suppression of individual data types.
+///
+/// Data Item I034/110
+#[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+#[deku(ctx = "_: deku::ctx::Endian")]
+pub struct DataFilter {
+    pub typ: DataFilterTYP,
+}
+
+impl DataFilter {
+    pub const FRN_34: u8 = 0b0010_0000;
+}
+
+/// 3D-Position of Data Source in WGS 84 Co-ordinates
+///
+/// Data Item I034/120
+#[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+#[deku(ctx = "_: deku::ctx::Endian")]
+pub struct ThreeDPositionOfDataSource {
+    pub height_of_wgs_84: u16,
+    #[deku(
+        reader = "read::bits_to_f32(rest, 24, Self::WGS_MODIFIER, Op::Multiply)",
+        writer = "write::f32_u32(&self.latitude_in_wgs_84, 24, Self::WGS_MODIFIER, Op::Divide)"
+    )]
+    pub latitude_in_wgs_84: f32,
+    #[deku(
+        reader = "read::bits_to_f32(rest, 24, Self::WGS_MODIFIER, Op::Multiply)",
+        writer = "write::f32_u32(&self.longitude_in_wgs_84, 24, Self::WGS_MODIFIER, Op::Divide)"
+    )]
+    pub longitude_in_wgs_84: f32,
+}
+
+impl ThreeDPositionOfDataSource {
+    pub const WGS_MODIFIER: f32 = 180.0 / 8388608.0;
+    pub const FRN_34: u8 = 0b0001_0000;
+}
+
+/// Averaged difference in range and in azimuth for the primary target
+/// position with respect to the SSR target position as calculated by
+/// the radar station
+///
+/// Data Item I034/090
+#[derive(Debug, PartialEq, DekuRead, DekuWrite)]
+#[deku(ctx = "_: deku::ctx::Endian")]
+pub struct CollimationError {
+    #[deku(
+        reader = "read::bits_to_f32(rest, 8, Self::MODIFIER, Op::Multiply)",
+        writer = "write::f32_u32(&self.range_error, 8, Self::MODIFIER, Op::Divide)"
+    )]
+    pub range_error: f32,
+    #[deku(
+        reader = "read::bits_to_f32(rest, 8, Self::AZIMUTH_MODIFIER, Op::Multiply)",
+        writer = "write::f32_u32(&self.azimuth_error, 8, Self::AZIMUTH_MODIFIER, Op::Divide)"
+    )]
+    pub azimuth_error: f32,
+}
+
+impl CollimationError {
+    pub const MODIFIER: f32 = 1.0 / 128.0;
+    // TODO #![feature(const_int_pow)]
+    //pub const AZIMUTH_MODIFIER: f32 = 360.0 / f32::from(2_u16.pow(14));
+    pub const AZIMUTH_MODIFIER: f32 = 360.0 / 16384.0;
+    pub const FRN_34: u8 = 0b0000_1000;
 }

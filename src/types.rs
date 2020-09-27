@@ -505,3 +505,67 @@ pub enum CLU {
     #[deku(id = "1")]
     NotAutonomous,
 }
+
+#[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
+#[deku(id_type = "u8", id_bits = "5")]
+pub enum MessageCounterTYP {
+    #[deku(id = "0")]
+    NoDetection,
+    #[deku(id = "1")]
+    SinglePSRTargetReports,
+    #[deku(id = "2")]
+    SingleSSRTargetReports,
+    #[deku(id = "3")]
+    SSRPSRTargetReports,
+    #[deku(id = "4")]
+    SingleAllCallTargetReports,
+    #[deku(id = "5")]
+    SingleRollCallTargetReports,
+    #[deku(id = "6")]
+    AllCallPSRModeSTargetReports,
+    #[deku(id = "7")]
+    RollCallPSRModeSTargetReports,
+    #[deku(id = "8")]
+    FilterForWeatherData,
+    #[deku(id = "9")]
+    FilterForJammingStrobe,
+    #[deku(id = "10")]
+    FilterPSRData,
+    #[deku(id = "11")]
+    FilterSSRModeSData,
+    #[deku(id = "12")]
+    FilterSSRModeSPSRData,
+    #[deku(id = "13")]
+    FilterForEnhancedSuveillanceData,
+    #[deku(id = "14")]
+    FilterForPSREnhancedSurveillance,
+    #[deku(id = "15")]
+    FilterForPSREnhancedSurveillancePlusSSRModeSDataNotInAreaOfPrimeInterest,
+    #[deku(id = "16")]
+    FilterForPSREnhancedSurveillancePlusAllSSRModeSData,
+}
+
+#[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
+#[deku(id_type = "u8", id_bits = "8")]
+pub enum DataFilterTYP {
+    #[deku(id = "0")]
+    InvalidValue,
+    #[deku(id = "1")]
+    FilterWeatherData,
+    #[deku(id = "2")]
+    FilterJammingStrobe,
+    #[deku(id = "3")]
+    FilterPSRData,
+    #[deku(id = "4")]
+    FilterSSRModeSData,
+    #[deku(id = "5")]
+    FilterSSRModeSPSRData,
+    #[deku(id = "6")]
+    EnhancedSurveillanceData,
+    #[deku(id = "7")]
+    FilterPSREnhancedSurveillanceData,
+    #[deku(id = "8")]
+    FilterPSREnhancedSurveillanceSSRModeSDataNotInAreaOfPrimeInterest,
+    #[deku(id = "9")]
+    FilterPSREnhancedSurveillanceAllSSRModeSData,
+}
