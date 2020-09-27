@@ -10,6 +10,11 @@ readme = "README.md"
 description = "Encode/Decode for ASTERIX protocol using the deku library"
 repository = "https://github.com/wcampbell0x2a/asterix-rs"
 
+[workspace]
+members = [
+    "asterix-derive",
+]
+
 [dependencies]
 deku = "0.7.1"
-asterix-derive = { path = "asterix-derive" }
+asterix-derive = { version = "^0.2.0", path = "asterix-derive" }
