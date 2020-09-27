@@ -1024,7 +1024,7 @@ pub struct ThreeDPositionOfDataSource {
 }
 
 impl ThreeDPositionOfDataSource {
-    pub const WGS_MODIFIER: f32 = 180.0 / 8388608.0;
+    pub const WGS_MODIFIER: f32 = 180.0 / 8_388_608.0;
     pub const FRN_34: u8 = 0b0001_0000;
 }
 

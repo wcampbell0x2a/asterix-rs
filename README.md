@@ -5,7 +5,7 @@
 
 Currently supported:
 - CAT048
-- Most of CAT034
+- CAT034
 
 # Usage
 
