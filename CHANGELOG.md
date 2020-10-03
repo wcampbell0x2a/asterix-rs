@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.4] - 2020-10-03
+- Update lib.rs example
+- Add CI
+
 ## [0.2.3] - 2020-10-03
 - Update deku: 0.8.0. Gives some speed improvements with less allocation for writing.
 
