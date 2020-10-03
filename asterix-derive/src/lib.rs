@@ -9,13 +9,15 @@ use syn::{parse_macro_input, Data, DeriveInput, Fields};
 /// the well defined deku derives.
 ///
 /// Input:
-/// ```
+/// ```rust, ignore
+/// use asterix::data_item::*;
 /// #[deku(skip, cond = "is_fspec(DataSourceIdentifier::FRN_48, fspec, 0)")]
 /// pub data_source_identifier: Option<DataSourceIdentifier>,
 /// ```
 ///
 /// General Output:
-/// ```
+/// ```rust, ignore
+/// use asterix::data_item::*;
 /// if self.data_source_identifier.is_some() {
 ///     fspec[0] |= DataSourceIdentifier::FRN_48;
 /// }
