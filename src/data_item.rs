@@ -38,7 +38,7 @@ impl DataSourceIdentifier {
 pub struct TimeOfDay {
     #[deku(
         reader = "read::bits_to_f32(rest, 24, Self::MODIFIER, Op::Divide)",
-        writer = "write::f32_u32(&self.time, 24, Self::MODIFIER, Op::Multiply)"
+        writer = "write::f32_u32(&self.time, 24, Self::MODIFIER, Op::Multiply, output)"
     )]
     pub time: f32,
 }
@@ -77,12 +77,12 @@ impl TargetReportDescriptor {
 pub struct MeasuredPositionInPolarCoordinates {
     #[deku(
         reader = "read::bits_to_f32(rest, 16, RHO_MODIFIER, Op::Multiply)",
-        writer = "write::f32_u32(&self.rho, 16, RHO_MODIFIER, Op::Divide)"
+        writer = "write::f32_u32(&self.rho, 16, RHO_MODIFIER, Op::Divide, output)"
     )]
     pub rho: f32,
     #[deku(
         reader = "read::bits_to_f32(rest, 16, THETA_MODIFIER, Op::Multiply)",
-        writer = "write::f32_u32(&self.theta, 16, THETA_MODIFIER, Op::Divide)"
+        writer = "write::f32_u32(&self.theta, 16, THETA_MODIFIER, Op::Divide, output)"
     )]
     pub theta: f32,
 }
@@ -121,7 +121,7 @@ pub struct FlightLevelInBinaryRepresentation {
     pub g: G,
     #[deku(
         reader = "Self::read(rest)",
-        writer = "Self::write(&self.flight_level)"
+        writer = "Self::write(&self.flight_level, output)"
     )]
     pub flight_level: u16,
 }
@@ -136,9 +136,9 @@ impl FlightLevelInBinaryRepresentation {
         Ok((rest, value / 4))
     }
 
-    fn write(flight_level: &u16) -> Result<BitVec<Msb0, u8>, DekuError> {
+    fn write(flight_level: &u16, output: &mut BitVec<Msb0, u8>) -> Result<(), DekuError> {
         let value = *flight_level * 4;
-        value.write(Self::CTX)
+        value.write(output, Self::CTX)
     }
 }
 
@@ -167,7 +167,7 @@ pub struct AircraftIdentification {
     /// IA5 char array
     #[deku(
         reader = "Self::read(rest)",
-        writer = "Self::write(&self.identification)"
+        writer = "Self::write(&self.identification, output)"
     )]
     pub identification: String,
 }
@@ -198,16 +198,17 @@ impl AircraftIdentification {
     }
 
     /// Parse from String to u8 and write
-    fn write(field_a: &str) -> Result<BitVec<Msb0, u8>, DekuError> {
-        let mut acc: BitVec<Msb0, u8> = BitVec::new();
+    fn write(field_a: &str, output: &mut BitVec<Msb0, u8>) -> Result<(), DekuError> {
         for c in field_a.chars() {
-            let bits = Self::as_ia5(c as u8)
-                .write((deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)))?;
-            acc.extend(bits);
+            Self::as_ia5(c as u8).write(
+                output,
+                (deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)),
+            )?;
         }
-        let bits = 0_u8.write((deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)))?;
-        acc.extend(bits);
-        Ok(acc)
+        0_u8.write(
+            output,
+            (deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)),
+        )
     }
 
     const IA5_ALPHA: u8 = 0x01;
@@ -305,12 +306,12 @@ impl TrackNumber {
 pub struct CalculatedPositionCartesianCorr {
     #[deku(
         reader = "read::bits_i16_to_f32(rest, 16, Self::MODIFIER, Op::Multiply)",
-        writer = "write::f32_i32(&self.x, 16, Self::MODIFIER, Op::Divide)"
+        writer = "write::f32_i32(&self.x, 16, Self::MODIFIER, Op::Divide, output)"
     )]
     pub x: f32,
     #[deku(
         reader = "read::bits_i16_to_f32(rest, 16, Self::MODIFIER, Op::Multiply)",
-        writer = "write::f32_i32(&self.y, 16, Self::MODIFIER, Op::Divide)"
+        writer = "write::f32_i32(&self.y, 16, Self::MODIFIER, Op::Divide, output)"
     )]
     pub y: f32,
 }
@@ -328,12 +329,12 @@ impl CalculatedPositionCartesianCorr {
 pub struct CalculatedTrackVelocity {
     #[deku(
         reader = "read::bits_to_f32(rest, 16, modifier::groundspeed(), Op::Multiply)",
-        writer = "write::f32_u32(&self.groundspeed, 16, modifier::groundspeed(), Op::Divide)"
+        writer = "write::f32_u32(&self.groundspeed, 16, modifier::groundspeed(), Op::Divide, output)"
     )]
     pub groundspeed: f32,
     #[deku(
         reader = "read::bits_to_f32(rest, 16, modifier::heading1(), Op::Multiply)",
-        writer = "write::f32_u32(&self.heading, 16, modifier::heading1(), Op::Divide)"
+        writer = "write::f32_u32(&self.heading, 16, modifier::heading1(), Op::Divide, output)"
     )]
     pub heading: f32,
 }
@@ -380,22 +381,22 @@ impl TrackStatus {
 pub struct TrackQuality {
     #[deku(
         reader = "read::bits_to_f32(rest, 8, Self::MODIFIER, Op::Divide)",
-        writer = "write::f32_u32(&self.horizontal_stddev, 8, Self::MODIFIER, Op::Multiply)"
+        writer = "write::f32_u32(&self.horizontal_stddev, 8, Self::MODIFIER, Op::Multiply, output)"
     )]
     pub horizontal_stddev: f32,
     #[deku(
         reader = "read::bits_to_f32(rest, 8, Self::MODIFIER, Op::Divide)",
-        writer = "write::f32_u32(&self.vertical_stddev, 8, Self::MODIFIER, Op::Multiply)"
+        writer = "write::f32_u32(&self.vertical_stddev, 8, Self::MODIFIER, Op::Multiply, output)"
     )]
     pub vertical_stddev: f32,
     #[deku(
         reader = "read::bits_to_f32(rest, 8, modifier::groundspeed(), Op::Multiply)",
-        writer = "write::f32_u32(&self.groundspeed_stddev, 8, modifier::groundspeed(), Op::Divide)"
+        writer = "write::f32_u32(&self.groundspeed_stddev, 8, modifier::groundspeed(), Op::Divide, output)"
     )]
     pub groundspeed_stddev: f32,
     #[deku(
         reader = "read::bits_to_f32(rest, 8, modifier::heading2(), Op::Multiply)",
-        writer = "write::f32_u32(&self.heading_stddev, 8, modifier::heading2(), Op::Divide)"
+        writer = "write::f32_u32(&self.heading_stddev, 8, modifier::heading2(), Op::Divide, output)"
     )]
     pub heading_stddev: f32,
 }
@@ -442,7 +443,7 @@ pub struct RadarPlotCharacteristics {
         skip,
         cond = "is_fspec(0b1000_0000, fspec, 0)",
         reader = "read::bits_to_optionf32(rest, 8, Self::runlength_modifier(), Op::Multiply)",
-        writer = "write::f32_optionu32(&self.srl, 8, Self::runlength_modifier(), Op::Divide)"
+        writer = "write::f32_optionu32(&self.srl, 8, Self::runlength_modifier(), Op::Divide, output)"
     )]
     pub srl: Option<f32>,
     #[deku(skip, cond = "is_fspec(0b100_0000, fspec, 0)", bytes = "1")]
@@ -453,7 +454,7 @@ pub struct RadarPlotCharacteristics {
         skip,
         cond = "is_fspec(0b1_0000, fspec, 0)",
         reader = "read::bits_to_optionf32(rest, 8, Self::runlength_modifier(), Op::Multiply)",
-        writer = "write::f32_optionu32(&self.prl, 8, Self::runlength_modifier(), Op::Divide)"
+        writer = "write::f32_optionu32(&self.prl, 8, Self::runlength_modifier(), Op::Divide, output)"
     )]
     pub prl: Option<f32>,
     #[deku(skip, cond = "is_fspec(0b1000, fspec, 0)", bytes = "1")]
@@ -462,14 +463,14 @@ pub struct RadarPlotCharacteristics {
         skip,
         cond = "is_fspec(0b100, fspec, 0)",
         reader = "read::bits_to_optionf32(rest, 8, Self::nm_modifier(), Op::Multiply)",
-        writer = "write::f32_optionu32(&self.rpd, 8, Self::nm_modifier(), Op::Divide)"
+        writer = "write::f32_optionu32(&self.rpd, 8, Self::nm_modifier(), Op::Divide, output)"
     )]
     pub rpd: Option<f32>,
     #[deku(
         skip,
         cond = "is_fspec(0b100, fspec, 0)",
         reader = "read::bits_to_optionf32(rest, 8, Self::apd_modifier(), Op::Multiply)",
-        writer = "write::f32_optionu32(&self.apd, 8, Self::apd_modifier(), Op::Divide)"
+        writer = "write::f32_optionu32(&self.apd, 8, Self::apd_modifier(), Op::Divide, output)"
     )]
     pub apd: Option<f32>,
 }
@@ -512,7 +513,7 @@ impl MessageType {
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct SectorNumber {
-    #[deku(reader = "Self::read(rest)", writer = "Self::write(&self.num)")]
+    #[deku(reader = "Self::read(rest)", writer = "Self::write(&self.num, output)")]
     pub num: u16,
 }
 
@@ -531,9 +532,9 @@ impl SectorNumber {
         Ok((rest, (f32::from(value) * Self::modifier()) as u16))
     }
 
-    fn write(num: &u16) -> Result<BitVec<Msb0, u8>, DekuError> {
+    fn write(num: &u16, output: &mut BitVec<Msb0, u8>) -> Result<(), DekuError> {
         let value = (f32::from(*num) / Self::modifier()) as u8;
-        value.write(Self::CTX)
+        value.write(output, Self::CTX)
     }
 }
 
@@ -623,7 +624,10 @@ impl ModeCCodeAndConfidenceIndicator {
 pub struct HeightMeasuredBy3dRadar {
     #[deku(bits = "2", endian = "big")]
     pub reserved: u8,
-    #[deku(reader = "Self::read(rest)", writer = "Self::write(&self.height)")]
+    #[deku(
+        reader = "Self::read(rest)",
+        writer = "Self::write(&self.height, output)"
+    )]
     pub height: i32,
 }
 
@@ -638,9 +642,9 @@ impl HeightMeasuredBy3dRadar {
         Ok((rest, (value * Self::MODIFIER) as i32))
     }
 
-    fn write(height: &i32) -> Result<BitVec<Msb0, u8>, DekuError> {
+    fn write(height: &i32, output: &mut BitVec<Msb0, u8>) -> Result<(), DekuError> {
         let value = height / Self::MODIFIER;
-        value.write(Self::CTX)
+        value.write(output, Self::CTX)
     }
 }
 
@@ -786,7 +790,7 @@ impl Mode2CodeConfidenceIndicator {
 pub struct AntennaRotationSpeed {
     #[deku(
         reader = "read::bits_to_f32(rest, 16, Self::MODIFIER, Op::Divide)",
-        writer = "write::f32_u32(&self.period, 16, Self::MODIFIER, Op::Multiply)"
+        writer = "write::f32_u32(&self.period, 16, Self::MODIFIER, Op::Multiply, output)"
     )]
     pub period: f32,
 }
@@ -967,22 +971,22 @@ impl MessageCountValues {
 pub struct GenericPolarWindow {
     #[deku(
         reader = "read::bits_to_f32(rest, 16, RHO_MODIFIER, Op::Multiply)",
-        writer = "write::f32_u32(&self.rho_start, 16, RHO_MODIFIER, Op::Divide)"
+        writer = "write::f32_u32(&self.rho_start, 16, RHO_MODIFIER, Op::Divide, output)"
     )]
     pub rho_start: f32,
     #[deku(
         reader = "read::bits_to_f32(rest, 16, RHO_MODIFIER, Op::Multiply)",
-        writer = "write::f32_u32(&self.rho_end, 16, RHO_MODIFIER, Op::Divide)"
+        writer = "write::f32_u32(&self.rho_end, 16, RHO_MODIFIER, Op::Divide, output)"
     )]
     pub rho_end: f32,
     #[deku(
         reader = "read::bits_to_f32(rest, 16, THETA_MODIFIER, Op::Multiply)",
-        writer = "write::f32_u32(&self.theta_start, 16, THETA_MODIFIER, Op::Divide)"
+        writer = "write::f32_u32(&self.theta_start, 16, THETA_MODIFIER, Op::Divide, output)"
     )]
     pub theta_start: f32,
     #[deku(
         reader = "read::bits_to_f32(rest, 16, THETA_MODIFIER, Op::Multiply)",
-        writer = "write::f32_u32(&self.theta_end, 16, THETA_MODIFIER, Op::Divide)"
+        writer = "write::f32_u32(&self.theta_end, 16, THETA_MODIFIER, Op::Divide, output)"
     )]
     pub theta_end: f32,
 }
@@ -1013,12 +1017,12 @@ pub struct ThreeDPositionOfDataSource {
     pub height_of_wgs_84: u16,
     #[deku(
         reader = "read::bits_to_f32(rest, 24, Self::WGS_MODIFIER, Op::Multiply)",
-        writer = "write::f32_u32(&self.latitude_in_wgs_84, 24, Self::WGS_MODIFIER, Op::Divide)"
+        writer = "write::f32_u32(&self.latitude_in_wgs_84, 24, Self::WGS_MODIFIER, Op::Divide, output)"
     )]
     pub latitude_in_wgs_84: f32,
     #[deku(
         reader = "read::bits_to_f32(rest, 24, Self::WGS_MODIFIER, Op::Multiply)",
-        writer = "write::f32_u32(&self.longitude_in_wgs_84, 24, Self::WGS_MODIFIER, Op::Divide)"
+        writer = "write::f32_u32(&self.longitude_in_wgs_84, 24, Self::WGS_MODIFIER, Op::Divide, output)"
     )]
     pub longitude_in_wgs_84: f32,
 }
@@ -1038,12 +1042,12 @@ impl ThreeDPositionOfDataSource {
 pub struct CollimationError {
     #[deku(
         reader = "read::bits_to_f32(rest, 8, Self::MODIFIER, Op::Multiply)",
-        writer = "write::f32_u32(&self.range_error, 8, Self::MODIFIER, Op::Divide)"
+        writer = "write::f32_u32(&self.range_error, 8, Self::MODIFIER, Op::Divide, output)"
     )]
     pub range_error: f32,
     #[deku(
         reader = "read::bits_to_f32(rest, 8, Self::AZIMUTH_MODIFIER, Op::Multiply)",
-        writer = "write::f32_u32(&self.azimuth_error, 8, Self::AZIMUTH_MODIFIER, Op::Divide)"
+        writer = "write::f32_u32(&self.azimuth_error, 8, Self::AZIMUTH_MODIFIER, Op::Divide, output)"
     )]
     pub azimuth_error: f32,
 }

@@ -67,15 +67,16 @@ pub mod write {
         bits: usize,
         modifier: f32,
         modifier_op: Op,
-    ) -> Result<BitVec<Msb0, u8>, DekuError> {
+        output: &mut BitVec<Msb0, u8>,
+    ) -> Result<(), DekuError> {
+        // TODO this should be function for this and the other one
         let value = match modifier_op {
             Op::Multiply => *value * modifier,
             Op::Divide => *value / modifier,
             Op::Add => *value + modifier,
             Op::Subtract => *value - modifier,
         };
-        let value = value as u32;
-        value.write((deku::ctx::Endian::Big, deku::ctx::BitSize(bits)))
+        (value as u32).write(output, (deku::ctx::Endian::Big, deku::ctx::BitSize(bits)))
     }
 
     pub fn f32_optionu32(
@@ -83,9 +84,10 @@ pub mod write {
         bits: usize,
         modifier: f32,
         modifier_op: Op,
-    ) -> Result<BitVec<Msb0, u8>, DekuError> {
-        value.map_or(Ok(BitVec::new()), |value| {
-            f32_u32(&value, bits, modifier, modifier_op)
+        output: &mut BitVec<Msb0, u8>,
+    ) -> Result<(), DekuError> {
+        value.map_or(Ok(()), |value| {
+            f32_u32(&value, bits, modifier, modifier_op, output)
         })
     }
 
@@ -94,14 +96,14 @@ pub mod write {
         bits: usize,
         modifier: f32,
         modifier_op: Op,
-    ) -> Result<BitVec<Msb0, u8>, DekuError> {
+        output: &mut BitVec<Msb0, u8>,
+    ) -> Result<(), DekuError> {
         let value = match modifier_op {
             Op::Multiply => *value * modifier,
             Op::Divide => *value / modifier,
             Op::Add => *value + modifier,
             Op::Subtract => *value - modifier,
         };
-        let value = value as i32;
-        value.write((deku::ctx::Endian::Big, deku::ctx::BitSize(bits)))
+        (value as i32).write(output, (deku::ctx::Endian::Big, deku::ctx::BitSize(bits)))
     }
 }

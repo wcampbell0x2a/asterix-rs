@@ -1,6 +1,6 @@
 [package]
 name = "asterix"
-version = "0.2.2"
+version = "0.2.3"
 authors = ["wcampbell"]
 edition = "2018"
 categories = ["encoding", "parsing"]
@@ -16,5 +16,5 @@ members = [
 ]
 
 [dependencies]
-deku = "0.7.1"
+deku = "0.8.0"
 asterix-derive = { version = "^0.2.0", path = "asterix-derive" }

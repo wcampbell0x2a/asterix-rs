@@ -81,7 +81,7 @@ pub struct AsterixPacket {
     /// Asterix Messages
     #[deku(
         reader = "Self::read_messages(rest, *category, *length)",
-        writer = "Self::write_messages(&self.messages, *category)"
+        writer = "Self::write_messages(&self.messages, *category, output)"
     )]
     pub messages: Vec<AsterixMessage>,
 }
@@ -124,19 +124,21 @@ impl AsterixPacket {
     fn write_messages(
         messages: &[AsterixMessage],
         category: u8,
-    ) -> Result<BitVec<Msb0, u8>, DekuError> {
-        let mut acc: BitVec<Msb0, u8> = BitVec::new();
+        output: &mut BitVec<Msb0, u8>,
+    ) -> Result<(), DekuError> {
         for message in messages {
-            let bits = message.write((deku::ctx::Endian::Big, category))?;
-            acc.extend(bits);
+            message.write(output, (deku::ctx::Endian::Big, category))?;
         }
-        Ok(acc)
+        Ok(())
     }
 
     fn update_len(messages: &mut Vec<AsterixMessage>) -> u16 {
         let mut len: u16 = 0;
         for message in messages.iter_mut() {
-            let bits = message.write((deku::ctx::Endian::Big, 0)).unwrap();
+            let mut bits: BitVec<Msb0, u8> = BitVec::new();
+            message
+                .write(&mut bits, (deku::ctx::Endian::Big, 0))
+                .unwrap();
             len += (bits.len() / 8) as u16 + ASTERIX_HEADER_SIZE
         }
         len

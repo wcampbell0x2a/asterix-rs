@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.3] - 2020-10-03
+- Update deku: 0.8.0. Gives some speed improvements with less allocation for writing.
+
 ## [0.2.2] - 2020-09-27
 - Introduce asterix-derive(UpdateFspec): Automatic update of Fspec from data_items generation.
 - Cat34: Complete
