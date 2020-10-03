@@ -186,13 +186,13 @@ impl AircraftIdentification {
         let (rest, _) = u8::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)))?;
         let value = format!(
             "{}{}{}{}{}{}{}",
-            Self::as_ascii(one) as char,
-            Self::as_ascii(two) as char,
-            Self::as_ascii(three) as char,
-            Self::as_ascii(four) as char,
-            Self::as_ascii(five) as char,
-            Self::as_ascii(six) as char,
-            Self::as_ascii(seven) as char
+            Self::asterix_char_to_ascii(one) as char,
+            Self::asterix_char_to_ascii(two) as char,
+            Self::asterix_char_to_ascii(three) as char,
+            Self::asterix_char_to_ascii(four) as char,
+            Self::asterix_char_to_ascii(five) as char,
+            Self::asterix_char_to_ascii(six) as char,
+            Self::asterix_char_to_ascii(seven) as char
         );
         Ok((rest, value))
     }
@@ -200,7 +200,7 @@ impl AircraftIdentification {
     /// Parse from String to u8 and write
     fn write(field_a: &str, output: &mut BitVec<Msb0, u8>) -> Result<(), DekuError> {
         for c in field_a.chars() {
-            Self::as_ia5(c as u8).write(
+            Self::asterix_ascii_to_ia5_char(c as u8).write(
                 output,
                 (deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)),
             )?;
@@ -220,7 +220,7 @@ impl AircraftIdentification {
     const ASC_ERROR: u8 = b'?';
 
     /// parse into ascii from IA5 char array
-    const fn as_ascii(code: u8) -> u8 {
+    const fn asterix_char_to_ascii(code: u8) -> u8 {
         // space
         if code == Self::IA5_SPACE {
             return Self::ASC_SPACE;
@@ -237,7 +237,7 @@ impl AircraftIdentification {
     }
 
     /// parse from IA5 char as u8 to u8 value
-    const fn as_ia5(code: u8) -> u8 {
+    const fn asterix_ascii_to_ia5_char(code: u8) -> u8 {
         // space
         if code == Self::ASC_SPACE {
             return Self::IA5_SPACE;

@@ -6,7 +6,8 @@
 //! ## From `&[u8]`
 //! ```
 //! use deku::prelude::*;
-//! use asterix::AsterixPacket;
+//! use asterix::*;
+//! use asterix::data_item::*;
 //!
 //! let bytes = &[0x22, 0x00, 0x0b, 0xf0, 0x19, 0x0d, 0x02, 0x35, 0x6d, 0xfa, 0x60];
 //! let (_, mut packet) = AsterixPacket::from_bytes((bytes, 0)).unwrap();
@@ -17,7 +18,7 @@
 //!
 //! ```rust
 //! use deku::prelude::*;
-//! use asterix::{AsterixPacket, Cat34};
+//! use asterix::*;
 //! use asterix::data_item::*;
 //! use asterix::types::*;
 //!
@@ -37,7 +38,8 @@
 //! # Encoding Packets
 //! ```rust
 //! use deku::prelude::*;
-//! use asterix::AsterixPacket;
+//! use asterix::*;
+//! use asterix::data_item::*;
 //!
 //! // Create / Mutate a packet
 //! let mut packet = AsterixPacket::default();
