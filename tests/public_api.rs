@@ -44,7 +44,7 @@ fn it_works() {
             target_report_descriptor.rab,
             RAB::ReportFromAircraftTransponder
         );
-        assert_eq!(target_report_descriptor.fx, FX::EndOfDataItem);
+        assert_eq!(target_report_descriptor.fx1, FX::EndOfDataItem);
 
         let measured_position_in_polar_coordinates = message
             .measured_position_in_polar_coordinates
@@ -199,7 +199,7 @@ fn third_packet() {
             target_report_descriptor.rab,
             RAB::ReportFromAircraftTransponder
         );
-        assert_eq!(target_report_descriptor.fx, FX::EndOfDataItem);
+        assert_eq!(target_report_descriptor.fx1, FX::EndOfDataItem);
 
         let measured_position_in_polar_coordinates = message
             .measured_position_in_polar_coordinates

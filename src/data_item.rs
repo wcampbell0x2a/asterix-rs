@@ -5,8 +5,8 @@ use crate::fspec::{is_fspec, read_fspec};
 use crate::modifier;
 use crate::types::{
     DataFilterTYP, MessageCounterTYP, AIC, ANT, ARC, CDM, CHAB, CLU, CNF, CODE, COM, D, DLF, DOU,
-    FX, G, GHO, L, MAH, MSC, MSSC, MTYPE, NOGO, OVL, POL, RAB, RAD, RDP, RDPC, RDPR, RED, SCF, SI,
-    SIM, SPI, STAT, STC, SUP, TCC, TRE, TSV, TYP, V,
+    ERR, FOEFRI, FX, G, GHO, L, MAH, ME, MI, MSC, MSSC, MTYPE, NOGO, OVL, POL, RAB, RAD, RDP, RDPC,
+    RDPR, RED, SCF, SI, SIM, SPI, STAT, STC, SUP, TCC, TRE, TST, TSV, TYP, V, XPP,
 };
 use deku::prelude::*;
 
@@ -51,7 +51,7 @@ impl TimeOfDay {
 
 /// Type and properties of the target report
 ///
-/// Data Item I048/040
+/// Data Item I048/020
 ///
 /// TODO: This can extend with FX bit.
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
@@ -62,7 +62,21 @@ pub struct TargetReportDescriptor {
     pub rdp: RDP,
     pub spi: SPI,
     pub rab: RAB,
-    pub fx: FX,
+    pub fx1: FX,
+    #[deku(skip, cond = "*fx1 != FX::ExtensionIntoFirstExtent")]
+    pub tst: Option<TST>,
+    #[deku(skip, cond = "*fx1 != FX::ExtensionIntoFirstExtent")]
+    pub err: Option<ERR>,
+    #[deku(skip, cond = "*fx1 != FX::ExtensionIntoFirstExtent")]
+    pub xpp: Option<XPP>,
+    #[deku(skip, cond = "*fx1 != FX::ExtensionIntoFirstExtent")]
+    pub me: Option<ME>,
+    #[deku(skip, cond = "*fx1 != FX::ExtensionIntoFirstExtent")]
+    pub mi: Option<MI>,
+    #[deku(skip, cond = "*fx1 != FX::ExtensionIntoFirstExtent")]
+    pub foe_fri: Option<FOEFRI>,
+    #[deku(skip, cond = "*fx1 != FX::ExtensionIntoFirstExtent")]
+    pub fx2: Option<FX>,
 }
 
 impl TargetReportDescriptor {
@@ -1058,4 +1072,43 @@ impl CollimationError {
     //pub const AZIMUTH_MODIFIER: f32 = 360.0 / f32::from(2_u16.pow(14));
     pub const AZIMUTH_MODIFIER: f32 = 360.0 / 16384.0;
     pub const FRN_34: u8 = 0b0000_1000;
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    // tests from https://github.com/wireshark/wireshark/blob/master/test/suite_dissectors/group_asterix.py
+
+    #[test]
+    fn tod_140() {
+        let mut input = BitSlice::from_slice(&[0xa8, 0xbf, 0xff]).unwrap();
+        let item = TimeOfDay::read(&mut input, deku::ctx::Endian::Big)
+            .unwrap()
+            .1;
+        assert_eq!(item.time, 86399.9921875);
+    }
+
+    #[test]
+    fn target_report_descriptor_020() {
+        let mut input = BitSlice::from_slice(&[
+            0xe0 | 0x08 | 0x04 | 0x02 | 0x01,
+            0x80 | 0x40 | 0x20 | 0x10 | 0x08 | 0x06,
+        ])
+        .unwrap();
+        let item = TargetReportDescriptor::read(&mut input, deku::ctx::Endian::Big)
+            .unwrap()
+            .1;
+        assert_eq!(item.typ, TYP::ModeSRollCallPlusPSR);
+        assert_eq!(item.sim, SIM::ActualTargetReport);
+        assert_eq!(item.rdp, RDP::ReportFromRDPChain2);
+        assert_eq!(item.spi, SPI::SpecialPositionIdentification);
+        assert_eq!(item.rab, RAB::ReportFromFieldMonitor);
+        assert_eq!(item.fx1, FX::ExtensionIntoFirstExtent);
+        assert_eq!(item.tst, Some(TST::TestTargetReport));
+        assert_eq!(item.err, Some(ERR::ExtendedRangePresent));
+        assert_eq!(item.xpp, Some(XPP::XPulsePresent));
+        assert_eq!(item.me, Some(ME::MilitaryEmergency));
+        assert_eq!(item.mi, Some(MI::MilitaryIdentification));
+        assert_eq!(item.foe_fri, Some(FOEFRI::NoReply));
+    }
 }

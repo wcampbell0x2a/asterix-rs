@@ -569,3 +569,61 @@ pub enum DataFilterTYP {
     #[deku(id = "9")]
     FilterPSREnhancedSurveillanceAllSSRModeSData,
 }
+
+#[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
+#[deku(type = "u8", bits = "1")]
+pub enum TST {
+    #[deku(id = "0")]
+    RealTargetReport,
+    #[deku(id = "1")]
+    TestTargetReport,
+}
+
+#[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
+#[deku(type = "u8", bits = "1")]
+pub enum ERR {
+    #[deku(id = "0")]
+    NoExtendedRange,
+    #[deku(id = "1")]
+    ExtendedRangePresent,
+}
+
+#[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
+#[deku(type = "u8", bits = "1")]
+pub enum XPP {
+    #[deku(id = "0")]
+    NoXPulsePresent,
+    #[deku(id = "1")]
+    XPulsePresent,
+}
+
+#[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
+#[deku(type = "u8", bits = "1")]
+pub enum ME {
+    #[deku(id = "0")]
+    NoMilitaryEmergency,
+    #[deku(id = "1")]
+    MilitaryEmergency,
+}
+
+#[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
+#[deku(type = "u8", bits = "1")]
+pub enum MI {
+    #[deku(id = "0")]
+    NoMilitaryIdentification,
+    #[deku(id = "1")]
+    MilitaryIdentification,
+}
+
+#[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
+#[deku(type = "u8", bits = "2")]
+pub enum FOEFRI {
+    #[deku(id = "0b00")]
+    NoMode4Interrogation,
+    #[deku(id = "0b01")]
+    FriendlyTarget,
+    #[deku(id = "0b10")]
+    UnknownTarget,
+    #[deku(id = "0b11")]
+    NoReply,
+}
