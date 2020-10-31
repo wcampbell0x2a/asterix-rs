@@ -81,10 +81,7 @@ pub struct AsterixPacket {
     #[deku(update = "Self::update_len(&mut self.messages)")]
     pub length: u16,
     /// Asterix Messages
-    #[deku(
-        reader = "Self::read_messages(rest, *category, *length)",
-        writer = "Self::write_messages(&self.messages, *category, output)"
-    )]
+    #[deku(bytes_read = "length - ASTERIX_HEADER_SIZE", ctx = "*category")]
     pub messages: Vec<AsterixMessage>,
 }
 
@@ -95,42 +92,6 @@ impl AsterixPacket {
             message.update_fspec();
         }
         self.update()?;
-        Ok(())
-    }
-
-    /// Parse as messages until the length of bits read matches `length`
-    fn read_messages(
-        rest: &BitSlice<Msb0, u8>,
-        category: u8,
-        length: u16,
-    ) -> Result<(&BitSlice<Msb0, u8>, Vec<AsterixMessage>), DekuError> {
-        let mut inside_rest = rest;
-        let mut messages = vec![];
-
-        // The finish len is the bytes subtracted by the length - 3 (header bytes)
-        let finish_len = (inside_rest.len() / 8) - usize::from(length - ASTERIX_HEADER_SIZE);
-
-        // loop until the correct number of bytes have been read, then return Vec
-        loop {
-            let (new_rest, value) =
-                AsterixMessage::read(inside_rest, (deku::ctx::Endian::Big, category))?;
-            messages.push(value);
-            inside_rest = new_rest;
-            if inside_rest.len() / 8 == finish_len {
-                break;
-            }
-        }
-        Ok((inside_rest, messages))
-    }
-
-    fn write_messages(
-        messages: &[AsterixMessage],
-        category: u8,
-        output: &mut BitVec<Msb0, u8>,
-    ) -> Result<(), DekuError> {
-        for message in messages {
-            message.write(output, (deku::ctx::Endian::Big, category))?;
-        }
         Ok(())
     }
 
