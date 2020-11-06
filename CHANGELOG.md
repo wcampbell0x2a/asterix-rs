@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.5] - 2020-11-06
+- Update/Use deku 0.9.1
+
 ## [0.2.4] - 2020-10-03
 - Update lib.rs example
 - Add CI
