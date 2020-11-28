@@ -366,9 +366,11 @@ fn test_not_from_bytes() {
     thirty_eight.time_of_day = Some(TimeOfDay { time: 27355.953 });
     thirty_eight.sector_number = Some(SectorNumber { num: 135 });
 
-    let mut packet = AsterixPacket::default();
-    packet.category = 34;
-    packet.messages = vec![asterix::AsterixMessage::Cat34(thirty_eight)];
+    let mut packet = AsterixPacket {
+        category: 34,
+        messages: vec![asterix::AsterixMessage::Cat34(thirty_eight)],
+        ..AsterixPacket::default()
+    };
     packet.finalize().unwrap();
     let exp_bytes = vec![
         0x22, 0x00, 0x0b, 0xf0, 0x19, 0x0d, 0x02, 0x35, 0x6d, 0xfa, 0x60,
@@ -387,9 +389,11 @@ fn test_48_track_quality() {
         groundspeed_stddev: 0.0,
         heading_stddev: 0.0,
     });
-    let mut packet = AsterixPacket::default();
-    packet.category = 48;
-    packet.messages = vec![asterix::AsterixMessage::Cat48(fourty_eight)];
+    let mut packet = AsterixPacket {
+        category: 48,
+        messages: vec![asterix::AsterixMessage::Cat48(fourty_eight)],
+        ..AsterixPacket::default()
+    };
     packet.finalize().unwrap();
     let exp_bytes = vec![
         0x30,
@@ -414,9 +418,11 @@ fn test_48_track_quality() {
         groundspeed_stddev: 0.015_563_965,
         heading_stddev: 22.412_11,
     });
-    let mut packet = AsterixPacket::default();
-    packet.category = 48;
-    packet.messages = vec![asterix::AsterixMessage::Cat48(fourty_eight)];
+    let mut packet = AsterixPacket {
+        category: 48,
+        messages: vec![asterix::AsterixMessage::Cat48(fourty_eight)],
+        ..AsterixPacket::default()
+    };
     packet.finalize().unwrap();
     let exp_bytes = vec![
         0x30,
@@ -453,9 +459,11 @@ fn test_48_warning_error_con_target_class() {
     };
 
     fourty_eight.warning_error_con_target_class = Some(warning);
-    let mut packet = AsterixPacket::default();
-    packet.category = 48;
-    packet.messages = vec![asterix::AsterixMessage::Cat48(fourty_eight)];
+    let mut packet = AsterixPacket {
+        category: 48,
+        messages: vec![asterix::AsterixMessage::Cat48(fourty_eight)],
+        ..AsterixPacket::default()
+    };
     packet.finalize().unwrap();
     let exp_bytes = vec![
         0x30,
@@ -481,9 +489,11 @@ fn test_48_mode_3a_code_confidence_indicator() {
         confidence: 0b0000_0001,
     };
     fourty_eight.mode3a_code_confidence_indicator = Some(confidence);
-    let mut packet = AsterixPacket::default();
-    packet.category = 48;
-    packet.messages = vec![asterix::AsterixMessage::Cat48(fourty_eight)];
+    let mut packet = AsterixPacket {
+        category: 48,
+        messages: vec![asterix::AsterixMessage::Cat48(fourty_eight)],
+        ..AsterixPacket::default()
+    };
     packet.finalize().unwrap();
     let exp_bytes = vec![0x30, 0x00, 0x08, 0x01, 0x01, 0b10_0000, 0x00, 0x01];
     assert_eq!(packet.to_bytes().unwrap(), exp_bytes);
@@ -503,9 +513,11 @@ fn test_48_mode_c_code_confidence() {
         confidence: 0x01,
     };
     fourty_eight.modec_code_and_confidence_indicator = Some(confidence);
-    let mut packet = AsterixPacket::default();
-    packet.category = 48;
-    packet.messages = vec![asterix::AsterixMessage::Cat48(fourty_eight)];
+    let mut packet = AsterixPacket {
+        category: 48,
+        messages: vec![asterix::AsterixMessage::Cat48(fourty_eight)],
+        ..AsterixPacket::default()
+    };
     packet.finalize().unwrap();
     let exp_bytes = vec![
         0x30, 0x00, 0x0a, 0x01, 0x01, 0b1_0000, 0x00, 0x01, 0x00, 0x01,
@@ -523,9 +535,11 @@ fn test_48_height_3d() {
         height: 25,
     };
     fourty_eight.height_measured_by_3d_radar = Some(height);
-    let mut packet = AsterixPacket::default();
-    packet.category = 48;
-    packet.messages = vec![asterix::AsterixMessage::Cat48(fourty_eight)];
+    let mut packet = AsterixPacket {
+        category: 48,
+        messages: vec![asterix::AsterixMessage::Cat48(fourty_eight)],
+        ..AsterixPacket::default()
+    };
     packet.finalize().unwrap();
     let exp_bytes = vec![0x30, 0x00, 0x08, 0x01, 0x01, 0b1000, 0x00, 0x01];
     assert_eq!(packet.to_bytes().unwrap(), exp_bytes);
@@ -538,9 +552,11 @@ fn test_48_height_3d() {
         height: 37200,
     };
     fourty_eight.height_measured_by_3d_radar = Some(height);
-    let mut packet = AsterixPacket::default();
-    packet.category = 48;
-    packet.messages = vec![asterix::AsterixMessage::Cat48(fourty_eight)];
+    let mut packet = AsterixPacket {
+        category: 48,
+        messages: vec![asterix::AsterixMessage::Cat48(fourty_eight)],
+        ..AsterixPacket::default()
+    };
     packet.finalize().unwrap();
     let exp_bytes = vec![0x30, 0x00, 0x08, 0x01, 0x01, 0b1000, 0x05, 0xd0];
     assert_eq!(packet.to_bytes().unwrap(), exp_bytes);
