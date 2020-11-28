@@ -112,17 +112,17 @@ impl AsterixPacket {
 #[deku(id = "category", ctx = "_: deku::ctx::Endian, category: u8")]
 /// Union of Asterix categories
 pub enum AsterixMessage {
-    #[deku(id = "48")]
-    Cat48(Cat48),
     #[deku(id = "34")]
     Cat34(Cat34),
+    #[deku(id = "48")]
+    Cat48(Cat48),
 }
 
 impl AsterixMessage {
     pub fn update_fspec(&mut self) {
         match self {
-            Self::Cat48(c) => c.update_fspec(),
             Self::Cat34(c) => c.update_fspec(),
+            Self::Cat48(c) => c.update_fspec(),
         }
     }
 }
