@@ -1,7 +1,7 @@
 //! Defined Data Items that are used for formal parsing of data structs in categories
 
 use crate::custom_read_write::{read, write, Op};
-use crate::fspec::{is_fspec, read_fspec};
+use crate::fspec::is_fspec;
 use crate::modifier;
 use crate::types::{
     DataFilterTYP, MessageCounterTYP, AIC, ANT, ARC, CDM, CHAB, CLU, CNF, CODE, COM, D, DLF, DOU,
@@ -476,7 +476,7 @@ impl CommunicationsCapabilityFlightStatus {
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct RadarPlotCharacteristics {
-    #[deku(reader = "read_fspec(deku::rest)")]
+    #[deku(until = "|b: &u8| *b & 0b0000_0001 == 0")]
     pub fspec: Vec<u8>,
     #[deku(
         skip,

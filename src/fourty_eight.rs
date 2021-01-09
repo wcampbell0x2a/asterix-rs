@@ -8,7 +8,7 @@ use crate::data_item::{
     RadarPlotCharacteristics, RadialDopplerSpeed, TargetReportDescriptor, TimeOfDay, TrackNumber,
     TrackQuality, TrackStatus, WarningErrorConditionsTargetClass,
 };
-use crate::fspec::{add_fx, is_fspec, read_fspec, trim_fspec};
+use crate::fspec::{add_fx, is_fspec, trim_fspec};
 use asterix_derive::UpdateFspec;
 use deku::prelude::*;
 
@@ -16,7 +16,7 @@ use deku::prelude::*;
 #[derive(Debug, Default, PartialEq, DekuRead, DekuWrite, UpdateFspec)]
 #[deku(endian = "big")]
 pub struct Cat48 {
-    #[deku(reader = "read_fspec(deku::rest)")]
+    #[deku(until = "|b: &u8| *b & 0b0000_0001 == 0")]
     pub fspec: Vec<u8>,
     /// FRN 1
     #[deku(skip, cond = "is_fspec(DataSourceIdentifier::FRN_48, fspec, 0)")]
