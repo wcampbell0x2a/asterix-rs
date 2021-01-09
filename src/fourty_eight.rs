@@ -16,7 +16,7 @@ use deku::prelude::*;
 #[derive(Debug, Default, PartialEq, DekuRead, DekuWrite, UpdateFspec)]
 #[deku(endian = "big")]
 pub struct Cat48 {
-    #[deku(reader = "read_fspec(rest)")]
+    #[deku(reader = "read_fspec(deku::rest)")]
     pub fspec: Vec<u8>,
     /// FRN 1
     #[deku(skip, cond = "is_fspec(DataSourceIdentifier::FRN_48, fspec, 0)")]

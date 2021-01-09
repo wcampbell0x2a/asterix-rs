@@ -7,7 +7,7 @@ pub fn read_fspec(rest: &BitSlice<Msb0, u8>) -> Result<(&BitSlice<Msb0, u8>, Vec
     loop {
         let (rest, value) = u8::read(
             inner_rest,
-            (deku::ctx::Endian::Big, deku::ctx::BitSize(8_usize)),
+            (deku::ctx::Endian::Big, deku::ctx::Size::Bits(8_usize)),
         )?;
         inner_rest = rest;
         v.push(value);

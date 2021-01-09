@@ -70,7 +70,7 @@ pub fn derive_answer_fn(input: TokenStream) -> TokenStream {
     let mut quotes = quote! {};
 
     for data_item in data_items {
-        let ident = syn::Ident::new(&data_item.0.to_string(), syn::export::Span::call_site());
+        let ident = syn::Ident::new(&data_item.0.to_string(), proc_macro2::Span::call_site());
         let fspec_num = data_item.1.parse::<usize>().unwrap();
         let frn = data_item.2;
         let frn = syn::parse_str::<syn::Expr>(&frn).unwrap();

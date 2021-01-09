@@ -16,5 +16,6 @@ members = [
 ]
 
 [dependencies]
-deku = "0.9.1"
+#deku = "0.9.1"
+deku = { git = "https://github.com/sharksforarms/deku.git", branch = "release-0.10.0" }
 asterix-derive = { version = "^0.2.0", path = "asterix-derive" }

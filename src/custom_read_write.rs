@@ -19,7 +19,7 @@ pub mod read {
         modifier: f32,
         modifier_op: Op,
     ) -> Result<(&BitSlice<Msb0, u8>, f32), DekuError> {
-        let (rest, value) = u32::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(bits)))?;
+        let (rest, value) = u32::read(rest, (deku::ctx::Endian::Big, deku::ctx::Size::Bits(bits)))?;
         op(rest, value as f32, modifier, modifier_op)
     }
 
@@ -30,7 +30,7 @@ pub mod read {
         modifier: f32,
         modifier_op: Op,
     ) -> Result<(&BitSlice<Msb0, u8>, f32), DekuError> {
-        let (rest, value) = i16::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(bits)))?;
+        let (rest, value) = i16::read(rest, (deku::ctx::Endian::Big, deku::ctx::Size::Bits(bits)))?;
         op(rest, f32::from(value), modifier, modifier_op)
     }
 
@@ -76,7 +76,10 @@ pub mod write {
             Op::Add => *value + modifier,
             Op::Subtract => *value - modifier,
         };
-        (value as u32).write(output, (deku::ctx::Endian::Big, deku::ctx::BitSize(bits)))
+        (value as u32).write(
+            output,
+            (deku::ctx::Endian::Big, deku::ctx::Size::Bits(bits)),
+        )
     }
 
     pub fn f32_optionu32(
@@ -104,6 +107,9 @@ pub mod write {
             Op::Add => *value + modifier,
             Op::Subtract => *value - modifier,
         };
-        (value as i32).write(output, (deku::ctx::Endian::Big, deku::ctx::BitSize(bits)))
+        (value as i32).write(
+            output,
+            (deku::ctx::Endian::Big, deku::ctx::Size::Bits(bits)),
+        )
     }
 }
