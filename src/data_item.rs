@@ -146,8 +146,7 @@ impl FlightLevelInBinaryRepresentation {
         (deku::ctx::Endian::Big, deku::ctx::Size::Bits(14_usize));
 
     fn read(rest: &BitSlice<Msb0, u8>) -> Result<(&BitSlice<Msb0, u8>, u16), DekuError> {
-        let (rest, value) = u16::read(rest, Self::CTX)?;
-        Ok((rest, value / 4))
+        u16::read(rest, Self::CTX).map(|(rest, value)| (rest, value / 4))
     }
 
     fn write(flight_level: &u16, output: &mut BitVec<Msb0, u8>) -> Result<(), DekuError> {
@@ -571,8 +570,8 @@ impl SectorNumber {
     }
 
     fn read(rest: &BitSlice<Msb0, u8>) -> Result<(&BitSlice<Msb0, u8>, u16), DekuError> {
-        let (rest, value) = u16::read(rest, Self::CTX)?;
-        Ok((rest, (f32::from(value) * Self::modifier()) as u16))
+        u16::read(rest, Self::CTX)
+            .map(|(rest, value)| (rest, (f32::from(value) * Self::modifier()) as u16))
     }
 
     fn write(num: &u16, output: &mut BitVec<Msb0, u8>) -> Result<(), DekuError> {
@@ -667,8 +666,7 @@ impl HeightMeasuredBy3dRadar {
     pub const MODIFIER: i32 = 25;
 
     fn read(rest: &BitSlice<Msb0, u8>) -> Result<(&BitSlice<Msb0, u8>, i32), DekuError> {
-        let (rest, value) = i32::read(rest, Self::CTX)?;
-        Ok((rest, (value * Self::MODIFIER) as i32))
+        i32::read(rest, Self::CTX).map(|(rest, value)| (rest, (value * Self::MODIFIER) as i32))
     }
 
     fn write(height: &i32, output: &mut BitVec<Msb0, u8>) -> Result<(), DekuError> {
