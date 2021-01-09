@@ -1098,7 +1098,7 @@ mod tests {
         let item = TimeOfDay::read(&mut input, deku::ctx::Endian::Big)
             .unwrap()
             .1;
-        assert_eq!(item.time, 86399.9921875);
+        assert_eq!(item.time, 86_399.99);
     }
 
     #[test]
