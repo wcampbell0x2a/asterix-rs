@@ -404,7 +404,7 @@ pub struct TrackStatus {
     #[deku(skip, cond = "*fx1 != FX::ExtensionIntoFirstExtent")]
     pub tcc: Option<TCC>,
     #[deku(skip, cond = "*fx1 != FX::ExtensionIntoFirstExtent", bits = "3")]
-    pub reserved: Option<u32>,
+    pub reserved: Option<u8>,
     #[deku(skip, cond = "*fx1 != FX::ExtensionIntoFirstExtent")]
     pub fx2: Option<FX>,
 }
