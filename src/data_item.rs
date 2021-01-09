@@ -589,26 +589,12 @@ impl SectorNumber {
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct WarningErrorConditionsTargetClass {
-    #[deku(reader = "Self::read(deku::rest)")]
+    #[deku(until = "|codefx: &CodeFx| codefx.fx == FX::EndOfDataItem")]
     pub codefxs: Vec<CodeFx>,
 }
 
 impl WarningErrorConditionsTargetClass {
     pub const FRN_48: u8 = 0b100_0000;
-
-    fn read(rest: &BitSlice<Msb0, u8>) -> Result<(&BitSlice<Msb0, u8>, Vec<CodeFx>), DekuError> {
-        let mut codefxs = vec![];
-        let mut inner_rest = rest;
-        loop {
-            let (rest, codefx) = CodeFx::read(inner_rest, ()).unwrap();
-            inner_rest = rest;
-            codefxs.push(codefx);
-            if codefx.fx == FX::EndOfDataItem {
-                break;
-            }
-        }
-        Ok((inner_rest, codefxs))
-    }
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
