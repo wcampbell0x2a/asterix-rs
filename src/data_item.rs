@@ -261,34 +261,36 @@ impl AircraftIdentification {
     const fn asterix_char_to_ascii(code: u8) -> u8 {
         // space
         if code == Self::IA5_SPACE {
-            return Self::ASC_SPACE;
+            Self::ASC_SPACE
         }
         // digit
-        if Self::IA5_DIGIT <= code && code < Self::IA5_DIGIT + 10 {
-            return Self::ASC_DIGIT + (code - Self::IA5_DIGIT);
+        else if Self::IA5_DIGIT <= code && code < Self::IA5_DIGIT + 10 {
+            Self::ASC_DIGIT + (code - Self::IA5_DIGIT)
         }
         // letter
-        if Self::IA5_ALPHA <= code && code < Self::IA5_ALPHA + 26 {
-            return Self::ASC_ALPHA + (code - Self::IA5_ALPHA);
+        else if Self::IA5_ALPHA <= code && code < Self::IA5_ALPHA + 26 {
+            Self::ASC_ALPHA + (code - Self::IA5_ALPHA)
+        } else {
+            Self::ASC_ERROR
         }
-        Self::ASC_ERROR
     }
 
     /// parse from IA5 char as u8 to u8 value
     const fn asterix_ascii_to_ia5_char(code: u8) -> u8 {
         // space
         if code == Self::ASC_SPACE {
-            return Self::IA5_SPACE;
+            Self::IA5_SPACE
         }
         // digit
-        if Self::ASC_DIGIT <= code && code < Self::ASC_DIGIT + 10 {
-            return Self::IA5_DIGIT + (code - Self::ASC_DIGIT);
+        else if Self::ASC_DIGIT <= code && code < Self::ASC_DIGIT + 10 {
+            Self::IA5_DIGIT + (code - Self::ASC_DIGIT)
         }
         // letter
-        if Self::ASC_ALPHA <= code && code < Self::ASC_ALPHA + 26 {
-            return Self::IA5_ALPHA + (code - Self::ASC_ALPHA);
+        else if Self::ASC_ALPHA <= code && code < Self::ASC_ALPHA + 26 {
+            Self::IA5_ALPHA + (code - Self::ASC_ALPHA)
+        } else {
+            Self::ASC_ERROR
         }
-        Self::ASC_ERROR
     }
 }
 

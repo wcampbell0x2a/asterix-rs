@@ -91,8 +91,7 @@ impl AsterixPacket {
         for message in &mut self.messages {
             message.update_fspec();
         }
-        self.update()?;
-        Ok(())
+        self.update()
     }
 
     fn update_len(messages: &mut Vec<AsterixMessage>) -> u16 {
