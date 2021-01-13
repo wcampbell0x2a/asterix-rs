@@ -1,6 +1,6 @@
 [package]
 name = "asterix-derive"
-version = "0.2.5"
+version = "0.2.6"
 authors = ["wcampbell <wcampbell1995@gmail.com>"]
 edition = "2018"
 description = "proc-macro convenience with the deku library, for updating ASTERIX FSPECs"

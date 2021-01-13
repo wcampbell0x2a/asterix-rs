@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.6] - 2020-01-13
+- Update deku to 0.10.0
+- Use deku attributes for loading fspec
+- Other code improvements
+
 ## [0.2.5] - 2020-11-06
 - Update/Use deku 0.9.1
 
