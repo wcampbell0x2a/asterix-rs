@@ -55,37 +55,35 @@ pub fn derive_answer_fn(input: TokenStream) -> TokenStream {
                     let s = &s[7..s.len() - 1];
 
                     // parse the expression into the data_items vec
-                    if let Ok(expr) = syn::parse_str::<syn::Expr>(s) {
-                        if let syn::Expr::Assign(assign) = expr {
-                            if let syn::Expr::Lit(lit) = *assign.right {
-                                if let syn::Lit::Str(token) = lit.lit {
-                                    let fn_call = token.parse::<syn::ExprCall>().unwrap();
+                    if let Ok(syn::Expr::Assign(assign)) = syn::parse_str::<syn::Expr>(s) {
+                        if let syn::Expr::Lit(lit) = *assign.right {
+                            if let syn::Lit::Str(token) = lit.lit {
+                                let fn_call = token.parse::<syn::ExprCall>().unwrap();
 
-                                    let frn = if let syn::Expr::Path(attrs) = &fn_call.args[0] {
-                                        format!(
-                                            "{}::{}",
-                                            attrs.path.segments[0].ident.to_string(),
-                                            attrs.path.segments[1].ident.to_string()
-                                        )
-                                    } else {
-                                        unreachable!()
-                                    };
+                                let frn = if let syn::Expr::Path(attrs) = &fn_call.args[0] {
+                                    format!(
+                                        "{}::{}",
+                                        attrs.path.segments[0].ident.to_string(),
+                                        attrs.path.segments[1].ident.to_string()
+                                    )
+                                } else {
+                                    unreachable!()
+                                };
 
-                                    let fspec_num = if let syn::Expr::Lit(lit) = &fn_call.args[2] {
-                                        if let syn::Lit::Int(int) = &lit.lit {
-                                            int.to_string()
-                                        } else {
-                                            unreachable!();
-                                        }
+                                let fspec_num = if let syn::Expr::Lit(lit) = &fn_call.args[2] {
+                                    if let syn::Lit::Int(int) = &lit.lit {
+                                        int.to_string()
                                     } else {
                                         unreachable!();
-                                    };
-                                    data_items.push((
-                                        ident.to_string(),
-                                        fspec_num.to_string(),
-                                        frn.to_string(),
-                                    ));
-                                }
+                                    }
+                                } else {
+                                    unreachable!();
+                                };
+                                data_items.push((
+                                    ident.to_string(),
+                                    fspec_num.to_string(),
+                                    frn.to_string(),
+                                ));
                             }
                         }
                     }
