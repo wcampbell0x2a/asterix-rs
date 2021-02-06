@@ -44,24 +44,51 @@ pub fn derive_answer_fn(input: TokenStream) -> TokenStream {
                 if ident == "fspec" {
                     continue;
                 }
-                // check if doc ident, we don't need that one
                 for att in &field.attrs {
+                    // check if doc ident, we don't need that one
                     if att.path.segments[0].ident == "doc" {
                         continue;
                     }
-                    // Unholy string parsing instead of AST :(
-                    let s: String = format!("{}", att.tokens);
+
+                    let s = att.tokens.to_string();
+                    // remove the first part until we get to the cond = "blah"
                     let s = &s[7..s.len() - 1];
 
-                    // find FRN
-                    let lpos = s.find('(').unwrap() + 1;
-                    let comma = s.find(',').unwrap();
-                    let fspec_pos = s.rfind(')').unwrap() - 1;
+                    // parse the expression into the data_items vec
+                    if let Ok(expr) = syn::parse_str::<syn::Expr>(s) {
+                        if let syn::Expr::Assign(assign) = expr {
+                            if let syn::Expr::Lit(lit) = *assign.right {
+                                if let syn::Lit::Str(token) = lit.lit {
+                                    let fn_call = token.parse::<syn::ExprCall>().unwrap();
 
-                    let frn = &s[lpos..comma];
-                    let fspec = &s[fspec_pos as usize..=fspec_pos as usize];
+                                    let frn = if let syn::Expr::Path(attrs) = &fn_call.args[0] {
+                                        format!(
+                                            "{}::{}",
+                                            attrs.path.segments[0].ident.to_string(),
+                                            attrs.path.segments[1].ident.to_string()
+                                        )
+                                    } else {
+                                        unreachable!()
+                                    };
 
-                    data_items.push((ident.to_string(), fspec.to_string(), frn.to_string()));
+                                    let fspec_num = if let syn::Expr::Lit(lit) = &fn_call.args[2] {
+                                        if let syn::Lit::Int(int) = &lit.lit {
+                                            int.to_string()
+                                        } else {
+                                            unreachable!();
+                                        }
+                                    } else {
+                                        unreachable!();
+                                    };
+                                    data_items.push((
+                                        ident.to_string(),
+                                        fspec_num.to_string(),
+                                        frn.to_string(),
+                                    ));
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -94,5 +121,5 @@ pub fn derive_answer_fn(input: TokenStream) -> TokenStream {
         }
     };
 
-    TokenStream::from(expanded)
+    expanded.into()
 }
