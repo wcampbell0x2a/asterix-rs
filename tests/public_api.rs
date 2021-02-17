@@ -1,4 +1,4 @@
-use assert_hex::*;
+use assert_hex::assert_eq_hex;
 use asterix::data_item::{
     CodeFx, DataSourceIdentifier, HeightMeasuredBy3dRadar, MBData, MessageType,
     Mode3ACodeConfidenceIndicator, ModeCCodeAndConfidenceIndicator, SectorNumber, TimeOfDay,
