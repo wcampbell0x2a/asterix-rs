@@ -1,3 +1,4 @@
+use assert_hex::*;
 use asterix::data_item::{
     CodeFx, DataSourceIdentifier, HeightMeasuredBy3dRadar, MBData, MessageType,
     Mode3ACodeConfidenceIndicator, ModeCCodeAndConfidenceIndicator, SectorNumber, TimeOfDay,
@@ -26,7 +27,7 @@ fn it_works() {
 
     // TODO check NONE values after more are implemented
     if let AsterixMessage::Cat48(ref mut message) = packet.messages[0] {
-        assert_eq!(message.fspec, &[0xfd, 0xf7, 0x02]);
+        assert_eq_hex!(message.fspec, &[0xfd, 0xf7, 0x02]);
 
         let data_source_identifier = message.data_source_identifier.as_ref().unwrap();
         assert_eq!(data_source_identifier.sac, 25);
@@ -78,7 +79,7 @@ fn it_works() {
 
         let mode_smb_data = message.mode_smb_data.as_ref().unwrap();
         assert_eq!(mode_smb_data.count, 1);
-        assert_eq!(
+        assert_eq_hex!(
             mode_smb_data.mb_data,
             vec![MBData {
                 data: [0xc0, 0x78, 0x00, 0x31, 0xbc, 0x00, 0x00].to_vec()
@@ -135,7 +136,7 @@ fn it_works() {
     packet.finalize().unwrap();
 
     // Confirm packet back to bytes
-    assert_eq!(packet.to_bytes(), Ok(bytes));
+    assert_eq_hex!(packet.to_bytes(), Ok(bytes));
 }
 
 #[test]
@@ -163,7 +164,7 @@ fn it_works_only_two_fspec() {
     packet.finalize().unwrap();
 
     // Confirm packet back to bytes
-    assert_eq!(packet.to_bytes(), Ok(bytes));
+    assert_eq_hex!(packet.to_bytes(), Ok(bytes));
 }
 
 #[test]
@@ -181,7 +182,7 @@ fn third_packet() {
 
     // TODO check NONE values after more are implemented
     if let AsterixMessage::Cat48(ref message) = packet.messages[0] {
-        assert_eq!(message.fspec, &[0xff, 0x0ff, 0x02]);
+        assert_eq_hex!(message.fspec, &[0xff, 0x0ff, 0x02]);
 
         let data_source_identifier = message.data_source_identifier.as_ref().unwrap();
         assert_eq!(data_source_identifier.sac, 25);
@@ -291,7 +292,7 @@ fn third_packet() {
         unreachable!("Message is not CAT48");
     }
     packet.finalize().unwrap();
-    assert_eq!(packet.to_bytes(), Ok(bytes));
+    assert_eq_hex!(packet.to_bytes(), Ok(bytes));
 }
 
 #[test]
@@ -306,7 +307,7 @@ fn test_34() {
 
     // TODO check NONE values after more are implemented
     if let AsterixMessage::Cat34(ref message) = packet.messages[0] {
-        assert_eq!(message.fspec, &[0xf0]);
+        assert_eq_hex!(message.fspec, &[0xf0]);
 
         let data_source_identifier = message.data_source_identifier.as_ref().unwrap();
         assert_eq!(data_source_identifier.sac, 25);
@@ -324,7 +325,7 @@ fn test_34() {
         unreachable!("Not Cat 34");
     }
     packet.finalize().unwrap();
-    assert_eq!(packet.to_bytes(), Ok(bytes));
+    assert_eq_hex!(packet.to_bytes(), Ok(bytes));
 }
 
 #[test]
@@ -436,9 +437,9 @@ fn test_48_track_quality() {
         0xff,
         0xff,
     ];
-    assert_eq!(packet.to_bytes().unwrap(), exp_bytes);
+    assert_eq_hex!(packet.to_bytes().unwrap(), exp_bytes);
     let (_, exp_packet) = AsterixPacket::from_bytes((&exp_bytes, 0)).unwrap();
-    assert_eq!(packet, exp_packet);
+    assert_eq_hex!(packet, exp_packet);
 }
 
 #[test]
@@ -475,9 +476,9 @@ fn test_48_warning_error_con_target_class() {
         0x5 << 1 | 0x01,
         0x5 << 1,
     ];
-    assert_eq!(packet.to_bytes().unwrap(), exp_bytes);
+    assert_eq_hex!(packet.to_bytes().unwrap(), exp_bytes);
     let (_, exp_packet) = AsterixPacket::from_bytes((&exp_bytes, 0)).unwrap();
-    assert_eq!(packet, exp_packet);
+    assert_eq_hex!(packet, exp_packet);
 }
 
 #[test]
@@ -496,9 +497,9 @@ fn test_48_mode_3a_code_confidence_indicator() {
     };
     packet.finalize().unwrap();
     let exp_bytes = vec![0x30, 0x00, 0x08, 0x01, 0x01, 0b10_0000, 0x00, 0x01];
-    assert_eq!(packet.to_bytes().unwrap(), exp_bytes);
+    assert_eq_hex!(packet.to_bytes().unwrap(), exp_bytes);
     let (_, exp_packet) = AsterixPacket::from_bytes((&exp_bytes, 0)).unwrap();
-    assert_eq!(packet, exp_packet);
+    assert_eq_hex!(packet, exp_packet);
 }
 
 #[test]
@@ -522,9 +523,9 @@ fn test_48_mode_c_code_confidence() {
     let exp_bytes = vec![
         0x30, 0x00, 0x0a, 0x01, 0x01, 0b1_0000, 0x00, 0x01, 0x00, 0x01,
     ];
-    assert_eq!(packet.to_bytes().unwrap(), exp_bytes);
+    assert_eq_hex!(packet.to_bytes().unwrap(), exp_bytes);
     let (_, exp_packet) = AsterixPacket::from_bytes((&exp_bytes, 0)).unwrap();
-    assert_eq!(packet, exp_packet);
+    assert_eq_hex!(packet, exp_packet);
 }
 
 #[test]
@@ -542,9 +543,9 @@ fn test_48_height_3d() {
     };
     packet.finalize().unwrap();
     let exp_bytes = vec![0x30, 0x00, 0x08, 0x01, 0x01, 0b1000, 0x00, 0x01];
-    assert_eq!(packet.to_bytes().unwrap(), exp_bytes);
+    assert_eq_hex!(packet.to_bytes().unwrap(), exp_bytes);
     let (_, exp_packet) = AsterixPacket::from_bytes((&exp_bytes, 0)).unwrap();
-    assert_eq!(packet, exp_packet);
+    assert_eq_hex!(packet, exp_packet);
 
     let mut fourty_eight = Cat48::default();
     let height = HeightMeasuredBy3dRadar {
@@ -559,9 +560,9 @@ fn test_48_height_3d() {
     };
     packet.finalize().unwrap();
     let exp_bytes = vec![0x30, 0x00, 0x08, 0x01, 0x01, 0b1000, 0x05, 0xd0];
-    assert_eq!(packet.to_bytes().unwrap(), exp_bytes);
+    assert_eq_hex!(packet.to_bytes().unwrap(), exp_bytes);
     let (_, exp_packet) = AsterixPacket::from_bytes((&exp_bytes, 0)).unwrap();
-    assert_eq!(packet, exp_packet);
+    assert_eq_hex!(packet, exp_packet);
 }
 
 #[test]
@@ -579,7 +580,7 @@ fn test_48_radial_dopplerspeed() {
         0b0000_0001,
     ];
     let (_, packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
-    assert_eq!(packet.to_bytes().unwrap(), bytes);
+    assert_eq_hex!(packet.to_bytes().unwrap(), bytes);
 
     // test the second subfield
     let bytes = vec![
@@ -599,7 +600,7 @@ fn test_48_radial_dopplerspeed() {
         0x01,
     ];
     let (_, packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
-    assert_eq!(packet.to_bytes().unwrap(), bytes);
+    assert_eq_hex!(packet.to_bytes().unwrap(), bytes);
 }
 
 #[test]
@@ -622,13 +623,13 @@ fn test_acas_resolution() {
     ];
     let (_, mut packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
     packet.finalize().unwrap();
-    assert_eq!(packet.to_bytes().unwrap(), bytes);
+    assert_eq_hex!(packet.to_bytes().unwrap(), bytes);
 
     if let AsterixMessage::Cat48(ref message) = packet.messages[0] {
-        assert_eq!(message.fspec, &[0x01, 0x01, 0x01, 0b1000_0000]);
+        assert_eq_hex!(message.fspec, &[0x01, 0x01, 0x01, 0b1000_0000]);
 
         let field = message.acas_resolution_advisory_report.as_ref().unwrap();
-        assert_eq!(&field.mb_data, &[0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07]);
+        assert_eq_hex!(&field.mb_data, &[0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07]);
     }
 }
 
@@ -637,10 +638,10 @@ fn test_mode1code_octal_representation() {
     let bytes = vec![0x30, 0x00, 0x08, 0x01, 0x01, 0x01, 0b0100_0000, 0b0000_0001];
     let (_, mut packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
     packet.finalize().unwrap();
-    assert_eq!(packet.to_bytes().unwrap(), bytes);
+    assert_eq_hex!(packet.to_bytes().unwrap(), bytes);
 
     if let AsterixMessage::Cat48(ref message) = packet.messages[0] {
-        assert_eq!(message.fspec, &[0x01, 0x01, 0x01, 0b0100_0000]);
+        assert_eq_hex!(message.fspec, &[0x01, 0x01, 0x01, 0b0100_0000]);
 
         let field = message.mode_1_code_octal_representation.as_ref().unwrap();
         assert_eq!(field.v, V::CodeValidated);
@@ -665,10 +666,10 @@ fn test_mode2code_octal_representation() {
     ];
     let (_, mut packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
     packet.finalize().unwrap();
-    assert_eq!(packet.to_bytes().unwrap(), bytes);
+    assert_eq_hex!(packet.to_bytes().unwrap(), bytes);
 
     if let AsterixMessage::Cat48(ref message) = packet.messages[0] {
-        assert_eq!(message.fspec, &[0x01, 0x01, 0x01, 0b0010_0000]);
+        assert_eq_hex!(message.fspec, &[0x01, 0x01, 0x01, 0b0010_0000]);
 
         let field = message.mode_2_code_octal_representation.as_ref().unwrap();
         assert_eq!(field.v, V::CodeValidated);
@@ -683,10 +684,10 @@ fn test_mode1codeconfidence() {
     let bytes = vec![0x30, 0x00, 0x08, 0x01, 0x01, 0x01, 0b0001_0000, 0x01];
     let (_, mut packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
     packet.finalize().unwrap();
-    assert_eq!(packet.to_bytes().unwrap(), bytes);
+    assert_eq_hex!(packet.to_bytes().unwrap(), bytes);
 
     if let AsterixMessage::Cat48(ref message) = packet.messages[0] {
-        assert_eq!(message.fspec, &[0x01, 0x01, 0x01, 0b0001_0000]);
+        assert_eq_hex!(message.fspec, &[0x01, 0x01, 0x01, 0b0001_0000]);
 
         let field = message.mode_1_code_confidence.as_ref().unwrap();
         assert_eq!(field.data, 0x01);
@@ -698,10 +699,10 @@ fn test_mode2codeconfidence() {
     let bytes = vec![0x30, 0x00, 0x09, 0x01, 0x01, 0x01, 0b0000_1000, 0x00, 0x01];
     let (_, mut packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
     packet.finalize().unwrap();
-    assert_eq!(packet.to_bytes().unwrap(), bytes);
+    assert_eq_hex!(packet.to_bytes().unwrap(), bytes);
 
     if let AsterixMessage::Cat48(ref message) = packet.messages[0] {
-        assert_eq!(message.fspec, &[0x01, 0x01, 0x01, 0b0000_1000]);
+        assert_eq_hex!(message.fspec, &[0x01, 0x01, 0x01, 0b0000_1000]);
 
         let field = message.mode_2_code_confidence.as_ref().unwrap();
         assert_eq!(field.data, 0x01);
@@ -713,10 +714,10 @@ fn test_34_antenna_rotation_speed() {
     let bytes = vec![0x22, 0x00, 0x06, 0b0000_1000, 0x00, 0x01];
     let (_, mut packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
     packet.finalize().unwrap();
-    assert_eq!(packet.to_bytes().unwrap(), bytes);
+    assert_eq_hex!(packet.to_bytes().unwrap(), bytes);
 
     if let AsterixMessage::Cat34(ref message) = packet.messages[0] {
-        assert_eq!(message.fspec, &[0b0000_1000]);
+        assert_eq_hex!(message.fspec, &[0b0000_1000]);
 
         let field = message.antenna_rotation_speed.as_ref().unwrap();
         assert_eq!(field.period, 1.0 / 128_f32);
