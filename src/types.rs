@@ -5,198 +5,147 @@ use deku::prelude::*;
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(type = "u8", bits = "3")]
 pub enum TYP {
-    #[deku(id = "0x00")]
-    NoDetection,
-    #[deku(id = "0x01")]
-    SinglePSRDetection,
-    #[deku(id = "0x02")]
-    SingleSSRDetection,
-    #[deku(id = "0x03")]
-    SSRPlusPSRDetection,
-    #[deku(id = "0x04")]
-    SingleModeSAllCall,
-    #[deku(id = "0x05")]
-    SingleModeSRollCall,
-    #[deku(id = "0x06")]
-    ModeSAllCallPlusPSR,
-    #[deku(id = "0x07")]
-    ModeSRollCallPlusPSR,
+    NoDetection          = 0x00,
+    SinglePSRDetection   = 0x01,
+    SingleSSRDetection   = 0x02,
+    SSRPlusPSRDetection  = 0x03,
+    SingleModeSAllCall   = 0x04,
+    SingleModeSRollCall  = 0x05,
+    ModeSAllCallPlusPSR  = 0x06,
+    ModeSRollCallPlusPSR = 0x07,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(type = "u8", bits = "1")]
 pub enum SIM {
-    #[deku(id = "0x00")]
-    ActualTargetReport,
-    #[deku(id = "0x01")]
-    SimulatedTargetReport,
+    ActualTargetReport    = 0x00,
+    SimulatedTargetReport = 0x01,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(type = "u8", bits = "1")]
 pub enum RDP {
-    #[deku(id = "0x00")]
-    ReportFromRDPChain1,
-    #[deku(id = "0x01")]
-    ReportFromRDPChain2,
+    ReportFromRDPChain1 = 0x00,
+    ReportFromRDPChain2 = 0x01,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(type = "u8", bits = "1")]
 pub enum SPI {
-    #[deku(id = "0x00")]
-    AbsenceOfSPI,
-    #[deku(id = "0x01")]
-    SpecialPositionIdentification,
+    AbsenceOfSPI                  = 0x00,
+    SpecialPositionIdentification = 0x01,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(type = "u8", bits = "1")]
 pub enum RAB {
-    #[deku(id = "0x00")]
-    ReportFromAircraftTransponder,
-    #[deku(id = "0x01")]
-    ReportFromFieldMonitor,
+    ReportFromAircraftTransponder = 0x00,
+    ReportFromFieldMonitor        = 0x01,
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
 #[deku(type = "u8", bits = "1")]
 pub enum FX {
-    #[deku(id = "0x00")]
-    EndOfDataItem = 0,
-    #[deku(id = "0x01")]
-    ExtensionIntoFirstExtent = 1,
+    EndOfDataItem            = 0x00,
+    ExtensionIntoFirstExtent = 0x01,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(type = "u8", bits = "1")]
 pub enum V {
-    #[deku(id = "0x00")]
-    CodeValidated = 0,
-    #[deku(id = "0x01")]
-    CodeNotValidated = 1,
+    CodeValidated    = 0x00,
+    CodeNotValidated = 0x01,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(type = "u8", bits = "1")]
 pub enum G {
-    #[deku(id = "0x00")]
-    Default = 0,
-    #[deku(id = "0x01")]
-    GarbledCode = 1,
+    Default     = 0x00,
+    GarbledCode = 0x01,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(type = "u8", bits = "1")]
 pub enum L {
-    #[deku(id = "0x00")]
-    Mode3CodeDerivedFromTheReplyOfTheTransponder = 0,
-    #[deku(id = "0x01")]
-    Mode3CodeNotExtractedDuringTheLastScan = 1,
+    Mode3CodeDerivedFromTheReplyOfTheTransponder = 0x00,
+    Mode3CodeNotExtractedDuringTheLastScan = 0x01,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(type = "u8", bits = "1")]
 pub enum CNF {
-    #[deku(id = "0x00")]
-    ConfirmedTrack,
-    #[deku(id = "0x01")]
-    TentativeTrack,
+    ConfirmedTrack = 0x00,
+    TentativeTrack = 0x01,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(type = "u8", bits = "2")]
 pub enum RAD {
-    #[deku(id = "0x00")]
-    CombinedTrack,
-    #[deku(id = "0x01")]
-    PSRTrack,
-    #[deku(id = "0x02")]
-    SSRModeSTrack,
-    #[deku(id = "0x03")]
-    Invalid,
+    CombinedTrack = 0x00,
+    PSRTrack      = 0x01,
+    SSRModeSTrack = 0x02,
+    Invalid       = 0x03,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(type = "u8", bits = "1")]
 pub enum DOU {
-    #[deku(id = "0x00")]
-    NormalConfidence,
-    #[deku(id = "0x01")]
-    LowConfidence,
+    NormalConfidence = 0x00,
+    LowConfidence    = 0x01,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(type = "u8", bits = "1")]
 pub enum MAH {
-    #[deku(id = "0x00")]
-    NoHorizontalManSensed,
-    #[deku(id = "0x01")]
-    HorizontalManSensed,
+    NoHorizontalManSensed = 0x00,
+    HorizontalManSensed   = 0x01,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(type = "u8", bits = "2")]
 pub enum CDM {
-    #[deku(id = "0x00")]
-    Maintaining,
-    #[deku(id = "0x01")]
-    Climbing,
-    #[deku(id = "0x02")]
-    Descending,
-    #[deku(id = "0x03")]
-    Unknown,
+    Maintaining = 0x00,
+    Climbing    = 0x01,
+    Descending  = 0x02,
+    Unknown     = 0x03,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(type = "u8", bits = "1")]
 pub enum TRE {
-    #[deku(id = "0x00")]
-    TrackStillAlive,
-    #[deku(id = "0x01")]
-    EndOfTrackLifetime,
+    TrackStillAlive    = 0x00,
+    EndOfTrackLifetime = 0x01,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(type = "u8", bits = "1")]
 pub enum GHO {
-    #[deku(id = "0x00")]
-    TrueTargetTrack,
-    #[deku(id = "0x01")]
-    GhostTargetTrack,
+    TrueTargetTrack  = 0x00,
+    GhostTargetTrack = 0x01,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(type = "u8", bits = "1")]
 pub enum SUP {
-    #[deku(id = "0x00")]
-    No,
-    #[deku(id = "0x01")]
-    Yes,
+    No  = 0x00,
+    Yes = 0x01,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(type = "u8", bits = "1")]
 pub enum TCC {
-    #[deku(id = "0x00")]
-    RadarPlanePlotTransformation,
-    #[deku(id = "0x01")]
-    SlantRangePlotTransformation,
+    RadarPlanePlotTransformation = 0x00,
+    SlantRangePlotTransformation = 0x01,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(type = "u8", bits = "3")]
 pub enum COM {
-    #[deku(id = "0x00")]
-    NoCommunicationsSurveillanceOnly,
-    #[deku(id = "0x01")]
-    CommACommB,
-    #[deku(id = "0x02")]
-    CommACommBUplinkELM,
-    #[deku(id = "0x03")]
-    CommACommBUplinkELMDownlinkELM,
-    #[deku(id = "0x04")]
-    Top5TransponderCapability,
+    NoCommunicationsSurveillanceOnly = 0x00,
+    CommACommB                       = 0x01,
+    CommACommBUplinkELM              = 0x02,
+    CommACommBUplinkELMDownlinkELM   = 0x03,
+    Top5TransponderCapability        = 0x04,
     #[deku(id_pat = "0x05..=0x07")]
     NoAssigned,
 }
@@ -204,169 +153,111 @@ pub enum COM {
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(type = "u8", bits = "3")]
 pub enum STAT {
-    #[deku(id = "0x00")]
-    NoAlertNoSPIAircraftAirborne,
-    #[deku(id = "0x01")]
-    NoAlertNoSPIAircraftOnGround,
-    #[deku(id = "0x02")]
-    AlertNoSPIAircraftAirborne,
-    #[deku(id = "0x03")]
-    AlertNoSPIAircraftOnGround,
-    #[deku(id = "0x04")]
-    AlertSPIAircraftAirborneOrOnGround,
-    #[deku(id = "0x05")]
-    NoAlertSPIAircraftAirborneOrOnGround,
-    #[deku(id = "0x06")]
-    NotAssigned,
-    #[deku(id = "0x07")]
-    Unknown,
+    NoAlertNoSPIAircraftAirborne         = 0x00,
+    NoAlertNoSPIAircraftOnGround         = 0x01,
+    AlertNoSPIAircraftAirborne           = 0x02,
+    AlertNoSPIAircraftOnGround           = 0x03,
+    AlertSPIAircraftAirborneOrOnGround   = 0x04,
+    NoAlertSPIAircraftAirborneOrOnGround = 0x05,
+    NotAssigned                          = 0x06,
+    Unknown                              = 0x07,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(type = "u8", bits = "1")]
 pub enum SI {
-    #[deku(id = "0x00")]
-    SICodeCapable,
-    #[deku(id = "0x01")]
-    IICodeCapable,
+    SICodeCapable = 0x00,
+    IICodeCapable = 0x01,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(type = "u8", bits = "1")]
 pub enum MSSC {
-    #[deku(id = "0x00")]
-    No,
-    #[deku(id = "0x01")]
-    Yes,
+    No  = 0x00,
+    Yes = 0x01,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(type = "u8", bits = "1")]
 pub enum ARC {
-    #[deku(id = "0x00")]
-    Resolution100ft,
-    #[deku(id = "0x01")]
-    Resolution25ft,
+    Resolution100ft = 0x00,
+    Resolution25ft  = 0x01,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(type = "u8", bits = "1")]
 pub enum AIC {
-    #[deku(id = "0x00")]
-    No,
-    #[deku(id = "0x01")]
-    Yes,
+    No  = 0x00,
+    Yes = 0x01,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(type = "u8", bits = "8")]
 pub enum MTYPE {
-    #[deku(id = "0x01")]
-    NorthMarker,
-    #[deku(id = "0x02")]
-    SectorCrossing,
-    #[deku(id = "0x03")]
-    GeographicaFiltering,
-    #[deku(id = "0x04")]
-    JammingStrobe,
+    NorthMarker          = 0x01,
+    SectorCrossing       = 0x02,
+    GeographicaFiltering = 0x03,
+    JammingStrobe        = 0x04,
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
 #[deku(type = "u16", bits = "7")]
 pub enum CODE {
-    #[deku(id = "0")]
-    NotDefined,
-    #[deku(id = "1")]
-    MultipathReply,
-    #[deku(id = "2")]
-    ReplySidelobeInterrogationReception,
-    #[deku(id = "3")]
-    SplitPlot,
-    #[deku(id = "4")]
-    SecondTimeAroundReply,
-    #[deku(id = "5")]
-    Angel,
-    #[deku(id = "6")]
-    SlowMovingTarget,
-    #[deku(id = "7")]
-    FixedPSRPlot,
-    #[deku(id = "8")]
-    SlowPSRPlot,
-    #[deku(id = "9")]
-    LowQualityPSRPlot,
-    #[deku(id = "10")]
-    PhantomSSRPlot,
-    #[deku(id = "11")]
-    NonMatchingMode3ACode,
-    #[deku(id = "12")]
-    ModeCCodeModeSAbnormal,
-    #[deku(id = "13")]
-    TargetInClutter,
-    #[deku(id = "14")]
-    MaximumDopplerREsponseInZeroFilter,
-    #[deku(id = "15")]
-    TransponderAnomalyDetected,
-    #[deku(id = "16")]
-    DuplicatedOrIllegalModeSAircraftAddress,
-    #[deku(id = "17")]
-    ModeSErrorCorrectionApplied,
-    #[deku(id = "18")]
-    UndecodableModeCSCode,
-    #[deku(id = "19")]
-    Birds,
-    #[deku(id = "20")]
-    FlockOfBirds,
-    #[deku(id = "21")]
-    Mode1PresentOriginalReply,
-    #[deku(id = "22")]
-    Mode2PresentOriginalReply,
-    #[deku(id = "23")]
-    PlotCausedByWindTurbine,
-    #[deku(id = "24")]
-    Helicopter,
-    #[deku(id = "25")]
-    MaxiumumNumberInterrogationsSurveillance,
-    #[deku(id = "26")]
-    MaxiumumNumberInterrogationsBDS,
-    #[deku(id = "27")]
-    BDSOverlayIncoherence,
-    #[deku(id = "28")]
-    PotentialBDSSwapDetected,
-    #[deku(id = "29")]
-    TrackUpdateZenithalGap,
-    #[deku(id = "30")]
-    ModeSTrackReAquired,
-    #[deku(id = "31")]
-    DuplicatedMode5PairNoPinDetected,
+    NotDefined                               = 0,
+    MultipathReply                           = 1,
+    ReplySidelobeInterrogationReception      = 2,
+    SplitPlot                                = 3,
+    SecondTimeAroundReply                    = 4,
+    Angel                                    = 5,
+    SlowMovingTarget                         = 6,
+    FixedPSRPlot                             = 7,
+    SlowPSRPlot                              = 8,
+    LowQualityPSRPlot                        = 9,
+    PhantomSSRPlot                           = 10,
+    NonMatchingMode3ACode                    = 11,
+    ModeCCodeModeSAbnormal                   = 12,
+    TargetInClutter                          = 13,
+    MaximumDopplerREsponseInZeroFilter       = 14,
+    TransponderAnomalyDetected               = 15,
+    DuplicatedOrIllegalModeSAircraftAddress  = 16,
+    ModeSErrorCorrectionApplied              = 17,
+    UndecodableModeCSCode                    = 18,
+    Birds                                    = 19,
+    FlockOfBirds                             = 20,
+    Mode1PresentOriginalReply                = 21,
+    Mode2PresentOriginalReply                = 22,
+    PlotCausedByWindTurbine                  = 23,
+    Helicopter                               = 24,
+    MaxiumumNumberInterrogationsSurveillance = 25,
+    MaxiumumNumberInterrogationsBDS          = 26,
+    BDSOverlayIncoherence                    = 27,
+    PotentialBDSSwapDetected                 = 28,
+    TrackUpdateZenithalGap                   = 29,
+    ModeSTrackReAquired                      = 30,
+    DuplicatedMode5PairNoPinDetected         = 31,
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
 #[deku(type = "u8", bits = "1")]
 pub enum D {
-    #[deku(id = "0")]
-    Valid,
-    #[deku(id = "1")]
-    Doubtful,
+    Valid    = 0,
+    Doubtful = 1,
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
 #[deku(type = "u8", bits = "1")]
 /// Operational Release Status of the System
 pub enum NOGO {
-    #[deku(id = "0")]
-    SystemIsReleasedForOperationalUse,
-    #[deku(id = "1")]
-    OperationalUseOfSystemIsInhibited,
+    SystemIsReleasedForOperationalUse = 0,
+    OperationalUseOfSystemIsInhibited = 1,
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
 #[deku(type = "u8", bits = "1")]
 /// Radar Data Processor Chain Selection Status
 pub enum RDPC {
-    #[deku(id = "0")]
-    RDPC1Selected,
-    #[deku(id = "1")]
-    RDPC2Selected,
+    RDPC1Selected = 0,
+    RDPC2Selected = 1,
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
@@ -374,256 +265,182 @@ pub enum RDPC {
 /// Event to signal a reset/restart of the selected Radar Data Processor Chain,
 /// i.e. expect a new assignment of track numbers
 pub enum RDPR {
-    #[deku(id = "0")]
-    DefaultSituation,
-    #[deku(id = "1")]
-    ResetOfRDPC,
+    DefaultSituation = 0,
+    ResetOfRDPC      = 1,
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
 #[deku(type = "u8", bits = "1")]
 /// Monitoring System Connected Status
 pub enum MSC {
-    #[deku(id = "0")]
-    MonitoringSystemConnected,
-    #[deku(id = "1")]
-    MonitoringSystemDisconnected,
+    MonitoringSystemConnected    = 0,
+    MonitoringSystemDisconnected = 1,
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
 #[deku(type = "u8", bits = "1")]
 /// Time Source Validity
 pub enum TSV {
-    #[deku(id = "0")]
-    Valid,
-    #[deku(id = "1")]
-    Invalid,
+    Valid   = 0,
+    Invalid = 1,
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
 #[deku(type = "u8", bits = "1")]
 /// Selected Antenna
 pub enum ANT {
-    #[deku(id = "0")]
-    Antenna1,
-    #[deku(id = "1")]
-    Antenna2,
+    Antenna1 = 0,
+    Antenna2 = 1,
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
 #[deku(type = "u8", bits = "2")]
 /// Channel A/B Selection Status
 pub enum CHAB {
-    #[deku(id = "0b00")]
-    NoChannelSelected,
-    #[deku(id = "0b01")]
-    ChannelAOnlySelected,
-    #[deku(id = "0b10")]
-    ChannelBOnlySelected,
-    #[deku(id = "0b11")]
-    DiversityMode,
+    NoChannelSelected    = 0b00,
+    ChannelAOnlySelected = 0b01,
+    ChannelBOnlySelected = 0b10,
+    DiversityMode        = 0b11,
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
 #[deku(type = "u8", bits = "1")]
 /// Overload Condition
 pub enum OVL {
-    #[deku(id = "0")]
-    NoOverload,
-    #[deku(id = "1")]
-    Overload,
+    NoOverload = 0,
+    Overload   = 1,
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
 #[deku(type = "u8", bits = "1")]
 /// Channel A/B selection status for Surveillance Co-ordination Function
 pub enum SCF {
-    #[deku(id = "0")]
-    ChannelAInUse,
-    #[deku(id = "1")]
-    ChannelBInUse,
+    ChannelAInUse = 0,
+    ChannelBInUse = 1,
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
 #[deku(type = "u8", bits = "1")]
 /// Channel A/B selection status for Data Link Function
 pub enum DLF {
-    #[deku(id = "0")]
-    ChannelAInUse,
-    #[deku(id = "1")]
-    ChannelBInUse,
+    ChannelAInUse = 0,
+    ChannelBInUse = 1,
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
 #[deku(type = "u8", bits = "3")]
 pub enum RED {
-    #[deku(id = "0b000")]
-    NoReductionActive,
-    #[deku(id = "0b001")]
-    ReductionStep1Active,
-    #[deku(id = "0b010")]
-    ReductionStep2Active,
-    #[deku(id = "0b011")]
-    ReductionStep3Active,
-    #[deku(id = "0b100")]
-    ReductionStep4Active,
-    #[deku(id = "0b101")]
-    ReductionStep5Active,
-    #[deku(id = "0b110")]
-    ReductionStep6Active,
-    #[deku(id = "0b111")]
-    ReductionStep7Active,
+    NoReductionActive    = 0b000,
+    ReductionStep1Active = 0b001,
+    ReductionStep2Active = 0b010,
+    ReductionStep3Active = 0b011,
+    ReductionStep4Active = 0b100,
+    ReductionStep5Active = 0b101,
+    ReductionStep6Active = 0b110,
+    ReductionStep7Active = 0b111,
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
 #[deku(type = "u8", bits = "1")]
 pub enum POL {
-    #[deku(id = "0")]
-    LinearPolarization,
-    #[deku(id = "1")]
-    CircularPolarization,
+    LinearPolarization   = 0,
+    CircularPolarization = 1,
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
 #[deku(type = "u8", bits = "1")]
 pub enum STC {
-    #[deku(id = "0b00")]
-    STCMap1,
-    #[deku(id = "0b01")]
-    STCMap2,
-    #[deku(id = "0b10")]
-    STCMap3,
-    #[deku(id = "0b11")]
-    STCMap4,
+    STCMap1 = 0b00,
+    STCMap2 = 0b01,
+    STCMap3 = 0b10,
+    STCMap4 = 0b11,
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
 #[deku(type = "u8", bits = "1")]
 pub enum CLU {
-    #[deku(id = "0")]
-    Autonomous,
+    Autonomous    = 0,
     #[deku(id = "1")]
-    NotAutonomous,
+    NotAutonomous = 1,
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
 #[deku(type = "u8", bits = "5")]
 pub enum MessageCounterTYP {
-    #[deku(id = "0")]
-    NoDetection,
-    #[deku(id = "1")]
-    SinglePSRTargetReports,
-    #[deku(id = "2")]
-    SingleSSRTargetReports,
-    #[deku(id = "3")]
-    SSRPSRTargetReports,
-    #[deku(id = "4")]
-    SingleAllCallTargetReports,
-    #[deku(id = "5")]
-    SingleRollCallTargetReports,
-    #[deku(id = "6")]
-    AllCallPSRModeSTargetReports,
-    #[deku(id = "7")]
-    RollCallPSRModeSTargetReports,
-    #[deku(id = "8")]
-    FilterForWeatherData,
-    #[deku(id = "9")]
-    FilterForJammingStrobe,
-    #[deku(id = "10")]
-    FilterPSRData,
-    #[deku(id = "11")]
-    FilterSSRModeSData,
-    #[deku(id = "12")]
-    FilterSSRModeSPSRData,
-    #[deku(id = "13")]
-    FilterForEnhancedSuveillanceData,
-    #[deku(id = "14")]
-    FilterForPSREnhancedSurveillance,
-    #[deku(id = "15")]
-    FilterForPSREnhancedSurveillancePlusSSRModeSDataNotInAreaOfPrimeInterest,
-    #[deku(id = "16")]
-    FilterForPSREnhancedSurveillancePlusAllSSRModeSData,
+    NoDetection                      = 0,
+    SinglePSRTargetReports           = 1,
+    SingleSSRTargetReports           = 2,
+    SSRPSRTargetReports              = 3,
+    SingleAllCallTargetReports       = 4,
+    SingleRollCallTargetReports      = 5,
+    AllCallPSRModeSTargetReports     = 6,
+    RollCallPSRModeSTargetReports    = 7,
+    FilterForWeatherData             = 8,
+    FilterForJammingStrobe           = 9,
+    FilterPSRData                    = 10,
+    FilterSSRModeSData               = 11,
+    FilterSSRModeSPSRData            = 12,
+    FilterForEnhancedSuveillanceData = 13,
+    FilterForPSREnhancedSurveillance = 14,
+    FilterForPSREnhancedSurveillancePlusSSRModeSDataNotInAreaOfPrimeInterest = 15,
+    FilterForPSREnhancedSurveillancePlusAllSSRModeSData = 16,
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
 #[deku(type = "u8", bits = "8")]
 pub enum DataFilterTYP {
-    #[deku(id = "0")]
-    InvalidValue,
-    #[deku(id = "1")]
-    FilterWeatherData,
-    #[deku(id = "2")]
-    FilterJammingStrobe,
-    #[deku(id = "3")]
-    FilterPSRData,
-    #[deku(id = "4")]
-    FilterSSRModeSData,
-    #[deku(id = "5")]
-    FilterSSRModeSPSRData,
-    #[deku(id = "6")]
-    EnhancedSurveillanceData,
-    #[deku(id = "7")]
-    FilterPSREnhancedSurveillanceData,
-    #[deku(id = "8")]
-    FilterPSREnhancedSurveillanceSSRModeSDataNotInAreaOfPrimeInterest,
-    #[deku(id = "9")]
-    FilterPSREnhancedSurveillanceAllSSRModeSData,
+    InvalidValue                      = 0,
+    FilterWeatherData                 = 1,
+    FilterJammingStrobe               = 2,
+    FilterPSRData                     = 3,
+    FilterSSRModeSData                = 4,
+    FilterSSRModeSPSRData             = 5,
+    EnhancedSurveillanceData          = 6,
+    FilterPSREnhancedSurveillanceData = 7,
+    FilterPSREnhancedSurveillanceSSRModeSDataNotInAreaOfPrimeInterest = 8,
+    FilterPSREnhancedSurveillanceAllSSRModeSData = 9,
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
 #[deku(type = "u8", bits = "1")]
 pub enum TST {
-    #[deku(id = "0")]
-    RealTargetReport,
-    #[deku(id = "1")]
-    TestTargetReport,
+    RealTargetReport = 0,
+    TestTargetReport = 1,
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
 #[deku(type = "u8", bits = "1")]
 pub enum ERR {
-    #[deku(id = "0")]
-    NoExtendedRange,
-    #[deku(id = "1")]
-    ExtendedRangePresent,
+    NoExtendedRange      = 0,
+    ExtendedRangePresent = 1,
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
 #[deku(type = "u8", bits = "1")]
 pub enum XPP {
-    #[deku(id = "0")]
-    NoXPulsePresent,
-    #[deku(id = "1")]
-    XPulsePresent,
+    NoXPulsePresent = 0,
+    XPulsePresent   = 1,
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
 #[deku(type = "u8", bits = "1")]
 pub enum ME {
-    #[deku(id = "0")]
-    NoMilitaryEmergency,
-    #[deku(id = "1")]
-    MilitaryEmergency,
+    NoMilitaryEmergency = 0,
+    MilitaryEmergency   = 1,
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
 #[deku(type = "u8", bits = "1")]
 pub enum MI {
-    #[deku(id = "0")]
-    NoMilitaryIdentification,
-    #[deku(id = "1")]
-    MilitaryIdentification,
+    NoMilitaryIdentification = 0,
+    MilitaryIdentification   = 1,
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
 #[deku(type = "u8", bits = "2")]
 pub enum FOEFRI {
-    #[deku(id = "0b00")]
-    NoMode4Interrogation,
-    #[deku(id = "0b01")]
-    FriendlyTarget,
-    #[deku(id = "0b10")]
-    UnknownTarget,
-    #[deku(id = "0b11")]
-    NoReply,
+    NoMode4Interrogation = 0b00,
+    FriendlyTarget       = 0b01,
+    UnknownTarget        = 0b10,
+    NoReply              = 0b11,
 }
