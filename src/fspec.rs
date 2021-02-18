@@ -1,3 +1,5 @@
+use crate::FSPEC_IDENT;
+
 /// Usage in cond for checking if dataitem is to be read, by checking the fspec for the data item
 pub fn is_fspec(dataitem_fspec: u8, fspec: &[u8], pos: usize) -> bool {
     if pos < fspec.len() {
@@ -26,6 +28,6 @@ pub fn trim_fspec(fspec: &mut Vec<u8>) {
 pub fn add_fx(fspec: &mut Vec<u8>) {
     let fspec_len = fspec.len();
     for f in fspec.iter_mut().take(fspec_len - 1) {
-        *f |= 0b0000_0001
+        *f |= FSPEC_IDENT
     }
 }

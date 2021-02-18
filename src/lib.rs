@@ -71,6 +71,8 @@ mod fspec;
 /// Size of category + length in bytes
 const ASTERIX_HEADER_SIZE: u16 = 3;
 
+const FSPEC_IDENT: u8 = 0b0000_0001;
+
 #[derive(Debug, Default, PartialEq, DekuRead, DekuWrite)]
 #[deku(endian = "big")]
 pub struct AsterixPacket {

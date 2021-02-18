@@ -4,6 +4,7 @@ use crate::data_item::{
     SystemProcessingMode, ThreeDPositionOfDataSource, TimeOfDay,
 };
 use crate::fspec::{add_fx, is_fspec, trim_fspec};
+use crate::FSPEC_IDENT;
 use asterix_derive::UpdateFspec;
 use deku::prelude::*;
 
@@ -11,7 +12,7 @@ use deku::prelude::*;
 #[derive(Debug, Default, PartialEq, DekuRead, DekuWrite, UpdateFspec)]
 #[deku(endian = "big")]
 pub struct Cat34 {
-    #[deku(until = "|b: &u8| *b & 0b0000_0001 == 0")]
+    #[deku(until = "|b: &u8| *b & FSPEC_IDENT == 0")]
     pub fspec: Vec<u8>,
     /// FRN 1
     #[deku(skip, cond = "is_fspec(DataSourceIdentifier::FRN_34, fspec, 0)")]
