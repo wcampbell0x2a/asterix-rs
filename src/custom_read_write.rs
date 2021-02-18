@@ -20,7 +20,7 @@ pub mod read {
         modifier_op: Op,
     ) -> Result<(&BitSlice<Msb0, u8>, f32), DekuError> {
         let (rest, value) = u32::read(rest, (deku::ctx::Endian::Big, deku::ctx::Size::Bits(bits)))?;
-        op(rest, value as f32, modifier, modifier_op)
+        Ok(op(rest, value as f32, modifier, modifier_op))
     }
 
     /// Read in big-endian bits to i16, multiply by f32, return f32
@@ -31,7 +31,7 @@ pub mod read {
         modifier_op: Op,
     ) -> Result<(&BitSlice<Msb0, u8>, f32), DekuError> {
         let (rest, value) = i16::read(rest, (deku::ctx::Endian::Big, deku::ctx::Size::Bits(bits)))?;
-        op(rest, f32::from(value), modifier, modifier_op)
+        Ok(op(rest, f32::from(value), modifier, modifier_op))
     }
 
     fn op(
@@ -39,12 +39,12 @@ pub mod read {
         value: f32,
         modifier: f32,
         modifier_op: Op,
-    ) -> Result<(&BitSlice<Msb0, u8>, f32), DekuError> {
+    ) -> (&BitSlice<Msb0, u8>, f32) {
         match modifier_op {
-            Op::Multiply => Ok((rest, value as f32 * modifier)),
-            Op::Divide => Ok((rest, value as f32 / modifier)),
-            Op::Add => Ok((rest, value as f32 + modifier)),
-            Op::Subtract => Ok((rest, value as f32 - modifier)),
+            Op::Multiply => (rest, value as f32 * modifier),
+            Op::Divide => (rest, value as f32 / modifier),
+            Op::Add => (rest, value as f32 + modifier),
+            Op::Subtract => (rest, value as f32 - modifier),
         }
     }
 
