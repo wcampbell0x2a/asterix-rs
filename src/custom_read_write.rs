@@ -1,19 +1,30 @@
 /// Several helpers for deku reading of certain types into certain types
-use deku::prelude::*;
 
 #[allow(dead_code)]
-pub enum Op {
+pub(crate) enum Op {
     Multiply,
     Divide,
     Add,
     Subtract,
 }
 
-pub mod read {
-    use super::{BitSlice, DekuError, DekuRead, Msb0, Op};
+impl Op {
+    pub(crate) fn calculate(&self, value: f32, modifier: f32) -> f32 {
+        match self {
+            Op::Multiply => value * modifier,
+            Op::Divide => value / modifier,
+            Op::Add => value + modifier,
+            Op::Subtract => value - modifier,
+        }
+    }
+}
+
+pub(crate) mod read {
+    use super::Op;
+    use deku::prelude::*;
 
     /// Read in big-endian bits to u32, multiply by f32, return f32
-    pub fn bits_to_f32(
+    pub(crate) fn bits_to_f32(
         rest: &BitSlice<Msb0, u8>,
         bits: usize,
         modifier: f32,
@@ -24,7 +35,7 @@ pub mod read {
     }
 
     /// Read in big-endian bits to i16, multiply by f32, return f32
-    pub fn bits_i16_to_f32(
+    pub(crate) fn bits_i16_to_f32(
         rest: &BitSlice<Msb0, u8>,
         bits: usize,
         modifier: f32,
@@ -34,22 +45,17 @@ pub mod read {
         Ok(op(rest, f32::from(value), modifier, modifier_op))
     }
 
-    fn op(
+    pub(crate) fn op(
         rest: &BitSlice<Msb0, u8>,
         value: f32,
         modifier: f32,
         modifier_op: Op,
     ) -> (&BitSlice<Msb0, u8>, f32) {
-        match modifier_op {
-            Op::Multiply => (rest, value as f32 * modifier),
-            Op::Divide => (rest, value as f32 / modifier),
-            Op::Add => (rest, value as f32 + modifier),
-            Op::Subtract => (rest, value as f32 - modifier),
-        }
+        (rest, modifier_op.calculate(value as f32, modifier))
     }
 
     /// Read in big-endian bits, multiply by f32, return Some(f32)
-    pub fn bits_to_optionf32(
+    pub(crate) fn bits_to_optionf32(
         rest: &BitSlice<Msb0, u8>,
         bits: usize,
         modifier: f32,
@@ -60,9 +66,10 @@ pub mod read {
 }
 
 pub mod write {
-    use super::{BitVec, DekuError, DekuWrite, Msb0, Op};
+    use super::Op;
+    use deku::prelude::*;
 
-    pub fn f32_u32(
+    pub(crate) fn f32_u32(
         value: &f32,
         bits: usize,
         modifier: f32,
@@ -70,19 +77,14 @@ pub mod write {
         output: &mut BitVec<Msb0, u8>,
     ) -> Result<(), DekuError> {
         // TODO this should be function for this and the other one
-        let value = match modifier_op {
-            Op::Multiply => *value * modifier,
-            Op::Divide => *value / modifier,
-            Op::Add => *value + modifier,
-            Op::Subtract => *value - modifier,
-        };
+        let value = modifier_op.calculate(*value, modifier);
         (value as u32).write(
             output,
             (deku::ctx::Endian::Big, deku::ctx::Size::Bits(bits)),
         )
     }
 
-    pub fn f32_optionu32(
+    pub(crate) fn f32_optionu32(
         value: &Option<f32>,
         bits: usize,
         modifier: f32,
@@ -94,19 +96,14 @@ pub mod write {
         })
     }
 
-    pub fn f32_i32(
+    pub(crate) fn f32_i32(
         value: &f32,
         bits: usize,
         modifier: f32,
         modifier_op: Op,
         output: &mut BitVec<Msb0, u8>,
     ) -> Result<(), DekuError> {
-        let value = match modifier_op {
-            Op::Multiply => *value * modifier,
-            Op::Divide => *value / modifier,
-            Op::Add => *value + modifier,
-            Op::Subtract => *value - modifier,
-        };
+        let value = modifier_op.calculate(*value, modifier);
         (value as i32).write(
             output,
             (deku::ctx::Endian::Big, deku::ctx::Size::Bits(bits)),
