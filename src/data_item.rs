@@ -8,6 +8,7 @@ use crate::types::{
     ERR, FOEFRI, FX, G, GHO, L, MAH, ME, MI, MSC, MSSC, MTYPE, NOGO, OVL, POL, RAB, RAD, RDP, RDPC,
     RDPR, RED, SCF, SI, SIM, SPI, STAT, STC, SUP, TCC, TRE, TST, TSV, TYP, V, XPP,
 };
+use deku::bitvec::{BitSlice, BitVec, Msb0};
 use deku::prelude::*;
 
 const RHO_MODIFIER: f32 = 1.0 / 256.0;

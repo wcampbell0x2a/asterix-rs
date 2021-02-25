@@ -1,4 +1,6 @@
+use deku::bitvec::{BitSlice, BitVec, Msb0};
 /// Several helpers for deku reading of certain types into certain types
+use deku::prelude::*;
 
 #[allow(dead_code)]
 pub(crate) enum Op {
@@ -20,8 +22,7 @@ impl Op {
 }
 
 pub(crate) mod read {
-    use super::Op;
-    use deku::prelude::*;
+    use super::*;
 
     /// Read in big-endian bits to u32, multiply by f32, return f32
     pub(crate) fn bits_to_f32(
@@ -66,8 +67,7 @@ pub(crate) mod read {
 }
 
 pub mod write {
-    use super::Op;
-    use deku::prelude::*;
+    use super::*;
 
     pub(crate) fn f32_u32(
         value: &f32,

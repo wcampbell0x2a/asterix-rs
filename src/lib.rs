@@ -52,6 +52,7 @@
 //! packet.to_bytes().unwrap();
 //! ```
 
+use deku::bitvec::{BitVec, Msb0};
 use deku::prelude::*;
 
 pub mod types;
