@@ -78,7 +78,6 @@ const FSPEC_IDENT: u8 = 0b0000_0001;
 #[deku(endian = "big")]
 pub struct AsterixPacket {
     /// Category of all `messages`
-    #[deku(bytes = "1")]
     pub category: u8,
     /// Total length of `AsterixPacket`
     #[deku(update = "Self::update_len(&mut self.messages)")]
