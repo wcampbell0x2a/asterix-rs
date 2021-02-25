@@ -96,6 +96,7 @@ impl AsterixPacket {
         self.update()
     }
 
+    /// Read all messages and return byte len
     fn update_len(messages: &mut Vec<AsterixMessage>) -> u16 {
         let mut len: u16 = 0;
         for message in messages.iter_mut() {
@@ -120,6 +121,7 @@ pub enum AsterixMessage {
 }
 
 impl AsterixMessage {
+    /// Call `update_fpsec` of internal type
     pub fn update_fspec(&mut self) {
         match self {
             Self::Cat34(c) => c.update_fspec(),
