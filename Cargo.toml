@@ -16,6 +16,6 @@ members = [
 ]
 
 [dependencies]
-deku = "0.11.0"
+deku = "0.12.0"
 asterix-derive = { version = "^0.2.0", path = "asterix-derive" }
 assert_hex = "0.2.1"
