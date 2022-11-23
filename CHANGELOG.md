@@ -5,7 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-- Update deku to 0.11.0
+
+## [0.3.0] - 2022-11-22
+- Update deku to 0.15.0
 - Improve deku usage
 - [deku-derive] improve rust AST parsing
 - use assert_hex for better testing panic display
