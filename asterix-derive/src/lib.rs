@@ -63,8 +63,7 @@ pub fn derive_answer_fn(input: TokenStream) -> TokenStream {
                                 let frn = if let syn::Expr::Path(attrs) = &fn_call.args[0] {
                                     format!(
                                         "{}::{}",
-                                        attrs.path.segments[0].ident.to_string(),
-                                        attrs.path.segments[1].ident.to_string()
+                                        attrs.path.segments[0].ident, attrs.path.segments[1].ident,
                                     )
                                 } else {
                                     unreachable!()
