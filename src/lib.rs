@@ -100,7 +100,7 @@ impl AsterixPacket {
     fn update_len(messages: &mut Vec<AsterixMessage>) -> u16 {
         let mut len: u16 = 0;
         for message in messages.iter_mut() {
-            let mut bits: BitVec<Msb0, u8> = BitVec::new();
+            let mut bits: BitVec<u8, Msb0> = BitVec::new();
             message
                 .write(&mut bits, (deku::ctx::Endian::Big, 0))
                 .unwrap();

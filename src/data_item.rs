@@ -143,14 +143,14 @@ pub struct FlightLevelInBinaryRepresentation {
 
 impl FlightLevelInBinaryRepresentation {
     pub const FRN_48: u8 = 0b100;
-    const CTX: (deku::ctx::Endian, deku::ctx::Size) =
-        (deku::ctx::Endian::Big, deku::ctx::Size::Bits(14_usize));
+    const CTX: (deku::ctx::Endian, deku::ctx::BitSize) =
+        (deku::ctx::Endian::Big, deku::ctx::BitSize(14_usize));
 
-    fn read(rest: &BitSlice<Msb0, u8>) -> Result<(&BitSlice<Msb0, u8>, u16), DekuError> {
+    fn read(rest: &BitSlice<u8, Msb0>) -> Result<(&BitSlice<u8, Msb0>, u16), DekuError> {
         u16::read(rest, Self::CTX).map(|(rest, value)| (rest, value / 4))
     }
 
-    fn write(flight_level: &u16, output: &mut BitVec<Msb0, u8>) -> Result<(), DekuError> {
+    fn write(flight_level: &u16, output: &mut BitVec<u8, Msb0>) -> Result<(), DekuError> {
         let value = *flight_level * 4;
         value.write(output, Self::CTX)
     }
@@ -189,39 +189,15 @@ pub struct AircraftIdentification {
 impl AircraftIdentification {
     pub const FRN_48: u8 = 0b100_0000;
     /// Read and convert to String
-    fn read(rest: &BitSlice<Msb0, u8>) -> Result<(&BitSlice<Msb0, u8>, String), DekuError> {
-        let (rest, one) = u8::read(
-            rest,
-            (deku::ctx::Endian::Big, deku::ctx::Size::Bits(6_usize)),
-        )?;
-        let (rest, two) = u8::read(
-            rest,
-            (deku::ctx::Endian::Big, deku::ctx::Size::Bits(6_usize)),
-        )?;
-        let (rest, three) = u8::read(
-            rest,
-            (deku::ctx::Endian::Big, deku::ctx::Size::Bits(6_usize)),
-        )?;
-        let (rest, four) = u8::read(
-            rest,
-            (deku::ctx::Endian::Big, deku::ctx::Size::Bits(6_usize)),
-        )?;
-        let (rest, five) = u8::read(
-            rest,
-            (deku::ctx::Endian::Big, deku::ctx::Size::Bits(6_usize)),
-        )?;
-        let (rest, six) = u8::read(
-            rest,
-            (deku::ctx::Endian::Big, deku::ctx::Size::Bits(6_usize)),
-        )?;
-        let (rest, seven) = u8::read(
-            rest,
-            (deku::ctx::Endian::Big, deku::ctx::Size::Bits(6_usize)),
-        )?;
-        let (rest, _) = u8::read(
-            rest,
-            (deku::ctx::Endian::Big, deku::ctx::Size::Bits(6_usize)),
-        )?;
+    fn read(rest: &BitSlice<u8, Msb0>) -> Result<(&BitSlice<u8, Msb0>, String), DekuError> {
+        let (rest, one) = u8::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)))?;
+        let (rest, two) = u8::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)))?;
+        let (rest, three) = u8::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)))?;
+        let (rest, four) = u8::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)))?;
+        let (rest, five) = u8::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)))?;
+        let (rest, six) = u8::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)))?;
+        let (rest, seven) = u8::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)))?;
+        let (rest, _) = u8::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)))?;
         let value = format!(
             "{}{}{}{}{}{}{}",
             Self::asterix_char_to_ascii(one) as char,
@@ -236,16 +212,16 @@ impl AircraftIdentification {
     }
 
     /// Parse from String to u8 and write
-    fn write(field_a: &str, output: &mut BitVec<Msb0, u8>) -> Result<(), DekuError> {
+    fn write(field_a: &str, output: &mut BitVec<u8, Msb0>) -> Result<(), DekuError> {
         for c in field_a.chars() {
             Self::asterix_ascii_to_ia5_char(c as u8).write(
                 output,
-                (deku::ctx::Endian::Big, deku::ctx::Size::Bits(6_usize)),
+                (deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)),
             )?;
         }
         0_u8.write(
             output,
-            (deku::ctx::Endian::Big, deku::ctx::Size::Bits(6_usize)),
+            (deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)),
         )
     }
 
@@ -563,19 +539,19 @@ pub struct SectorNumber {
 impl SectorNumber {
     pub const FRN_34: u8 = 0b1_0000;
     pub const FRN_48: u8 = 0b1_0000;
-    const CTX: (deku::ctx::Endian, deku::ctx::Size) =
-        (deku::ctx::Endian::Big, deku::ctx::Size::Bits(8_usize));
+    const CTX: (deku::ctx::Endian, deku::ctx::BitSize) =
+        (deku::ctx::Endian::Big, deku::ctx::BitSize(8_usize));
 
     fn modifier() -> f32 {
         360.0 / 2_f32.powi(8)
     }
 
-    fn read(rest: &BitSlice<Msb0, u8>) -> Result<(&BitSlice<Msb0, u8>, u16), DekuError> {
+    fn read(rest: &BitSlice<u8, Msb0>) -> Result<(&BitSlice<u8, Msb0>, u16), DekuError> {
         u16::read(rest, Self::CTX)
             .map(|(rest, value)| (rest, (f32::from(value) * Self::modifier()) as u16))
     }
 
-    fn write(num: &u16, output: &mut BitVec<Msb0, u8>) -> Result<(), DekuError> {
+    fn write(num: &u16, output: &mut BitVec<u8, Msb0>) -> Result<(), DekuError> {
         let value = (f32::from(*num) / Self::modifier()) as u8;
         value.write(output, Self::CTX)
     }
@@ -662,15 +638,15 @@ pub struct HeightMeasuredBy3dRadar {
 
 impl HeightMeasuredBy3dRadar {
     pub const FRN_48: u8 = 0b1000;
-    const CTX: (deku::ctx::Endian, deku::ctx::Size) =
-        (deku::ctx::Endian::Big, deku::ctx::Size::Bits(14_usize));
+    const CTX: (deku::ctx::Endian, deku::ctx::BitSize) =
+        (deku::ctx::Endian::Big, deku::ctx::BitSize(14_usize));
     pub const MODIFIER: i32 = 25;
 
-    fn read(rest: &BitSlice<Msb0, u8>) -> Result<(&BitSlice<Msb0, u8>, i32), DekuError> {
+    fn read(rest: &BitSlice<u8, Msb0>) -> Result<(&BitSlice<u8, Msb0>, i32), DekuError> {
         i32::read(rest, Self::CTX).map(|(rest, value)| (rest, (value * Self::MODIFIER) as i32))
     }
 
-    fn write(height: &i32, output: &mut BitVec<Msb0, u8>) -> Result<(), DekuError> {
+    fn write(height: &i32, output: &mut BitVec<u8, Msb0>) -> Result<(), DekuError> {
         let value = height / Self::MODIFIER;
         value.write(output, Self::CTX)
     }
@@ -1095,7 +1071,7 @@ mod tests {
 
     #[test]
     fn tod_140() {
-        let mut input = BitSlice::from_slice(&[0xa8, 0xbf, 0xff]).unwrap();
+        let mut input = BitSlice::from_slice(&[0xa8, 0xbf, 0xff]);
         let item = TimeOfDay::read(&mut input, deku::ctx::Endian::Big)
             .unwrap()
             .1;
@@ -1107,8 +1083,7 @@ mod tests {
         let mut input = BitSlice::from_slice(&[
             0xe0 | 0x08 | 0x04 | 0x02 | 0x01,
             0x80 | 0x40 | 0x20 | 0x10 | 0x08 | 0x06,
-        ])
-        .unwrap();
+        ]);
         let item = TargetReportDescriptor::read(&mut input, deku::ctx::Endian::Big)
             .unwrap()
             .1;
