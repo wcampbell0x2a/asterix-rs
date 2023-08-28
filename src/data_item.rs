@@ -1,5 +1,7 @@
 //! Defined Data Items that are used for formal parsing of data structs in categories
 
+use std::io::{Read, Write};
+
 use crate::custom_read_write::{read, write, Op};
 use crate::fspec::is_fspec;
 use crate::modifier;
@@ -8,7 +10,7 @@ use crate::types::{
     ERR, FOEFRI, FX, G, GHO, L, MAH, ME, MI, MSC, MSSC, MTYPE, NOGO, OVL, POL, RAB, RAD, RDP, RDPC,
     RDPR, RED, SCF, SI, SIM, SPI, STAT, STC, SUP, TCC, TRE, TST, TSV, TYP, V, XPP,
 };
-use deku::bitvec::{BitSlice, BitVec, Msb0};
+use deku::ctx::{BitSize, Endian};
 use deku::prelude::*;
 
 const RHO_MODIFIER: f32 = 1.0 / 256.0;
@@ -38,8 +40,8 @@ impl DataSourceIdentifier {
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct TimeOfDay {
     #[deku(
-        reader = "read::bits_to_f32(deku::rest, 24, Self::MODIFIER, Op::Divide)",
-        writer = "write::f32_u32(&self.time, 24, Self::MODIFIER, Op::Multiply, deku::output)"
+        reader = "read::bits_to_f32(deku::reader, 24, Self::MODIFIER, Op::Divide)",
+        writer = "write::f32_u32(&self.time, 24, Self::MODIFIER, Op::Multiply, deku::writer)"
     )]
     pub time: f32,
 }
@@ -91,13 +93,13 @@ impl TargetReportDescriptor {
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct MeasuredPositionInPolarCoordinates {
     #[deku(
-        reader = "read::bits_to_f32(deku::rest, 16, RHO_MODIFIER, Op::Multiply)",
-        writer = "write::f32_u32(&self.rho, 16, RHO_MODIFIER, Op::Divide, deku::output)"
+        reader = "read::bits_to_f32(deku::reader, 16, RHO_MODIFIER, Op::Multiply)",
+        writer = "write::f32_u32(&self.rho, 16, RHO_MODIFIER, Op::Divide, deku::writer)"
     )]
     pub rho: f32,
     #[deku(
-        reader = "read::bits_to_f32(deku::rest, 16, THETA_MODIFIER, Op::Multiply)",
-        writer = "write::f32_u32(&self.theta, 16, THETA_MODIFIER, Op::Divide, deku::output)"
+        reader = "read::bits_to_f32(deku::reader, 16, THETA_MODIFIER, Op::Multiply)",
+        writer = "write::f32_u32(&self.theta, 16, THETA_MODIFIER, Op::Divide, deku::writer)"
     )]
     pub theta: f32,
 }
@@ -135,24 +137,23 @@ pub struct FlightLevelInBinaryRepresentation {
     pub v: V,
     pub g: G,
     #[deku(
-        reader = "Self::read(deku::rest)",
-        writer = "Self::write(&self.flight_level, deku::output)"
+        reader = "Self::read(deku::reader)",
+        writer = "Self::write(&self.flight_level, deku::writer)"
     )]
     pub flight_level: u16,
 }
 
 impl FlightLevelInBinaryRepresentation {
     pub const FRN_48: u8 = 0b100;
-    const CTX: (deku::ctx::Endian, deku::ctx::BitSize) =
-        (deku::ctx::Endian::Big, deku::ctx::BitSize(14_usize));
+    const CTX: (Endian, BitSize) = (Endian::Big, BitSize(14_usize));
 
-    fn read(rest: &BitSlice<u8, Msb0>) -> Result<(&BitSlice<u8, Msb0>, u16), DekuError> {
-        u16::read(rest, Self::CTX).map(|(rest, value)| (rest, value / 4))
+    fn read<R: Read>(reader: &mut Reader<R>) -> Result<u16, DekuError> {
+        u16::from_reader_with_ctx(reader, Self::CTX).map(|value| value / 4)
     }
 
-    fn write(flight_level: &u16, output: &mut BitVec<u8, Msb0>) -> Result<(), DekuError> {
+    fn write<W: Write>(flight_level: &u16, writer: &mut Writer<W>) -> Result<(), DekuError> {
         let value = *flight_level * 4;
-        value.write(output, Self::CTX)
+        value.to_writer(writer, Self::CTX)
     }
 }
 
@@ -180,8 +181,8 @@ impl AircraftAddress {
 pub struct AircraftIdentification {
     /// IA5 char array
     #[deku(
-        reader = "Self::read(deku::rest)",
-        writer = "Self::write(&self.identification, deku::output)"
+        reader = "Self::read(deku::reader)",
+        writer = "Self::write(&self.identification, deku::writer)"
     )]
     pub identification: String,
 }
@@ -189,15 +190,15 @@ pub struct AircraftIdentification {
 impl AircraftIdentification {
     pub const FRN_48: u8 = 0b100_0000;
     /// Read and convert to String
-    fn read(rest: &BitSlice<u8, Msb0>) -> Result<(&BitSlice<u8, Msb0>, String), DekuError> {
-        let (rest, one) = u8::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)))?;
-        let (rest, two) = u8::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)))?;
-        let (rest, three) = u8::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)))?;
-        let (rest, four) = u8::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)))?;
-        let (rest, five) = u8::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)))?;
-        let (rest, six) = u8::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)))?;
-        let (rest, seven) = u8::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)))?;
-        let (rest, _) = u8::read(rest, (deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)))?;
+    fn read<R: Read>(reader: &mut Reader<R>) -> Result<String, DekuError> {
+        let one = u8::from_reader_with_ctx(reader, (Endian::Big, BitSize(6_usize)))?;
+        let two = u8::from_reader_with_ctx(reader, (Endian::Big, BitSize(6_usize)))?;
+        let three = u8::from_reader_with_ctx(reader, (Endian::Big, BitSize(6_usize)))?;
+        let four = u8::from_reader_with_ctx(reader, (Endian::Big, BitSize(6_usize)))?;
+        let five = u8::from_reader_with_ctx(reader, (Endian::Big, BitSize(6_usize)))?;
+        let six = u8::from_reader_with_ctx(reader, (Endian::Big, BitSize(6_usize)))?;
+        let seven = u8::from_reader_with_ctx(reader, (Endian::Big, BitSize(6_usize)))?;
+        let _ = u8::from_reader_with_ctx(reader, (Endian::Big, BitSize(6_usize)))?;
         let value = format!(
             "{}{}{}{}{}{}{}",
             Self::asterix_char_to_ascii(one) as char,
@@ -208,16 +209,16 @@ impl AircraftIdentification {
             Self::asterix_char_to_ascii(six) as char,
             Self::asterix_char_to_ascii(seven) as char
         );
-        Ok((rest, value))
+        Ok(value)
     }
 
     /// Parse from String to u8 and write
-    fn write(field_a: &str, output: &mut BitVec<u8, Msb0>) -> Result<(), DekuError> {
+    fn write<W: Write>(field_a: &str, writer: &mut Writer<W>) -> Result<(), DekuError> {
         for c in field_a.chars() {
             Self::asterix_ascii_to_ia5_char(c as u8)
-                .write(output, (deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)))?;
+                .to_writer(writer, (Endian::Big, BitSize(6_usize)))?;
         }
-        0_u8.write(output, (deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)))
+        0_u8.to_writer(writer, (Endian::Big, BitSize(6_usize)))
     }
 
     const IA5_ALPHA: u8 = 0x01;
@@ -316,13 +317,13 @@ impl TrackNumber {
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct CalculatedPositionCartesianCorr {
     #[deku(
-        reader = "read::bits_i16_to_f32(deku::rest, 16, Self::MODIFIER, Op::Multiply)",
-        writer = "write::f32_i32(&self.x, 16, Self::MODIFIER, Op::Divide, deku::output)"
+        reader = "read::bits_i16_to_f32(deku::reader, 16, Self::MODIFIER, Op::Multiply)",
+        writer = "write::f32_i32(&self.x, 16, Self::MODIFIER, Op::Divide, deku::writer)"
     )]
     pub x: f32,
     #[deku(
-        reader = "read::bits_i16_to_f32(deku::rest, 16, Self::MODIFIER, Op::Multiply)",
-        writer = "write::f32_i32(&self.y, 16, Self::MODIFIER, Op::Divide, deku::output)"
+        reader = "read::bits_i16_to_f32(deku::reader, 16, Self::MODIFIER, Op::Multiply)",
+        writer = "write::f32_i32(&self.y, 16, Self::MODIFIER, Op::Divide, deku::writer)"
     )]
     pub y: f32,
 }
@@ -339,13 +340,13 @@ impl CalculatedPositionCartesianCorr {
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct CalculatedTrackVelocity {
     #[deku(
-        reader = "read::bits_to_f32(deku::rest, 16, modifier::groundspeed(), Op::Multiply)",
-        writer = "write::f32_u32(&self.groundspeed, 16, modifier::groundspeed(), Op::Divide, deku::output)"
+        reader = "read::bits_to_f32(deku::reader, 16, modifier::groundspeed(), Op::Multiply)",
+        writer = "write::f32_u32(&self.groundspeed, 16, modifier::groundspeed(), Op::Divide, deku::writer)"
     )]
     pub groundspeed: f32,
     #[deku(
-        reader = "read::bits_to_f32(deku::rest, 16, modifier::heading1(), Op::Multiply)",
-        writer = "write::f32_u32(&self.heading, 16, modifier::heading1(), Op::Divide, deku::output)"
+        reader = "read::bits_to_f32(deku::reader, 16, modifier::heading1(), Op::Multiply)",
+        writer = "write::f32_u32(&self.heading, 16, modifier::heading1(), Op::Divide, deku::writer)"
     )]
     pub heading: f32,
 }
@@ -391,23 +392,23 @@ impl TrackStatus {
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct TrackQuality {
     #[deku(
-        reader = "read::bits_to_f32(deku::rest, 8, Self::MODIFIER, Op::Divide)",
-        writer = "write::f32_u32(&self.horizontal_stddev, 8, Self::MODIFIER, Op::Multiply, deku::output)"
+        reader = "read::bits_to_f32(deku::reader, 8, Self::MODIFIER, Op::Divide)",
+        writer = "write::f32_u32(&self.horizontal_stddev, 8, Self::MODIFIER, Op::Multiply, deku::writer)"
     )]
     pub horizontal_stddev: f32,
     #[deku(
-        reader = "read::bits_to_f32(deku::rest, 8, Self::MODIFIER, Op::Divide)",
-        writer = "write::f32_u32(&self.vertical_stddev, 8, Self::MODIFIER, Op::Multiply, deku::output)"
+        reader = "read::bits_to_f32(deku::reader, 8, Self::MODIFIER, Op::Divide)",
+        writer = "write::f32_u32(&self.vertical_stddev, 8, Self::MODIFIER, Op::Multiply, deku::writer)"
     )]
     pub vertical_stddev: f32,
     #[deku(
-        reader = "read::bits_to_f32(deku::rest, 8, modifier::groundspeed(), Op::Multiply)",
-        writer = "write::f32_u32(&self.groundspeed_stddev, 8, modifier::groundspeed(), Op::Divide, deku::output)"
+        reader = "read::bits_to_f32(deku::reader, 8, modifier::groundspeed(), Op::Multiply)",
+        writer = "write::f32_u32(&self.groundspeed_stddev, 8, modifier::groundspeed(), Op::Divide, deku::writer)"
     )]
     pub groundspeed_stddev: f32,
     #[deku(
-        reader = "read::bits_to_f32(deku::rest, 8, modifier::heading2(), Op::Multiply)",
-        writer = "write::f32_u32(&self.heading_stddev, 8, modifier::heading2(), Op::Divide, deku::output)"
+        reader = "read::bits_to_f32(deku::reader, 8, modifier::heading2(), Op::Multiply)",
+        writer = "write::f32_u32(&self.heading_stddev, 8, modifier::heading2(), Op::Divide, deku::writer)"
     )]
     pub heading_stddev: f32,
 }
@@ -453,8 +454,8 @@ pub struct RadarPlotCharacteristics {
     #[deku(
         skip,
         cond = "is_fspec(0b1000_0000, fspec, 0)",
-        reader = "read::bits_to_optionf32(deku::rest, 8, Self::runlength_modifier(), Op::Multiply)",
-        writer = "write::f32_optionu32(&self.srl, 8, Self::runlength_modifier(), Op::Divide, deku::output)"
+        reader = "read::bits_to_optionf32(deku::reader, 8, Self::runlength_modifier(), Op::Multiply)",
+        writer = "write::f32_optionu32(&self.srl, 8, Self::runlength_modifier(), Op::Divide, deku::writer)"
     )]
     pub srl: Option<f32>,
     #[deku(skip, cond = "is_fspec(0b100_0000, fspec, 0)")]
@@ -464,8 +465,8 @@ pub struct RadarPlotCharacteristics {
     #[deku(
         skip,
         cond = "is_fspec(0b1_0000, fspec, 0)",
-        reader = "read::bits_to_optionf32(deku::rest, 8, Self::runlength_modifier(), Op::Multiply)",
-        writer = "write::f32_optionu32(&self.prl, 8, Self::runlength_modifier(), Op::Divide, deku::output)"
+        reader = "read::bits_to_optionf32(deku::reader, 8, Self::runlength_modifier(), Op::Multiply)",
+        writer = "write::f32_optionu32(&self.prl, 8, Self::runlength_modifier(), Op::Divide, deku::writer)"
     )]
     pub prl: Option<f32>,
     #[deku(skip, cond = "is_fspec(0b1000, fspec, 0)")]
@@ -473,15 +474,15 @@ pub struct RadarPlotCharacteristics {
     #[deku(
         skip,
         cond = "is_fspec(0b100, fspec, 0)",
-        reader = "read::bits_to_optionf32(deku::rest, 8, Self::nm_modifier(), Op::Multiply)",
-        writer = "write::f32_optionu32(&self.rpd, 8, Self::nm_modifier(), Op::Divide, deku::output)"
+        reader = "read::bits_to_optionf32(deku::reader, 8, Self::nm_modifier(), Op::Multiply)",
+        writer = "write::f32_optionu32(&self.rpd, 8, Self::nm_modifier(), Op::Divide, deku::writer)"
     )]
     pub rpd: Option<f32>,
     #[deku(
         skip,
         cond = "is_fspec(0b100, fspec, 0)",
-        reader = "read::bits_to_optionf32(deku::rest, 8, Self::apd_modifier(), Op::Multiply)",
-        writer = "write::f32_optionu32(&self.apd, 8, Self::apd_modifier(), Op::Divide, deku::output)"
+        reader = "read::bits_to_optionf32(deku::reader, 8, Self::apd_modifier(), Op::Multiply)",
+        writer = "write::f32_optionu32(&self.apd, 8, Self::apd_modifier(), Op::Divide, deku::writer)"
     )]
     pub apd: Option<f32>,
 }
@@ -524,28 +525,27 @@ impl MessageType {
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct SectorNumber {
-    #[deku(reader = "Self::read(deku::rest)", writer = "Self::write(&self.num, deku::output)")]
+    #[deku(reader = "Self::read(deku::reader)", writer = "Self::write(&self.num, deku::writer)")]
     pub num: u16,
 }
 
 impl SectorNumber {
     pub const FRN_34: u8 = 0b1_0000;
     pub const FRN_48: u8 = 0b1_0000;
-    const CTX: (deku::ctx::Endian, deku::ctx::BitSize) =
-        (deku::ctx::Endian::Big, deku::ctx::BitSize(8_usize));
+    const CTX: (Endian, BitSize) = (Endian::Big, BitSize(8_usize));
 
     fn modifier() -> f32 {
         360.0 / 2_f32.powi(8)
     }
 
-    fn read(rest: &BitSlice<u8, Msb0>) -> Result<(&BitSlice<u8, Msb0>, u16), DekuError> {
-        u16::read(rest, Self::CTX)
-            .map(|(rest, value)| (rest, (f32::from(value) * Self::modifier()) as u16))
+    fn read<R: Read>(reader: &mut Reader<R>) -> Result<u16, DekuError> {
+        u16::from_reader_with_ctx(reader, Self::CTX)
+            .map(|value| (f32::from(value) * Self::modifier()) as u16)
     }
 
-    fn write(num: &u16, output: &mut BitVec<u8, Msb0>) -> Result<(), DekuError> {
+    fn write<W: Write>(num: &u16, writer: &mut Writer<W>) -> Result<(), DekuError> {
         let value = (f32::from(*num) / Self::modifier()) as u8;
-        value.write(output, Self::CTX)
+        value.to_writer(writer, Self::CTX)
     }
 }
 
@@ -621,23 +621,25 @@ impl ModeCCodeAndConfidenceIndicator {
 pub struct HeightMeasuredBy3dRadar {
     #[deku(bits = "2", endian = "big")]
     pub reserved: u8,
-    #[deku(reader = "Self::read(deku::rest)", writer = "Self::write(&self.height, deku::output)")]
+    #[deku(
+        reader = "Self::read(deku::reader)",
+        writer = "Self::write(&self.height, deku::writer)"
+    )]
     pub height: i32,
 }
 
 impl HeightMeasuredBy3dRadar {
     pub const FRN_48: u8 = 0b1000;
-    const CTX: (deku::ctx::Endian, deku::ctx::BitSize) =
-        (deku::ctx::Endian::Big, deku::ctx::BitSize(14_usize));
+    const CTX: (Endian, BitSize) = (Endian::Big, BitSize(14_usize));
     pub const MODIFIER: i32 = 25;
 
-    fn read(rest: &BitSlice<u8, Msb0>) -> Result<(&BitSlice<u8, Msb0>, i32), DekuError> {
-        i32::read(rest, Self::CTX).map(|(rest, value)| (rest, value * Self::MODIFIER))
+    fn read<R: Read>(reader: &mut Reader<R>) -> Result<i32, DekuError> {
+        i32::from_reader_with_ctx(reader, Self::CTX).map(|value| (value * Self::MODIFIER) as i32)
     }
 
-    fn write(height: &i32, output: &mut BitVec<u8, Msb0>) -> Result<(), DekuError> {
+    fn write<W: Write>(height: &i32, writer: &mut Writer<W>) -> Result<(), DekuError> {
         let value = height / Self::MODIFIER;
-        value.write(output, Self::CTX)
+        value.to_writer(writer, Self::CTX)
     }
 }
 
@@ -782,8 +784,8 @@ impl Mode2CodeConfidenceIndicator {
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct AntennaRotationSpeed {
     #[deku(
-        reader = "read::bits_to_f32(deku::rest, 16, Self::MODIFIER, Op::Divide)",
-        writer = "write::f32_u32(&self.period, 16, Self::MODIFIER, Op::Multiply, deku::output)"
+        reader = "read::bits_to_f32(deku::reader, 16, Self::MODIFIER, Op::Divide)",
+        writer = "write::f32_u32(&self.period, 16, Self::MODIFIER, Op::Multiply, deku::writer)"
     )]
     pub period: f32,
 }
@@ -963,23 +965,23 @@ impl MessageCountValues {
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct GenericPolarWindow {
     #[deku(
-        reader = "read::bits_to_f32(deku::rest, 16, RHO_MODIFIER, Op::Multiply)",
-        writer = "write::f32_u32(&self.rho_start, 16, RHO_MODIFIER, Op::Divide, deku::output)"
+        reader = "read::bits_to_f32(deku::reader, 16, RHO_MODIFIER, Op::Multiply)",
+        writer = "write::f32_u32(&self.rho_start, 16, RHO_MODIFIER, Op::Divide, deku::writer)"
     )]
     pub rho_start: f32,
     #[deku(
-        reader = "read::bits_to_f32(deku::rest, 16, RHO_MODIFIER, Op::Multiply)",
-        writer = "write::f32_u32(&self.rho_end, 16, RHO_MODIFIER, Op::Divide, deku::output)"
+        reader = "read::bits_to_f32(deku::reader, 16, RHO_MODIFIER, Op::Multiply)",
+        writer = "write::f32_u32(&self.rho_end, 16, RHO_MODIFIER, Op::Divide, deku::writer)"
     )]
     pub rho_end: f32,
     #[deku(
-        reader = "read::bits_to_f32(deku::rest, 16, THETA_MODIFIER, Op::Multiply)",
-        writer = "write::f32_u32(&self.theta_start, 16, THETA_MODIFIER, Op::Divide, deku::output)"
+        reader = "read::bits_to_f32(deku::reader, 16, THETA_MODIFIER, Op::Multiply)",
+        writer = "write::f32_u32(&self.theta_start, 16, THETA_MODIFIER, Op::Divide, deku::writer)"
     )]
     pub theta_start: f32,
     #[deku(
-        reader = "read::bits_to_f32(deku::rest, 16, THETA_MODIFIER, Op::Multiply)",
-        writer = "write::f32_u32(&self.theta_end, 16, THETA_MODIFIER, Op::Divide, deku::output)"
+        reader = "read::bits_to_f32(deku::reader, 16, THETA_MODIFIER, Op::Multiply)",
+        writer = "write::f32_u32(&self.theta_end, 16, THETA_MODIFIER, Op::Divide, deku::writer)"
     )]
     pub theta_end: f32,
 }
@@ -1009,13 +1011,13 @@ impl DataFilter {
 pub struct ThreeDPositionOfDataSource {
     pub height_of_wgs_84: u16,
     #[deku(
-        reader = "read::bits_to_f32(deku::rest, 24, Self::WGS_MODIFIER, Op::Multiply)",
-        writer = "write::f32_u32(&self.latitude_in_wgs_84, 24, Self::WGS_MODIFIER, Op::Divide, deku::output)"
+        reader = "read::bits_to_f32(deku::reader, 24, Self::WGS_MODIFIER, Op::Multiply)",
+        writer = "write::f32_u32(&self.latitude_in_wgs_84, 24, Self::WGS_MODIFIER, Op::Divide, deku::writer)"
     )]
     pub latitude_in_wgs_84: f32,
     #[deku(
-        reader = "read::bits_to_f32(deku::rest, 24, Self::WGS_MODIFIER, Op::Multiply)",
-        writer = "write::f32_u32(&self.longitude_in_wgs_84, 24, Self::WGS_MODIFIER, Op::Divide, deku::output)"
+        reader = "read::bits_to_f32(deku::reader, 24, Self::WGS_MODIFIER, Op::Multiply)",
+        writer = "write::f32_u32(&self.longitude_in_wgs_84, 24, Self::WGS_MODIFIER, Op::Divide, deku::writer)"
     )]
     pub longitude_in_wgs_84: f32,
 }
@@ -1034,13 +1036,13 @@ impl ThreeDPositionOfDataSource {
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct CollimationError {
     #[deku(
-        reader = "read::bits_to_f32(deku::rest, 8, Self::MODIFIER, Op::Multiply)",
-        writer = "write::f32_u32(&self.range_error, 8, Self::MODIFIER, Op::Divide, deku::output)"
+        reader = "read::bits_to_f32(deku::reader, 8, Self::MODIFIER, Op::Multiply)",
+        writer = "write::f32_u32(&self.range_error, 8, Self::MODIFIER, Op::Divide, deku::writer)"
     )]
     pub range_error: f32,
     #[deku(
-        reader = "read::bits_to_f32(deku::rest, 8, Self::AZIMUTH_MODIFIER, Op::Multiply)",
-        writer = "write::f32_u32(&self.azimuth_error, 8, Self::AZIMUTH_MODIFIER, Op::Divide, deku::output)"
+        reader = "read::bits_to_f32(deku::reader, 8, Self::AZIMUTH_MODIFIER, Op::Multiply)",
+        writer = "write::f32_u32(&self.azimuth_error, 8, Self::AZIMUTH_MODIFIER, Op::Divide, deku::writer)"
     )]
     pub azimuth_error: f32,
 }
@@ -1055,23 +1057,28 @@ impl CollimationError {
 
 #[cfg(test)]
 mod tests {
+    use std::io::Cursor;
+
     use super::*;
     // tests from https://github.com/wireshark/wireshark/blob/master/test/suite_dissectors/group_asterix.py
 
     #[test]
     fn tod_140() {
-        let mut input = BitSlice::from_slice(&[0xa8, 0xbf, 0xff]);
-        let item = TimeOfDay::read(&mut input, deku::ctx::Endian::Big).unwrap().1;
+        let input = &[0xa8, 0xbf, 0xff];
+        let mut cursor = Cursor::new(input);
+        let mut reader = Reader::new(&mut cursor);
+        let item = TimeOfDay::from_reader_with_ctx(&mut reader, deku::ctx::Endian::Big).unwrap();
         assert_eq!(item.time, 86_399.99);
     }
 
     #[test]
     fn target_report_descriptor_020() {
-        let mut input = BitSlice::from_slice(&[
-            0xe0 | 0x08 | 0x04 | 0x02 | 0x01,
-            0x80 | 0x40 | 0x20 | 0x10 | 0x08 | 0x06,
-        ]);
-        let item = TargetReportDescriptor::read(&mut input, deku::ctx::Endian::Big).unwrap().1;
+        let input = &[0xe0 | 0x08 | 0x04 | 0x02 | 0x01, 0x80 | 0x40 | 0x20 | 0x10 | 0x08 | 0x06];
+        let mut cursor = Cursor::new(input);
+        let mut reader = Reader::new(&mut cursor);
+        let item =
+            TargetReportDescriptor::from_reader_with_ctx(&mut reader, deku::ctx::Endian::Big)
+                .unwrap();
         assert_eq!(item.typ, TYP::ModeSRollCallPlusPSR);
         assert_eq!(item.sim, SIM::ActualTargetReport);
         assert_eq!(item.rdp, RDP::ReportFromRDPChain2);

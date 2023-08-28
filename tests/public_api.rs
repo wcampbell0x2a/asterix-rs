@@ -1,3 +1,5 @@
+use std::io::Cursor;
+
 use assert_hex::assert_eq_hex;
 use asterix::data_item::{
     CodeFx, DataSourceIdentifier, HeightMeasuredBy3dRadar, MBData, MessageType,
@@ -20,7 +22,8 @@ fn it_works() {
         0x00, 0x01, 0xc0, 0x78, 0x00, 0x31, 0xbc, 0x00, 0x00, 0x40, 0x0d, 0xeb, 0x07, 0xb9, 0x58,
         0x2e, 0x41, 0x00, 0x20, 0xf5,
     ];
-    let (_, mut packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
+    let mut cursor = Cursor::new(bytes.clone());
+    let (_, mut packet) = AsterixPacket::from_reader((&mut cursor, 0)).unwrap();
 
     assert_eq!(packet.category, 48);
     assert_eq!(packet.length, 48);
@@ -131,7 +134,8 @@ fn it_works_only_two_fspec() {
         0x02, 0x00, 0x05, 0x28, 0x3c, 0x66, 0x0c, 0x10, 0xc2, 0x36, 0xd4, 0x18, 0x00, 0x01, 0xc0,
         0x78, 0x00, 0x31, 0xbc, 0x00, 0x00, 0x40, 0x0d, 0xeb, 0x07, 0xb9, 0x58, 0x2e, 0x41, 0x00,
     ];
-    let (_, mut packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
+    let mut cursor = Cursor::new(bytes.clone());
+    let (_, mut packet) = AsterixPacket::from_reader((&mut cursor, 0)).unwrap();
 
     assert_eq!(packet.category, 48);
     assert_eq!(packet.length, 45);
@@ -159,7 +163,8 @@ fn third_packet() {
         0xf6, 0xc3, 0x04, 0x08, 0x1e, 0xbb, 0x73, 0x40, 0x20, 0xf5,
     ];
     // TODO: Add CAT034
-    let (_, mut packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
+    let mut cursor = Cursor::new(bytes.clone());
+    let (_, mut packet) = AsterixPacket::from_reader((&mut cursor, 0)).unwrap();
     assert_eq!(packet.category, 48);
     assert_eq!(packet.length, 55);
 
@@ -264,7 +269,8 @@ fn third_packet() {
 #[test]
 fn test_34() {
     let bytes = vec![0x22, 0x00, 0x0b, 0xf0, 0x19, 0x0d, 0x02, 0x35, 0x6d, 0xfa, 0x60];
-    let (_, mut packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
+    let mut cursor = Cursor::new(bytes.clone());
+    let (_, mut packet) = AsterixPacket::from_reader((&mut cursor, 0)).unwrap();
 
     assert_eq!(packet.category, 34);
     assert_eq!(packet.length, 11);
@@ -313,16 +319,17 @@ fn test_four_messages() {
         0xe2, 0x78, 0x40, 0x20, 0xf6, // Cat 034
         0x22, 0x00, 0x0b, 0xf0, 0x19, 0x0d, 0x02, 0x35, 0x6e, 0x0e, 0x68,
     ];
-    let (rest, mut packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
+    let mut cursor = Cursor::new(bytes);
+    let (_rest, mut packet) = AsterixPacket::from_reader((&mut cursor, 0)).unwrap();
     packet.finalize().unwrap();
     assert_eq!(packet.category, 48);
-    let (_, mut packet) = AsterixPacket::from_bytes(rest).unwrap();
+    let (_, mut packet) = AsterixPacket::from_reader((&mut cursor, 0)).unwrap();
     packet.finalize().unwrap();
     assert_eq!(packet.category, 34);
 }
 
 #[test]
-fn test_not_from_bytes() {
+fn test_not_from_reader() {
     let mut thirty_eight = Cat34::default();
     thirty_eight.data_source_identifier = Some(DataSourceIdentifier { sac: 25, sic: 13 });
     thirty_eight.message_type = Some(MessageType { t: MTYPE::SectorCrossing });
@@ -358,7 +365,9 @@ fn test_48_track_quality() {
     packet.finalize().unwrap();
     let exp_bytes = vec![0x30, 0x00, 0x0a, 0x01, 0x01, 0b1000_0000, 0x00, 0x00, 0x00, 0x00];
     assert_eq!(packet.to_bytes().unwrap(), exp_bytes);
-    let (_, exp_packet) = AsterixPacket::from_bytes((&exp_bytes, 0)).unwrap();
+
+    let mut cursor = Cursor::new(exp_bytes);
+    let (_, exp_packet) = AsterixPacket::from_reader((&mut cursor, 0)).unwrap();
     assert_eq!(packet, exp_packet);
 
     let mut fourty_eight = Cat48::default();
@@ -376,7 +385,9 @@ fn test_48_track_quality() {
     packet.finalize().unwrap();
     let exp_bytes = vec![0x30, 0x00, 0x0a, 0x01, 0x01, 0b1000_0000, 0xfa, 0xfa, 0xff, 0xff];
     assert_eq_hex!(packet.to_bytes().unwrap(), exp_bytes);
-    let (_, exp_packet) = AsterixPacket::from_bytes((&exp_bytes, 0)).unwrap();
+
+    let mut cursor = Cursor::new(exp_bytes);
+    let (_, exp_packet) = AsterixPacket::from_reader((&mut cursor, 0)).unwrap();
     assert_eq_hex!(packet, exp_packet);
 }
 
@@ -400,7 +411,9 @@ fn test_48_warning_error_con_target_class() {
     packet.finalize().unwrap();
     let exp_bytes = vec![0x30, 0x00, 0x08, 0x01, 0x01, 0b100_0000, 0x5 << 1 | 0x01, 0x5 << 1];
     assert_eq_hex!(packet.to_bytes().unwrap(), exp_bytes);
-    let (_, exp_packet) = AsterixPacket::from_bytes((&exp_bytes, 0)).unwrap();
+
+    let mut cursor = Cursor::new(exp_bytes);
+    let (_, exp_packet) = AsterixPacket::from_reader((&mut cursor, 0)).unwrap();
     assert_eq_hex!(packet, exp_packet);
 }
 
@@ -418,7 +431,9 @@ fn test_48_mode_3a_code_confidence_indicator() {
     packet.finalize().unwrap();
     let exp_bytes = vec![0x30, 0x00, 0x08, 0x01, 0x01, 0b10_0000, 0x00, 0x01];
     assert_eq_hex!(packet.to_bytes().unwrap(), exp_bytes);
-    let (_, exp_packet) = AsterixPacket::from_bytes((&exp_bytes, 0)).unwrap();
+
+    let mut cursor = Cursor::new(exp_bytes);
+    let (_, exp_packet) = AsterixPacket::from_reader((&mut cursor, 0)).unwrap();
     assert_eq_hex!(packet, exp_packet);
 }
 
@@ -442,7 +457,9 @@ fn test_48_mode_c_code_confidence() {
     packet.finalize().unwrap();
     let exp_bytes = vec![0x30, 0x00, 0x0a, 0x01, 0x01, 0b1_0000, 0x00, 0x01, 0x00, 0x01];
     assert_eq_hex!(packet.to_bytes().unwrap(), exp_bytes);
-    let (_, exp_packet) = AsterixPacket::from_bytes((&exp_bytes, 0)).unwrap();
+
+    let mut cursor = Cursor::new(exp_bytes);
+    let (_, exp_packet) = AsterixPacket::from_reader((&mut cursor, 0)).unwrap();
     assert_eq_hex!(packet, exp_packet);
 }
 
@@ -459,7 +476,9 @@ fn test_48_height_3d() {
     packet.finalize().unwrap();
     let exp_bytes = vec![0x30, 0x00, 0x08, 0x01, 0x01, 0b1000, 0x00, 0x01];
     assert_eq_hex!(packet.to_bytes().unwrap(), exp_bytes);
-    let (_, exp_packet) = AsterixPacket::from_bytes((&exp_bytes, 0)).unwrap();
+
+    let mut cursor = Cursor::new(exp_bytes);
+    let (_, exp_packet) = AsterixPacket::from_reader((&mut cursor, 0)).unwrap();
     assert_eq_hex!(packet, exp_packet);
 
     let mut fourty_eight = Cat48::default();
@@ -473,7 +492,9 @@ fn test_48_height_3d() {
     packet.finalize().unwrap();
     let exp_bytes = vec![0x30, 0x00, 0x08, 0x01, 0x01, 0b1000, 0x05, 0xd0];
     assert_eq_hex!(packet.to_bytes().unwrap(), exp_bytes);
-    let (_, exp_packet) = AsterixPacket::from_bytes((&exp_bytes, 0)).unwrap();
+
+    let mut cursor = Cursor::new(exp_bytes);
+    let (_, exp_packet) = AsterixPacket::from_reader((&mut cursor, 0)).unwrap();
     assert_eq_hex!(packet, exp_packet);
 }
 
@@ -481,7 +502,9 @@ fn test_48_height_3d() {
 fn test_48_radial_dopplerspeed() {
     // test the first subfield
     let bytes = vec![0x30, 0x00, 0x09, 0x01, 0x01, 0b100, 0b1000_0000, 0b1000_0000, 0b0000_0001];
-    let (_, packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
+
+    let mut cursor = Cursor::new(bytes.clone());
+    let (_, packet) = AsterixPacket::from_reader((&mut cursor, 0)).unwrap();
     assert_eq_hex!(packet.to_bytes().unwrap(), bytes);
 
     // test the second subfield
@@ -501,7 +524,9 @@ fn test_48_radial_dopplerspeed() {
         0x00,
         0x01,
     ];
-    let (_, packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
+
+    let mut cursor = Cursor::new(bytes.clone());
+    let (_, packet) = AsterixPacket::from_reader((&mut cursor, 0)).unwrap();
     assert_eq_hex!(packet.to_bytes().unwrap(), bytes);
 }
 
@@ -523,7 +548,9 @@ fn test_acas_resolution() {
         0x06,
         0x07,
     ];
-    let (_, mut packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
+
+    let mut cursor = Cursor::new(bytes.clone());
+    let (_, mut packet) = AsterixPacket::from_reader((&mut cursor, 0)).unwrap();
     packet.finalize().unwrap();
     assert_eq_hex!(packet.to_bytes().unwrap(), bytes);
 
@@ -538,7 +565,9 @@ fn test_acas_resolution() {
 #[test]
 fn test_mode1code_octal_representation() {
     let bytes = vec![0x30, 0x00, 0x08, 0x01, 0x01, 0x01, 0b0100_0000, 0b0000_0001];
-    let (_, mut packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
+
+    let mut cursor = Cursor::new(bytes.clone());
+    let (_, mut packet) = AsterixPacket::from_reader((&mut cursor, 0)).unwrap();
     packet.finalize().unwrap();
     assert_eq_hex!(packet.to_bytes().unwrap(), bytes);
 
@@ -556,7 +585,8 @@ fn test_mode1code_octal_representation() {
 #[test]
 fn test_mode2code_octal_representation() {
     let bytes = vec![0x30, 0x00, 0x09, 0x01, 0x01, 0x01, 0b0010_0000, 0b0000_0000, 0b0000_0001];
-    let (_, mut packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
+    let mut cursor = Cursor::new(bytes.clone());
+    let (_, mut packet) = AsterixPacket::from_reader((&mut cursor, 0)).unwrap();
     packet.finalize().unwrap();
     assert_eq_hex!(packet.to_bytes().unwrap(), bytes);
 
@@ -574,7 +604,8 @@ fn test_mode2code_octal_representation() {
 #[test]
 fn test_mode1codeconfidence() {
     let bytes = vec![0x30, 0x00, 0x08, 0x01, 0x01, 0x01, 0b0001_0000, 0x01];
-    let (_, mut packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
+    let mut cursor = Cursor::new(bytes.clone());
+    let (_, mut packet) = AsterixPacket::from_reader((&mut cursor, 0)).unwrap();
     packet.finalize().unwrap();
     assert_eq_hex!(packet.to_bytes().unwrap(), bytes);
 
@@ -589,7 +620,8 @@ fn test_mode1codeconfidence() {
 #[test]
 fn test_mode2codeconfidence() {
     let bytes = vec![0x30, 0x00, 0x09, 0x01, 0x01, 0x01, 0b0000_1000, 0x00, 0x01];
-    let (_, mut packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
+    let mut cursor = Cursor::new(bytes.clone());
+    let (_, mut packet) = AsterixPacket::from_reader((&mut cursor, 0)).unwrap();
     packet.finalize().unwrap();
     assert_eq_hex!(packet.to_bytes().unwrap(), bytes);
 
@@ -604,7 +636,8 @@ fn test_mode2codeconfidence() {
 #[test]
 fn test_34_antenna_rotation_speed() {
     let bytes = vec![0x22, 0x00, 0x06, 0b0000_1000, 0x00, 0x01];
-    let (_, mut packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
+    let mut cursor = Cursor::new(bytes.clone());
+    let (_, mut packet) = AsterixPacket::from_reader((&mut cursor, 0)).unwrap();
     packet.finalize().unwrap();
     assert_eq_hex!(packet.to_bytes().unwrap(), bytes);
 
