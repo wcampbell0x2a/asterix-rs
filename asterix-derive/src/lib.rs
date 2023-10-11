@@ -29,9 +29,10 @@ use syn::{parse_macro_input, Data, DeriveInput, Fields};
 #[proc_macro_derive(UpdateFspec)]
 #[doc(hidden)]
 pub fn derive_answer_fn(input: TokenStream) -> TokenStream {
+    // Parse the input tokens into a syntax tree
     let input = parse_macro_input!(input as DeriveInput);
 
-    let name = input.ident;
+    let name = &input.ident; // struct name
 
     // (self.name, fspec_num, FRN)
     let mut data_items: Vec<(String, String, String)> = vec![];
@@ -39,53 +40,50 @@ pub fn derive_answer_fn(input: TokenStream) -> TokenStream {
     if let Data::Struct(s) = input.data {
         if let Fields::Named(f) = s.fields {
             for field in f.named.iter() {
-                // check if first fspec field in struct, skip
-                let ident = field.ident.as_ref().unwrap();
+                let ident = field.ident.as_ref().unwrap(); // they are 'named' fields
+                                                           // check if is first 'fspec' field in struct, skip
                 if ident == "fspec" {
                     continue;
                 }
-                for att in &field.attrs {
+                for attr in &field.attrs {
                     // check if doc ident, we don't need that one
-                    if att.path.segments[0].ident == "doc" {
+                    if !attr.path().is_ident("deku") {
                         continue;
                     }
+                    // ident should be 'deku' at this point
+                    // pulling out the `TokenStream` from `Meta::List` and parsing
+                    attr.parse_nested_meta(|meta| {
+                        if meta.path.is_ident("cond") {
+                            let value = meta.value()?; // this parses the `=`
+                            let token: syn::LitStr = value.parse()?; // this parses `"is_fspec(...)"`
+                            let fn_call = token.parse::<syn::ExprCall>().unwrap();
+                            let frn = if let syn::Expr::Path(attrs) = &fn_call.args[0] {
+                                format!(
+                                    "{}::{}",
+                                    attrs.path.segments[0].ident, attrs.path.segments[1].ident,
+                                )
+                            } else {
+                                unreachable!()
+                            };
 
-                    let s = att.tokens.to_string();
-                    // remove the first part until we get to the cond = "blah"
-                    let s = &s[7..s.len() - 1];
-
-                    // parse the expression into the data_items vec
-                    if let Ok(syn::Expr::Assign(assign)) = syn::parse_str::<syn::Expr>(s) {
-                        if let syn::Expr::Lit(lit) = *assign.right {
-                            if let syn::Lit::Str(token) = lit.lit {
-                                let fn_call = token.parse::<syn::ExprCall>().unwrap();
-
-                                let frn = if let syn::Expr::Path(attrs) = &fn_call.args[0] {
-                                    format!(
-                                        "{}::{}",
-                                        attrs.path.segments[0].ident, attrs.path.segments[1].ident,
-                                    )
-                                } else {
-                                    unreachable!()
-                                };
-
-                                let fspec_num = if let syn::Expr::Lit(lit) = &fn_call.args[2] {
-                                    if let syn::Lit::Int(int) = &lit.lit {
-                                        int.to_string()
-                                    } else {
-                                        unreachable!();
-                                    }
+                            let fspec_num = if let syn::Expr::Lit(lit) = &fn_call.args[2] {
+                                if let syn::Lit::Int(int) = &lit.lit {
+                                    int.to_string()
                                 } else {
                                     unreachable!();
-                                };
-                                data_items.push((
-                                    ident.to_string(),
-                                    fspec_num.to_string(),
-                                    frn.to_string(),
-                                ));
-                            }
+                                }
+                            } else {
+                                unreachable!();
+                            };
+                            data_items.push((
+                                ident.to_string(),
+                                fspec_num.to_string(),
+                                frn.to_string(),
+                            ));
                         }
-                    }
+                        Ok(())
+                    })
+                    .expect("Error parsing nested meta");
                 }
             }
         }
@@ -117,6 +115,6 @@ pub fn derive_answer_fn(input: TokenStream) -> TokenStream {
             }
         }
     };
-
-    expanded.into()
+    // Hand the output tokens back to the compiler
+    TokenStream::from(expanded) // als  could be 'expanded.into()'
 }
