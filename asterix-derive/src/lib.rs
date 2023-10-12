@@ -116,5 +116,5 @@ pub fn derive_answer_fn(input: TokenStream) -> TokenStream {
         }
     };
     // Hand the output tokens back to the compiler
-    TokenStream::from(expanded) // als  could be 'expanded.into()'
+    TokenStream::from(expanded) // also could be 'expanded.into()'
 }
