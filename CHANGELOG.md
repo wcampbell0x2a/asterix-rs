@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.1] - 2023-10-12
+- Update deku to 0.16
+- Update syn to 2.0
+- Improve use of syn NestedMeta for loading fspec
+ 
 ## [0.3.0] - 2022-11-22
 - Update deku to 0.15.0
 - Improve deku usage

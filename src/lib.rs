@@ -97,7 +97,7 @@ impl AsterixPacket {
     }
 
     /// Read all messages and return byte len
-    fn update_len(messages: &mut Vec<AsterixMessage>) -> u16 {
+    fn update_len(messages: &mut [AsterixMessage]) -> u16 {
         let mut len: u16 = 0;
         for message in messages.iter_mut() {
             let mut bits: BitVec<u8, Msb0> = BitVec::new();

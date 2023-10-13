@@ -1,6 +1,6 @@
 [package]
 name = "asterix"
-version = "0.3.0"
+version = "0.3.1"
 authors = ["wcampbell"]
 edition = "2021"
 categories = ["encoding", "parsing"]
@@ -16,6 +16,6 @@ members = [
 ]
 
 [dependencies]
-deku = "0.15.0"
-asterix-derive = { version = "^0.3.0", path = "asterix-derive" }
-assert_hex = "0.2.1"
+deku = "0.16"
+asterix-derive = { version = "^0.3", path = "asterix-derive" }
+assert_hex = "0.4"

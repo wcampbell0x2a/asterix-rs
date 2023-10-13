@@ -643,7 +643,7 @@ impl HeightMeasuredBy3dRadar {
     pub const MODIFIER: i32 = 25;
 
     fn read(rest: &BitSlice<u8, Msb0>) -> Result<(&BitSlice<u8, Msb0>, i32), DekuError> {
-        i32::read(rest, Self::CTX).map(|(rest, value)| (rest, (value * Self::MODIFIER) as i32))
+        i32::read(rest, Self::CTX).map(|(rest, value)| (rest, value * Self::MODIFIER))
     }
 
     fn write(height: &i32, output: &mut BitVec<u8, Msb0>) -> Result<(), DekuError> {

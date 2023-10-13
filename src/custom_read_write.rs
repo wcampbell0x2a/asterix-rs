@@ -52,7 +52,7 @@ pub(crate) mod read {
         modifier: f32,
         modifier_op: Op,
     ) -> (&BitSlice<u8, Msb0>, f32) {
-        (rest, modifier_op.calculate(value as f32, modifier))
+        (rest, modifier_op.calculate(value, modifier))
     }
 
     /// Read in big-endian bits, multiply by f32, return Some(f32)
