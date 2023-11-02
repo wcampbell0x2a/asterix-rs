@@ -10,9 +10,14 @@ Currently supported:
 - CAT048
 - CAT034
 
-# Usage
+## Usage
+*Compiler support: requires rustc 1.70+*
 
-See `tests/public_api.rs` and the docs for example usage.
+Add the following to your `Cargo.toml` file:
+```toml
+[dependencies]
+asterix = "v0.3.1"
+```
 
 ## Changelog
 
