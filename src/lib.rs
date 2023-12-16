@@ -101,9 +101,7 @@ impl AsterixPacket {
         let mut len: u16 = 0;
         for message in messages.iter_mut() {
             let mut bits: BitVec<u8, Msb0> = BitVec::new();
-            message
-                .write(&mut bits, (deku::ctx::Endian::Big, 0))
-                .unwrap();
+            message.write(&mut bits, (deku::ctx::Endian::Big, 0)).unwrap();
             len += (bits.len() / 8) as u16 + ASTERIX_HEADER_SIZE
         }
         len

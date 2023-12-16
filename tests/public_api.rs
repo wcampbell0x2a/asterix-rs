@@ -41,23 +41,16 @@ fn it_works() {
         assert_eq!(target_report_descriptor.sim, SIM::ActualTargetReport);
         assert_eq!(target_report_descriptor.rdp, RDP::ReportFromRDPChain1);
         assert_eq!(target_report_descriptor.spi, SPI::AbsenceOfSPI);
-        assert_eq!(
-            target_report_descriptor.rab,
-            RAB::ReportFromAircraftTransponder
-        );
+        assert_eq!(target_report_descriptor.rab, RAB::ReportFromAircraftTransponder);
         assert_eq!(target_report_descriptor.fx1, FX::EndOfDataItem);
 
-        let measured_position_in_polar_coordinates = message
-            .measured_position_in_polar_coordinates
-            .as_ref()
-            .unwrap();
+        let measured_position_in_polar_coordinates =
+            message.measured_position_in_polar_coordinates.as_ref().unwrap();
         assert_eq!(measured_position_in_polar_coordinates.rho, 197.6836);
         assert_eq!(measured_position_in_polar_coordinates.theta, 340.13672);
 
-        let mode_3_a_code_in_octal_representation = message
-            .mode_3_a_code_in_octal_representation
-            .as_ref()
-            .unwrap();
+        let mode_3_a_code_in_octal_representation =
+            message.mode_3_a_code_in_octal_representation.as_ref().unwrap();
         assert_eq!(mode_3_a_code_in_octal_representation.v, V::CodeValidated);
         assert_eq!(mode_3_a_code_in_octal_representation.g, G::Default);
         assert_eq!(
@@ -81,9 +74,7 @@ fn it_works() {
         assert_eq!(mode_smb_data.count, 1);
         assert_eq_hex!(
             mode_smb_data.mb_data,
-            vec![MBData {
-                data: [0xc0, 0x78, 0x00, 0x31, 0xbc, 0x00, 0x00].to_vec()
-            }]
+            vec![MBData { data: [0xc0, 0x78, 0x00, 0x31, 0xbc, 0x00, 0x00].to_vec() }]
         );
         // TODO assert BDS1
         // TODO assert BDS2
@@ -108,24 +99,16 @@ fn it_works() {
         assert_eq!(track_status.tcc, Some(TCC::RadarPlanePlotTransformation));
         assert_eq!(track_status.fx2, Some(FX::EndOfDataItem));
 
-        let communications_capability_flight_status = message
-            .communications_capability_flight_status
-            .as_ref()
-            .unwrap();
+        let communications_capability_flight_status =
+            message.communications_capability_flight_status.as_ref().unwrap();
         assert_eq!(communications_capability_flight_status.com, COM::CommACommB);
         assert_eq!(
             communications_capability_flight_status.stat,
             STAT::NoAlertNoSPIAircraftAirborne
         );
-        assert_eq!(
-            communications_capability_flight_status.si,
-            SI::SICodeCapable
-        );
+        assert_eq!(communications_capability_flight_status.si, SI::SICodeCapable);
         assert_eq!(communications_capability_flight_status.mssc, MSSC::Yes);
-        assert_eq!(
-            communications_capability_flight_status.arc,
-            ARC::Resolution25ft
-        );
+        assert_eq!(communications_capability_flight_status.arc, ARC::Resolution25ft);
         assert_eq!(communications_capability_flight_status.aic, AIC::Yes);
         assert_eq!(communications_capability_flight_status.b1a, 1);
         assert_eq!(communications_capability_flight_status.b1b, 5);
@@ -196,23 +179,16 @@ fn third_packet() {
         assert_eq!(target_report_descriptor.sim, SIM::ActualTargetReport);
         assert_eq!(target_report_descriptor.rdp, RDP::ReportFromRDPChain1);
         assert_eq!(target_report_descriptor.spi, SPI::AbsenceOfSPI);
-        assert_eq!(
-            target_report_descriptor.rab,
-            RAB::ReportFromAircraftTransponder
-        );
+        assert_eq!(target_report_descriptor.rab, RAB::ReportFromAircraftTransponder);
         assert_eq!(target_report_descriptor.fx1, FX::EndOfDataItem);
 
-        let measured_position_in_polar_coordinates = message
-            .measured_position_in_polar_coordinates
-            .as_ref()
-            .unwrap();
+        let measured_position_in_polar_coordinates =
+            message.measured_position_in_polar_coordinates.as_ref().unwrap();
         assert_eq!(measured_position_in_polar_coordinates.rho, 194.824_22);
         assert_eq!(measured_position_in_polar_coordinates.theta, 128.759_77);
 
-        let mode_3_a_code_in_octal_representation = message
-            .mode_3_a_code_in_octal_representation
-            .as_ref()
-            .unwrap();
+        let mode_3_a_code_in_octal_representation =
+            message.mode_3_a_code_in_octal_representation.as_ref().unwrap();
         assert_eq!(mode_3_a_code_in_octal_representation.v, V::CodeValidated);
         assert_eq!(mode_3_a_code_in_octal_representation.g, G::Default);
         assert_eq!(
@@ -236,9 +212,7 @@ fn third_packet() {
         assert_eq!(mode_smb_data.count, 1);
         assert_eq!(
             mode_smb_data.mb_data,
-            vec![MBData {
-                data: [0xc6, 0x56, 0x32, 0xb0, 0xa8, 0x00, 0x00].to_vec()
-            }]
+            vec![MBData { data: [0xc6, 0x56, 0x32, 0xb0, 0xa8, 0x00, 0x00].to_vec() }]
         );
         assert_eq!(mode_smb_data.bds1, 4);
         assert_eq!(mode_smb_data.bds2, 0);
@@ -267,24 +241,16 @@ fn third_packet() {
         assert_eq!(track_status.tcc, None);
         assert_eq!(track_status.fx2, None);
 
-        let communications_capability_flight_status = message
-            .communications_capability_flight_status
-            .as_ref()
-            .unwrap();
+        let communications_capability_flight_status =
+            message.communications_capability_flight_status.as_ref().unwrap();
         assert_eq!(communications_capability_flight_status.com, COM::CommACommB);
         assert_eq!(
             communications_capability_flight_status.stat,
             STAT::NoAlertNoSPIAircraftAirborne
         );
-        assert_eq!(
-            communications_capability_flight_status.si,
-            SI::SICodeCapable
-        );
+        assert_eq!(communications_capability_flight_status.si, SI::SICodeCapable);
         assert_eq!(communications_capability_flight_status.mssc, MSSC::Yes);
-        assert_eq!(
-            communications_capability_flight_status.arc,
-            ARC::Resolution25ft
-        );
+        assert_eq!(communications_capability_flight_status.arc, ARC::Resolution25ft);
         assert_eq!(communications_capability_flight_status.aic, AIC::Yes);
         assert_eq!(communications_capability_flight_status.b1a, 1);
         assert_eq!(communications_capability_flight_status.b1b, 5);
@@ -297,9 +263,7 @@ fn third_packet() {
 
 #[test]
 fn test_34() {
-    let bytes = vec![
-        0x22, 0x00, 0x0b, 0xf0, 0x19, 0x0d, 0x02, 0x35, 0x6d, 0xfa, 0x60,
-    ];
+    let bytes = vec![0x22, 0x00, 0x0b, 0xf0, 0x19, 0x0d, 0x02, 0x35, 0x6d, 0xfa, 0x60];
     let (_, mut packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
 
     assert_eq!(packet.category, 34);
@@ -361,9 +325,7 @@ fn test_four_messages() {
 fn test_not_from_bytes() {
     let mut thirty_eight = Cat34::default();
     thirty_eight.data_source_identifier = Some(DataSourceIdentifier { sac: 25, sic: 13 });
-    thirty_eight.message_type = Some(MessageType {
-        t: MTYPE::SectorCrossing,
-    });
+    thirty_eight.message_type = Some(MessageType { t: MTYPE::SectorCrossing });
     thirty_eight.time_of_day = Some(TimeOfDay { time: 27355.953 });
     thirty_eight.sector_number = Some(SectorNumber { num: 135 });
 
@@ -373,9 +335,7 @@ fn test_not_from_bytes() {
         ..AsterixPacket::default()
     };
     packet.finalize().unwrap();
-    let exp_bytes = vec![
-        0x22, 0x00, 0x0b, 0xf0, 0x19, 0x0d, 0x02, 0x35, 0x6d, 0xfa, 0x60,
-    ];
+    let exp_bytes = vec![0x22, 0x00, 0x0b, 0xf0, 0x19, 0x0d, 0x02, 0x35, 0x6d, 0xfa, 0x60];
     assert_eq!(packet.to_bytes().unwrap(), exp_bytes)
 }
 
@@ -396,18 +356,7 @@ fn test_48_track_quality() {
         ..AsterixPacket::default()
     };
     packet.finalize().unwrap();
-    let exp_bytes = vec![
-        0x30,
-        0x00,
-        0x0a,
-        0x01,
-        0x01,
-        0b1000_0000,
-        0x00,
-        0x00,
-        0x00,
-        0x00,
-    ];
+    let exp_bytes = vec![0x30, 0x00, 0x0a, 0x01, 0x01, 0b1000_0000, 0x00, 0x00, 0x00, 0x00];
     assert_eq!(packet.to_bytes().unwrap(), exp_bytes);
     let (_, exp_packet) = AsterixPacket::from_bytes((&exp_bytes, 0)).unwrap();
     assert_eq!(packet, exp_packet);
@@ -425,18 +374,7 @@ fn test_48_track_quality() {
         ..AsterixPacket::default()
     };
     packet.finalize().unwrap();
-    let exp_bytes = vec![
-        0x30,
-        0x00,
-        0x0a,
-        0x01,
-        0x01,
-        0b1000_0000,
-        0xfa,
-        0xfa,
-        0xff,
-        0xff,
-    ];
+    let exp_bytes = vec![0x30, 0x00, 0x0a, 0x01, 0x01, 0b1000_0000, 0xfa, 0xfa, 0xff, 0xff];
     assert_eq_hex!(packet.to_bytes().unwrap(), exp_bytes);
     let (_, exp_packet) = AsterixPacket::from_bytes((&exp_bytes, 0)).unwrap();
     assert_eq_hex!(packet, exp_packet);
@@ -448,14 +386,8 @@ fn test_48_warning_error_con_target_class() {
 
     let warning = WarningErrorConditionsTargetClass {
         codefxs: vec![
-            CodeFx {
-                code: CODE::Angel,
-                fx: FX::ExtensionIntoFirstExtent,
-            },
-            CodeFx {
-                code: CODE::Angel,
-                fx: FX::EndOfDataItem,
-            },
+            CodeFx { code: CODE::Angel, fx: FX::ExtensionIntoFirstExtent },
+            CodeFx { code: CODE::Angel, fx: FX::EndOfDataItem },
         ],
     };
 
@@ -466,16 +398,7 @@ fn test_48_warning_error_con_target_class() {
         ..AsterixPacket::default()
     };
     packet.finalize().unwrap();
-    let exp_bytes = vec![
-        0x30,
-        0x00,
-        0x08,
-        0x01,
-        0x01,
-        0b100_0000,
-        0x5 << 1 | 0x01,
-        0x5 << 1,
-    ];
+    let exp_bytes = vec![0x30, 0x00, 0x08, 0x01, 0x01, 0b100_0000, 0x5 << 1 | 0x01, 0x5 << 1];
     assert_eq_hex!(packet.to_bytes().unwrap(), exp_bytes);
     let (_, exp_packet) = AsterixPacket::from_bytes((&exp_bytes, 0)).unwrap();
     assert_eq_hex!(packet, exp_packet);
@@ -485,10 +408,7 @@ fn test_48_warning_error_con_target_class() {
 fn test_48_mode_3a_code_confidence_indicator() {
     let mut fourty_eight = Cat48::default();
 
-    let confidence = Mode3ACodeConfidenceIndicator {
-        reserved: 0,
-        confidence: 0b0000_0001,
-    };
+    let confidence = Mode3ACodeConfidenceIndicator { reserved: 0, confidence: 0b0000_0001 };
     fourty_eight.mode3a_code_confidence_indicator = Some(confidence);
     let mut packet = AsterixPacket {
         category: 48,
@@ -520,9 +440,7 @@ fn test_48_mode_c_code_confidence() {
         ..AsterixPacket::default()
     };
     packet.finalize().unwrap();
-    let exp_bytes = vec![
-        0x30, 0x00, 0x0a, 0x01, 0x01, 0b1_0000, 0x00, 0x01, 0x00, 0x01,
-    ];
+    let exp_bytes = vec![0x30, 0x00, 0x0a, 0x01, 0x01, 0b1_0000, 0x00, 0x01, 0x00, 0x01];
     assert_eq_hex!(packet.to_bytes().unwrap(), exp_bytes);
     let (_, exp_packet) = AsterixPacket::from_bytes((&exp_bytes, 0)).unwrap();
     assert_eq_hex!(packet, exp_packet);
@@ -531,10 +449,7 @@ fn test_48_mode_c_code_confidence() {
 #[test]
 fn test_48_height_3d() {
     let mut fourty_eight = Cat48::default();
-    let height = HeightMeasuredBy3dRadar {
-        reserved: 0,
-        height: 25,
-    };
+    let height = HeightMeasuredBy3dRadar { reserved: 0, height: 25 };
     fourty_eight.height_measured_by_3d_radar = Some(height);
     let mut packet = AsterixPacket {
         category: 48,
@@ -548,10 +463,7 @@ fn test_48_height_3d() {
     assert_eq_hex!(packet, exp_packet);
 
     let mut fourty_eight = Cat48::default();
-    let height = HeightMeasuredBy3dRadar {
-        reserved: 0,
-        height: 37200,
-    };
+    let height = HeightMeasuredBy3dRadar { reserved: 0, height: 37200 };
     fourty_eight.height_measured_by_3d_radar = Some(height);
     let mut packet = AsterixPacket {
         category: 48,
@@ -568,17 +480,7 @@ fn test_48_height_3d() {
 #[test]
 fn test_48_radial_dopplerspeed() {
     // test the first subfield
-    let bytes = vec![
-        0x30,
-        0x00,
-        0x09,
-        0x01,
-        0x01,
-        0b100,
-        0b1000_0000,
-        0b1000_0000,
-        0b0000_0001,
-    ];
+    let bytes = vec![0x30, 0x00, 0x09, 0x01, 0x01, 0b100, 0b1000_0000, 0b1000_0000, 0b0000_0001];
     let (_, packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
     assert_eq_hex!(packet.to_bytes().unwrap(), bytes);
 
@@ -653,17 +555,7 @@ fn test_mode1code_octal_representation() {
 
 #[test]
 fn test_mode2code_octal_representation() {
-    let bytes = vec![
-        0x30,
-        0x00,
-        0x09,
-        0x01,
-        0x01,
-        0x01,
-        0b0010_0000,
-        0b0000_0000,
-        0b0000_0001,
-    ];
+    let bytes = vec![0x30, 0x00, 0x09, 0x01, 0x01, 0x01, 0b0010_0000, 0b0000_0000, 0b0000_0001];
     let (_, mut packet) = AsterixPacket::from_bytes((&bytes, 0)).unwrap();
     packet.finalize().unwrap();
     assert_eq_hex!(packet.to_bytes().unwrap(), bytes);

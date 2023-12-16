@@ -32,15 +32,15 @@ jobs:
       - run: cargo build --workspace --target ${{ matrix.targets }}
       - run: cargo test --workspace --target ${{ matrix.targets }}
 
-  # fmt and clippy on nightly builds
-  fmt-clippy-nightly:
+  # fmt and clippy on stable builds
+  fmt-clippy-stable:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       - uses: dtolnay/rust-toolchain@439cf607258077187679211f12aa6f19af4a0af7 # master
         with:
-          toolchain: nightly
+          toolchain: stable
           target: x86_64-unknown-linux-gnu
           components: rustfmt, clippy
       - uses: Swatinem/rust-cache@3cf7f8cc28d1b4e7d01e3783be10a97d55d483c8 # v2.7.1
