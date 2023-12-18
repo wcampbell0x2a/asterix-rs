@@ -29,22 +29,13 @@ pub struct Cat48 {
     #[deku(skip, cond = "is_fspec(TargetReportDescriptor::FRN_48, fspec, 0)")]
     pub target_report_descriptor: Option<TargetReportDescriptor>,
     /// FRN 4
-    #[deku(
-        skip,
-        cond = "is_fspec(MeasuredPositionInPolarCoordinates::FRN_48, fspec, 0)"
-    )]
+    #[deku(skip, cond = "is_fspec(MeasuredPositionInPolarCoordinates::FRN_48, fspec, 0)")]
     pub measured_position_in_polar_coordinates: Option<MeasuredPositionInPolarCoordinates>,
     /// FRN 5
-    #[deku(
-        skip,
-        cond = "is_fspec(Mode3ACodeInOctalRepresentation::FRN_48, fspec, 0)"
-    )]
+    #[deku(skip, cond = "is_fspec(Mode3ACodeInOctalRepresentation::FRN_48, fspec, 0)")]
     pub mode_3_a_code_in_octal_representation: Option<Mode3ACodeInOctalRepresentation>,
     /// FRN 6
-    #[deku(
-        skip,
-        cond = "is_fspec(FlightLevelInBinaryRepresentation::FRN_48, fspec, 0)"
-    )]
+    #[deku(skip, cond = "is_fspec(FlightLevelInBinaryRepresentation::FRN_48, fspec, 0)")]
     pub flight_level_in_binary_repre: Option<FlightLevelInBinaryRepresentation>,
     /// FRN 7
     #[deku(skip, cond = "is_fspec(RadarPlotCharacteristics::FRN_48, fspec, 0)")]
@@ -62,10 +53,7 @@ pub struct Cat48 {
     #[deku(skip, cond = "is_fspec(TrackNumber::FRN_48, fspec, 1)")]
     pub track_number: Option<TrackNumber>,
     /// FRN 12
-    #[deku(
-        skip,
-        cond = "is_fspec(CalculatedPositionCartesianCorr::FRN_48, fspec, 1)"
-    )]
+    #[deku(skip, cond = "is_fspec(CalculatedPositionCartesianCorr::FRN_48, fspec, 1)")]
     pub calculated_position_cartesian_coor: Option<CalculatedPositionCartesianCorr>,
     /// FRN 13
     #[deku(skip, cond = "is_fspec(CalculatedTrackVelocity::FRN_48, fspec, 1)")]
@@ -77,22 +65,13 @@ pub struct Cat48 {
     #[deku(skip, cond = "is_fspec(TrackQuality::FRN_48, fspec, 2)")]
     pub track_quality: Option<TrackQuality>,
     /// FRN 16
-    #[deku(
-        skip,
-        cond = "is_fspec(WarningErrorConditionsTargetClass::FRN_48, fspec, 2)"
-    )]
+    #[deku(skip, cond = "is_fspec(WarningErrorConditionsTargetClass::FRN_48, fspec, 2)")]
     pub warning_error_con_target_class: Option<WarningErrorConditionsTargetClass>,
     /// FRN 17
-    #[deku(
-        skip,
-        cond = "is_fspec(Mode3ACodeConfidenceIndicator::FRN_48, fspec, 2)"
-    )]
+    #[deku(skip, cond = "is_fspec(Mode3ACodeConfidenceIndicator::FRN_48, fspec, 2)")]
     pub mode3a_code_confidence_indicator: Option<Mode3ACodeConfidenceIndicator>,
     /// FRN 18
-    #[deku(
-        skip,
-        cond = "is_fspec(ModeCCodeAndConfidenceIndicator::FRN_48, fspec, 2)"
-    )]
+    #[deku(skip, cond = "is_fspec(ModeCCodeAndConfidenceIndicator::FRN_48, fspec, 2)")]
     pub modec_code_and_confidence_indicator: Option<ModeCCodeAndConfidenceIndicator>,
     /// FRN 19
     #[deku(skip, cond = "is_fspec(HeightMeasuredBy3dRadar::FRN_48, fspec, 2)")]
@@ -101,40 +80,22 @@ pub struct Cat48 {
     #[deku(skip, cond = "is_fspec(RadialDopplerSpeed::FRN_48, fspec, 2)")]
     pub radial_doppler_speed: Option<RadialDopplerSpeed>,
     /// FRN 21
-    #[deku(
-        skip,
-        cond = "is_fspec(CommunicationsCapabilityFlightStatus::FRN_48, fspec, 2)"
-    )]
+    #[deku(skip, cond = "is_fspec(CommunicationsCapabilityFlightStatus::FRN_48, fspec, 2)")]
     pub communications_capability_flight_status: Option<CommunicationsCapabilityFlightStatus>,
     /// FRN 22
-    #[deku(
-        skip,
-        cond = "is_fspec(ACASResolutionAdvisoryReport::FRN_48, fspec, 3)"
-    )]
+    #[deku(skip, cond = "is_fspec(ACASResolutionAdvisoryReport::FRN_48, fspec, 3)")]
     pub acas_resolution_advisory_report: Option<ACASResolutionAdvisoryReport>,
     /// FRN 23
-    #[deku(
-        skip,
-        cond = "is_fspec(Mode1CodeOctalRepresentation::FRN_48, fspec, 3)"
-    )]
+    #[deku(skip, cond = "is_fspec(Mode1CodeOctalRepresentation::FRN_48, fspec, 3)")]
     pub mode_1_code_octal_representation: Option<Mode1CodeOctalRepresentation>,
     /// FRN 24
-    #[deku(
-        skip,
-        cond = "is_fspec(Mode2CodeOctalRepresentation::FRN_48, fspec, 3)"
-    )]
+    #[deku(skip, cond = "is_fspec(Mode2CodeOctalRepresentation::FRN_48, fspec, 3)")]
     pub mode_2_code_octal_representation: Option<Mode2CodeOctalRepresentation>,
     /// FRN 25
-    #[deku(
-        skip,
-        cond = "is_fspec(Mode1CodeConfidenceIndicator::FRN_48, fspec, 3)"
-    )]
+    #[deku(skip, cond = "is_fspec(Mode1CodeConfidenceIndicator::FRN_48, fspec, 3)")]
     pub mode_1_code_confidence: Option<Mode1CodeConfidenceIndicator>,
     /// FRN 26
-    #[deku(
-        skip,
-        cond = "is_fspec(Mode2CodeConfidenceIndicator::FRN_48, fspec, 3)"
-    )]
+    #[deku(skip, cond = "is_fspec(Mode2CodeConfidenceIndicator::FRN_48, fspec, 3)")]
     pub mode_2_code_confidence: Option<Mode2CodeConfidenceIndicator>,
     // FRN 27: Special Purpose Field
     // FRN 28: Reserved Expansion Field

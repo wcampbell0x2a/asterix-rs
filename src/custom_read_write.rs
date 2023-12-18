@@ -88,9 +88,7 @@ pub mod write {
         modifier_op: Op,
         output: &mut BitVec<u8, Msb0>,
     ) -> Result<(), DekuError> {
-        value.map_or(Ok(()), |value| {
-            f32_u32(&value, bits, modifier, modifier_op, output)
-        })
+        value.map_or(Ok(()), |value| f32_u32(&value, bits, modifier, modifier_op, output))
     }
 
     pub(crate) fn f32_i32(

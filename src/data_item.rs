@@ -214,15 +214,10 @@ impl AircraftIdentification {
     /// Parse from String to u8 and write
     fn write(field_a: &str, output: &mut BitVec<u8, Msb0>) -> Result<(), DekuError> {
         for c in field_a.chars() {
-            Self::asterix_ascii_to_ia5_char(c as u8).write(
-                output,
-                (deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)),
-            )?;
+            Self::asterix_ascii_to_ia5_char(c as u8)
+                .write(output, (deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)))?;
         }
-        0_u8.write(
-            output,
-            (deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)),
-        )
+        0_u8.write(output, (deku::ctx::Endian::Big, deku::ctx::BitSize(6_usize)))
     }
 
     const IA5_ALPHA: u8 = 0x01;
@@ -529,10 +524,7 @@ impl MessageType {
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(ctx = "_: deku::ctx::Endian")]
 pub struct SectorNumber {
-    #[deku(
-        reader = "Self::read(deku::rest)",
-        writer = "Self::write(&self.num, deku::output)"
-    )]
+    #[deku(reader = "Self::read(deku::rest)", writer = "Self::write(&self.num, deku::output)")]
     pub num: u16,
 }
 
@@ -629,10 +621,7 @@ impl ModeCCodeAndConfidenceIndicator {
 pub struct HeightMeasuredBy3dRadar {
     #[deku(bits = "2", endian = "big")]
     pub reserved: u8,
-    #[deku(
-        reader = "Self::read(deku::rest)",
-        writer = "Self::write(&self.height, deku::output)"
-    )]
+    #[deku(reader = "Self::read(deku::rest)", writer = "Self::write(&self.height, deku::output)")]
     pub height: i32,
 }
 
@@ -1072,9 +1061,7 @@ mod tests {
     #[test]
     fn tod_140() {
         let mut input = BitSlice::from_slice(&[0xa8, 0xbf, 0xff]);
-        let item = TimeOfDay::read(&mut input, deku::ctx::Endian::Big)
-            .unwrap()
-            .1;
+        let item = TimeOfDay::read(&mut input, deku::ctx::Endian::Big).unwrap().1;
         assert_eq!(item.time, 86_399.99);
     }
 
@@ -1084,9 +1071,7 @@ mod tests {
             0xe0 | 0x08 | 0x04 | 0x02 | 0x01,
             0x80 | 0x40 | 0x20 | 0x10 | 0x08 | 0x06,
         ]);
-        let item = TargetReportDescriptor::read(&mut input, deku::ctx::Endian::Big)
-            .unwrap()
-            .1;
+        let item = TargetReportDescriptor::read(&mut input, deku::ctx::Endian::Big).unwrap().1;
         assert_eq!(item.typ, TYP::ModeSRollCallPlusPSR);
         assert_eq!(item.sim, SIM::ActualTargetReport);
         assert_eq!(item.rdp, RDP::ReportFromRDPChain2);
