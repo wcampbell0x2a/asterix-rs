@@ -16,7 +16,7 @@ Currently supported:
 Add the following to your `Cargo.toml` file:
 ```toml
 [dependencies]
-asterix = "v0.3.1"
+asterix = "v0.4.0"
 ```
 
 ## Changelog

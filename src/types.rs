@@ -203,38 +203,84 @@ pub enum MTYPE {
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
 #[deku(type = "u16", bits = "7")]
 pub enum CODE {
-    NotDefined = 0,
-    MultipathReply = 1,
-    ReplySidelobeInterrogationReception = 2,
-    SplitPlot = 3,
-    SecondTimeAroundReply = 4,
-    Angel = 5,
-    SlowMovingTarget = 6,
-    FixedPSRPlot = 7,
-    SlowPSRPlot = 8,
-    LowQualityPSRPlot = 9,
-    PhantomSSRPlot = 10,
-    NonMatchingMode3ACode = 11,
-    ModeCCodeModeSAbnormal = 12,
-    TargetInClutter = 13,
-    MaximumDopplerREsponseInZeroFilter = 14,
-    TransponderAnomalyDetected = 15,
-    DuplicatedOrIllegalModeSAircraftAddress = 16,
-    ModeSErrorCorrectionApplied = 17,
-    UndecodableModeCSCode = 18,
-    Birds = 19,
-    FlockOfBirds = 20,
-    Mode1PresentOriginalReply = 21,
-    Mode2PresentOriginalReply = 22,
-    PlotCausedByWindTurbine = 23,
-    Helicopter = 24,
-    MaxiumumNumberInterrogationsSurveillance = 25,
-    MaxiumumNumberInterrogationsBDS = 26,
-    BDSOverlayIncoherence = 27,
-    PotentialBDSSwapDetected = 28,
-    TrackUpdateZenithalGap = 29,
-    ModeSTrackReAquired = 30,
-    DuplicatedMode5PairNoPinDetected = 31,
+    #[deku(id = "0")]
+    NotDefined,
+    #[deku(id = "1")]
+    MultipathReply,
+    #[deku(id = "2")]
+    ReplySidelobeInterrogationReception,
+    #[deku(id = "3")]
+    SplitPlot,
+    #[deku(id = "4")]
+    SecondTimeAroundReply,
+    #[deku(id = "5")]
+    Angel,
+    #[deku(id = "6")]
+    SlowMovingTarget,
+    #[deku(id = "7")]
+    FixedPSRPlot,
+    #[deku(id = "8")]
+    SlowPSRPlot,
+    #[deku(id = "9")]
+    LowQualityPSRPlot,
+    #[deku(id = "10")]
+    PhantomSSRPlot,
+    #[deku(id = "11")]
+    NonMatchingMode3ACode,
+    #[deku(id = "12")]
+    ModeCCodeModeSAbnormal,
+    #[deku(id = "13")]
+    TargetInClutter,
+    #[deku(id = "14")]
+    MaximumDopplerREsponseInZeroFilter,
+    #[deku(id = "15")]
+    TransponderAnomalyDetected,
+    #[deku(id = "16")]
+    DuplicatedOrIllegalModeSAircraftAddress,
+    #[deku(id = "17")]
+    ModeSErrorCorrectionApplied,
+    #[deku(id = "18")]
+    UndecodableModeCSCode,
+    #[deku(id = "19")]
+    Birds,
+    #[deku(id = "20")]
+    FlockOfBirds,
+    #[deku(id = "21")]
+    Mode1PresentOriginalReply,
+    #[deku(id = "22")]
+    Mode2PresentOriginalReply,
+    #[deku(id = "23")]
+    PlotCausedByWindTurbine,
+    #[deku(id = "24")]
+    Helicopter,
+    #[deku(id = "25")]
+    MaxiumumNumberInterrogationsSurveillance,
+    #[deku(id = "26")]
+    MaxiumumNumberInterrogationsBDS,
+    #[deku(id = "27")]
+    BDSOverlayIncoherence,
+    #[deku(id = "28")]
+    PotentialBDSSwapDetected,
+    #[deku(id = "29")]
+    TrackUpdateZenithalGap,
+    #[deku(id = "30")]
+    ModeSTrackReAquired,
+    #[deku(id = "31")]
+    DuplicatedMode5PairNoPinDetected,
+    #[deku(id = "32")]
+    WrongDFReplyFormatDetected,
+    #[deku(id = "33")]
+    TransponderAnomalyMs,
+    #[deku(id = "34")]
+    TransponderAnomalySI,
+    #[deku(id = "35")]
+    PotentialICConflict,
+    #[deku(id = "36")]
+    ICConflictDetectionPossible,
+    #[deku(id_pat = "37..=63")]
+    AMGAllocated(u16),
+    #[deku(id_pat = "64..=127")]
+    Manufacturer(u16),
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]

@@ -25,7 +25,7 @@ pub fn trim_fspec(fspec: &mut Vec<u8>) {
 }
 
 /// Add FX bits
-pub fn add_fx(fspec: &mut Vec<u8>) {
+pub fn add_fx(fspec: &mut [u8]) {
     let fspec_len = fspec.len();
     for f in fspec.iter_mut().take(fspec_len - 1) {
         *f |= FSPEC_IDENT

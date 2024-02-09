@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2024-02-09
+- Add support for the following 48/030 packets:
+    - `WrongDFReplyFormatDetected`
+    - `TransponderAnomalyMs`
+    - `TransponderAnomalySI`
+    - `PotentialICConflict`
+    - `ICConflictDetectionPossible`
+    - `AMGAllocated(u16)`
+    - `Manufacture(u16)`
+
 ## [0.3.1] - 2023-10-14
 - Update deku to 0.16
 - Update syn to 2.0
