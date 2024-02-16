@@ -278,9 +278,9 @@ pub enum CODE {
     #[deku(id = "36")]
     ICConflictDetectionPossible,
     #[deku(id_pat = "37..=63")]
-    AMGAllocated(u16),
+    AMGAllocated,
     #[deku(id_pat = "64..=127")]
-    Manufacturer(u16),
+    Manufacturer,
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
