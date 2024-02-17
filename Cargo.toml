@@ -18,5 +18,5 @@ members = [
 
 [dependencies]
 asterix-derive = { version = "^0.4", path = "asterix-derive" }
-deku = { git = "https://github.com/sharksforarms/deku", branch = "impl-writer"}
+deku = { git = "https://github.com/sharksforarms/deku", branch = "impl-writer-inline-read-bytes"}
 assert_hex = "0.4"
