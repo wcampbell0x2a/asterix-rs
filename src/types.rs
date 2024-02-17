@@ -3,7 +3,7 @@
 use deku::prelude::*;
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "3")]
+#[deku(id_type = "u8", bits = "3")]
 pub enum TYP {
     NoDetection = 0x00,
     SinglePSRDetection = 0x01,
@@ -16,70 +16,70 @@ pub enum TYP {
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "1")]
+#[deku(id_type = "u8", bits = "1")]
 pub enum SIM {
     ActualTargetReport = 0x00,
     SimulatedTargetReport = 0x01,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "1")]
+#[deku(id_type = "u8", bits = "1")]
 pub enum RDP {
     ReportFromRDPChain1 = 0x00,
     ReportFromRDPChain2 = 0x01,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "1")]
+#[deku(id_type = "u8", bits = "1")]
 pub enum SPI {
     AbsenceOfSPI = 0x00,
     SpecialPositionIdentification = 0x01,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "1")]
+#[deku(id_type = "u8", bits = "1")]
 pub enum RAB {
     ReportFromAircraftTransponder = 0x00,
     ReportFromFieldMonitor = 0x01,
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "1")]
+#[deku(id_type = "u8", bits = "1")]
 pub enum FX {
     EndOfDataItem = 0x00,
     ExtensionIntoFirstExtent = 0x01,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "1")]
+#[deku(id_type = "u8", bits = "1")]
 pub enum V {
     CodeValidated = 0x00,
     CodeNotValidated = 0x01,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "1")]
+#[deku(id_type = "u8", bits = "1")]
 pub enum G {
     Default = 0x00,
     GarbledCode = 0x01,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "1")]
+#[deku(id_type = "u8", bits = "1")]
 pub enum L {
     Mode3CodeDerivedFromTheReplyOfTheTransponder = 0x00,
     Mode3CodeNotExtractedDuringTheLastScan = 0x01,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "1")]
+#[deku(id_type = "u8", bits = "1")]
 pub enum CNF {
     ConfirmedTrack = 0x00,
     TentativeTrack = 0x01,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "2")]
+#[deku(id_type = "u8", bits = "2")]
 pub enum RAD {
     CombinedTrack = 0x00,
     PSRTrack = 0x01,
@@ -88,21 +88,21 @@ pub enum RAD {
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "1")]
+#[deku(id_type = "u8", bits = "1")]
 pub enum DOU {
     NormalConfidence = 0x00,
     LowConfidence = 0x01,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "1")]
+#[deku(id_type = "u8", bits = "1")]
 pub enum MAH {
     NoHorizontalManSensed = 0x00,
     HorizontalManSensed = 0x01,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "2")]
+#[deku(id_type = "u8", bits = "2")]
 pub enum CDM {
     Maintaining = 0x00,
     Climbing = 0x01,
@@ -111,35 +111,35 @@ pub enum CDM {
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "1")]
+#[deku(id_type = "u8", bits = "1")]
 pub enum TRE {
     TrackStillAlive = 0x00,
     EndOfTrackLifetime = 0x01,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "1")]
+#[deku(id_type = "u8", bits = "1")]
 pub enum GHO {
     TrueTargetTrack = 0x00,
     GhostTargetTrack = 0x01,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "1")]
+#[deku(id_type = "u8", bits = "1")]
 pub enum SUP {
     No = 0x00,
     Yes = 0x01,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "1")]
+#[deku(id_type = "u8", bits = "1")]
 pub enum TCC {
     RadarPlanePlotTransformation = 0x00,
     SlantRangePlotTransformation = 0x01,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "3")]
+#[deku(id_type = "u8", bits = "3")]
 pub enum COM {
     NoCommunicationsSurveillanceOnly = 0x00,
     CommACommB = 0x01,
@@ -151,7 +151,7 @@ pub enum COM {
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "3")]
+#[deku(id_type = "u8", bits = "3")]
 pub enum STAT {
     NoAlertNoSPIAircraftAirborne = 0x00,
     NoAlertNoSPIAircraftOnGround = 0x01,
@@ -164,35 +164,35 @@ pub enum STAT {
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "1")]
+#[deku(id_type = "u8", bits = "1")]
 pub enum SI {
     SICodeCapable = 0x00,
     IICodeCapable = 0x01,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "1")]
+#[deku(id_type = "u8", bits = "1")]
 pub enum MSSC {
     No = 0x00,
     Yes = 0x01,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "1")]
+#[deku(id_type = "u8", bits = "1")]
 pub enum ARC {
     Resolution100ft = 0x00,
     Resolution25ft = 0x01,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "1")]
+#[deku(id_type = "u8", bits = "1")]
 pub enum AIC {
     No = 0x00,
     Yes = 0x01,
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "8")]
+#[deku(id_type = "u8", bits = "8")]
 pub enum MTYPE {
     NorthMarker = 0x01,
     SectorCrossing = 0x02,
@@ -201,7 +201,7 @@ pub enum MTYPE {
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
-#[deku(type = "u16", bits = "7")]
+#[deku(id_type = "u16", bits = "7")]
 pub enum CODE {
     #[deku(id = "0")]
     NotDefined,
@@ -284,14 +284,14 @@ pub enum CODE {
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "1")]
+#[deku(id_type = "u8", bits = "1")]
 pub enum D {
     Valid = 0,
     Doubtful = 1,
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "1")]
+#[deku(id_type = "u8", bits = "1")]
 /// Operational Release Status of the System
 pub enum NOGO {
     SystemIsReleasedForOperationalUse = 0,
@@ -299,7 +299,7 @@ pub enum NOGO {
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "1")]
+#[deku(id_type = "u8", bits = "1")]
 /// Radar Data Processor Chain Selection Status
 pub enum RDPC {
     RDPC1Selected = 0,
@@ -307,7 +307,7 @@ pub enum RDPC {
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "1")]
+#[deku(id_type = "u8", bits = "1")]
 /// Event to signal a reset/restart of the selected Radar Data Processor Chain,
 /// i.e. expect a new assignment of track numbers
 pub enum RDPR {
@@ -316,7 +316,7 @@ pub enum RDPR {
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "1")]
+#[deku(id_type = "u8", bits = "1")]
 /// Monitoring System Connected Status
 pub enum MSC {
     MonitoringSystemConnected = 0,
@@ -324,7 +324,7 @@ pub enum MSC {
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "1")]
+#[deku(id_type = "u8", bits = "1")]
 /// Time Source Validity
 pub enum TSV {
     Valid = 0,
@@ -332,7 +332,7 @@ pub enum TSV {
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "1")]
+#[deku(id_type = "u8", bits = "1")]
 /// Selected Antenna
 pub enum ANT {
     Antenna1 = 0,
@@ -340,7 +340,7 @@ pub enum ANT {
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "2")]
+#[deku(id_type = "u8", bits = "2")]
 /// Channel A/B Selection Status
 pub enum CHAB {
     NoChannelSelected = 0b00,
@@ -350,7 +350,7 @@ pub enum CHAB {
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "1")]
+#[deku(id_type = "u8", bits = "1")]
 /// Overload Condition
 pub enum OVL {
     NoOverload = 0,
@@ -358,7 +358,7 @@ pub enum OVL {
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "1")]
+#[deku(id_type = "u8", bits = "1")]
 /// Channel A/B selection status for Surveillance Co-ordination Function
 pub enum SCF {
     ChannelAInUse = 0,
@@ -366,7 +366,7 @@ pub enum SCF {
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "1")]
+#[deku(id_type = "u8", bits = "1")]
 /// Channel A/B selection status for Data Link Function
 pub enum DLF {
     ChannelAInUse = 0,
@@ -374,7 +374,7 @@ pub enum DLF {
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "3")]
+#[deku(id_type = "u8", bits = "3")]
 pub enum RED {
     NoReductionActive = 0b000,
     ReductionStep1Active = 0b001,
@@ -387,14 +387,14 @@ pub enum RED {
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "1")]
+#[deku(id_type = "u8", bits = "1")]
 pub enum POL {
     LinearPolarization = 0,
     CircularPolarization = 1,
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "1")]
+#[deku(id_type = "u8", bits = "1")]
 pub enum STC {
     STCMap1 = 0b00,
     STCMap2 = 0b01,
@@ -403,7 +403,7 @@ pub enum STC {
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "1")]
+#[deku(id_type = "u8", bits = "1")]
 pub enum CLU {
     Autonomous = 0,
     #[deku(id = "1")]
@@ -411,7 +411,7 @@ pub enum CLU {
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "5")]
+#[deku(id_type = "u8", bits = "5")]
 pub enum MessageCounterTYP {
     NoDetection = 0,
     SinglePSRTargetReports = 1,
@@ -433,7 +433,7 @@ pub enum MessageCounterTYP {
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "8")]
+#[deku(id_type = "u8", bits = "8")]
 pub enum DataFilterTYP {
     InvalidValue = 0,
     FilterWeatherData = 1,
@@ -448,42 +448,42 @@ pub enum DataFilterTYP {
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "1")]
+#[deku(id_type = "u8", bits = "1")]
 pub enum TST {
     RealTargetReport = 0,
     TestTargetReport = 1,
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "1")]
+#[deku(id_type = "u8", bits = "1")]
 pub enum ERR {
     NoExtendedRange = 0,
     ExtendedRangePresent = 1,
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "1")]
+#[deku(id_type = "u8", bits = "1")]
 pub enum XPP {
     NoXPulsePresent = 0,
     XPulsePresent = 1,
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "1")]
+#[deku(id_type = "u8", bits = "1")]
 pub enum ME {
     NoMilitaryEmergency = 0,
     MilitaryEmergency = 1,
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "1")]
+#[deku(id_type = "u8", bits = "1")]
 pub enum MI {
     NoMilitaryIdentification = 0,
     MilitaryIdentification = 1,
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, DekuRead, DekuWrite)]
-#[deku(type = "u8", bits = "2")]
+#[deku(id_type = "u8", bits = "2")]
 pub enum FOEFRI {
     NoMode4Interrogation = 0b00,
     FriendlyTarget = 0b01,
