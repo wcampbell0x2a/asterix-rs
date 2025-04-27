@@ -1,6 +1,6 @@
 //! Defined Data Items that are used for formal parsing of data structs in categories
 
-use std::io::{Read, Write};
+use deku::no_std_io::{Read, Seek, Write};
 
 use crate::custom_read_write::{read, write, Op};
 use crate::fspec::is_fspec;
@@ -147,11 +147,11 @@ impl FlightLevelInBinaryRepresentation {
     pub const FRN_48: u8 = 0b100;
     const CTX: (Endian, BitSize) = (Endian::Big, BitSize(14_usize));
 
-    fn read<R: Read>(reader: &mut Reader<R>) -> Result<u16, DekuError> {
+    fn read<R: Read + Seek>(reader: &mut Reader<R>) -> Result<u16, DekuError> {
         u16::from_reader_with_ctx(reader, Self::CTX).map(|value| value / 4)
     }
 
-    fn write<W: Write>(flight_level: &u16, writer: &mut Writer<W>) -> Result<(), DekuError> {
+    fn write<W: Write + Seek>(flight_level: &u16, writer: &mut Writer<W>) -> Result<(), DekuError> {
         let value = *flight_level * 4;
         value.to_writer(writer, Self::CTX)
     }
@@ -190,7 +190,7 @@ pub struct AircraftIdentification {
 impl AircraftIdentification {
     pub const FRN_48: u8 = 0b100_0000;
     /// Read and convert to String
-    fn read<R: Read>(reader: &mut Reader<R>) -> Result<String, DekuError> {
+    fn read<R: Read + Seek>(reader: &mut Reader<R>) -> Result<String, DekuError> {
         let one = u8::from_reader_with_ctx(reader, (Endian::Big, BitSize(6_usize)))?;
         let two = u8::from_reader_with_ctx(reader, (Endian::Big, BitSize(6_usize)))?;
         let three = u8::from_reader_with_ctx(reader, (Endian::Big, BitSize(6_usize)))?;
@@ -213,7 +213,7 @@ impl AircraftIdentification {
     }
 
     /// Parse from String to u8 and write
-    fn write<W: Write>(field_a: &str, writer: &mut Writer<W>) -> Result<(), DekuError> {
+    fn write<W: Write + Seek>(field_a: &str, writer: &mut Writer<W>) -> Result<(), DekuError> {
         for c in field_a.chars() {
             Self::asterix_ascii_to_ia5_char(c as u8)
                 .to_writer(writer, (Endian::Big, BitSize(6_usize)))?;
@@ -538,12 +538,12 @@ impl SectorNumber {
         360.0 / 2_f32.powi(8)
     }
 
-    fn read<R: Read>(reader: &mut Reader<R>) -> Result<u16, DekuError> {
+    fn read<R: Read + Seek>(reader: &mut Reader<R>) -> Result<u16, DekuError> {
         u16::from_reader_with_ctx(reader, Self::CTX)
             .map(|value| (f32::from(value) * Self::modifier()) as u16)
     }
 
-    fn write<W: Write>(num: &u16, writer: &mut Writer<W>) -> Result<(), DekuError> {
+    fn write<W: Write + Seek>(num: &u16, writer: &mut Writer<W>) -> Result<(), DekuError> {
         let value = (f32::from(*num) / Self::modifier()) as u8;
         value.to_writer(writer, Self::CTX)
     }
@@ -633,11 +633,11 @@ impl HeightMeasuredBy3dRadar {
     const CTX: (Endian, BitSize) = (Endian::Big, BitSize(14_usize));
     pub const MODIFIER: i32 = 25;
 
-    fn read<R: Read>(reader: &mut Reader<R>) -> Result<i32, DekuError> {
+    fn read<R: Read + Seek>(reader: &mut Reader<R>) -> Result<i32, DekuError> {
         i32::from_reader_with_ctx(reader, Self::CTX).map(|value| (value * Self::MODIFIER) as i32)
     }
 
-    fn write<W: Write>(height: &i32, writer: &mut Writer<W>) -> Result<(), DekuError> {
+    fn write<W: Write + Seek>(height: &i32, writer: &mut Writer<W>) -> Result<(), DekuError> {
         let value = height / Self::MODIFIER;
         value.to_writer(writer, Self::CTX)
     }

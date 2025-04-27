@@ -138,6 +138,7 @@ pub enum TCC {
     SlantRangePlotTransformation = 0x01,
 }
 
+#[repr(u8)]
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
 #[deku(id_type = "u8", bits = "3")]
 pub enum COM {
@@ -147,7 +148,7 @@ pub enum COM {
     CommACommBUplinkELMDownlinkELM = 0x03,
     Top5TransponderCapability = 0x04,
     #[deku(id_pat = "0x05..=0x07")]
-    NoAssigned,
+    NoAssigned(u8),
 }
 
 #[derive(Debug, PartialEq, DekuRead, DekuWrite)]
