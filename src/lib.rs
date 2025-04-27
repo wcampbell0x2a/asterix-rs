@@ -5,12 +5,14 @@
 //!
 //! ## From `&[u8]`
 //! ```
+//! # use std::io::Cursor;
 //! use deku::prelude::*;
 //! use asterix::*;
 //! use asterix::data_item::*;
 //!
 //! let bytes = &[0x22, 0x00, 0x0b, 0xf0, 0x19, 0x0d, 0x02, 0x35, 0x6d, 0xfa, 0x60];
-//! let (_, mut packet) = AsterixPacket::from_bytes((bytes, 0)).unwrap();
+//! let mut cursor = Cursor::new(bytes);
+//! let (_, mut packet) = AsterixPacket::from_reader((&mut cursor, 0)).unwrap();
 //! ```
 //!
 //! ## Packet Creation
@@ -52,7 +54,8 @@
 //! packet.to_bytes().unwrap();
 //! ```
 
-use deku::bitvec::{BitVec, Msb0};
+use std::io::Cursor;
+
 use deku::prelude::*;
 
 pub mod types;
@@ -100,9 +103,11 @@ impl AsterixPacket {
     fn update_len(messages: &mut [AsterixMessage]) -> u16 {
         let mut len: u16 = 0;
         for message in messages.iter_mut() {
-            let mut bits: BitVec<u8, Msb0> = BitVec::new();
-            message.write(&mut bits, (deku::ctx::Endian::Big, 0)).unwrap();
-            len += (bits.len() / 8) as u16 + ASTERIX_HEADER_SIZE
+            let mut v = vec![];
+            let mut cursor = Cursor::new(&mut v);
+            let mut writer = Writer::new(&mut cursor);
+            message.to_writer(&mut writer, (deku::ctx::Endian::Big, 0)).unwrap();
+            len += v.len() as u16 + ASTERIX_HEADER_SIZE;
         }
         len
     }
