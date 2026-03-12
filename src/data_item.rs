@@ -276,10 +276,6 @@ pub struct ModeSMBData {
     pub count: u8,
     #[deku(count = "count")]
     pub mb_data: Vec<MBData>,
-    #[deku(bits = "4")]
-    pub bds1: u8,
-    #[deku(bits = "4")]
-    pub bds2: u8,
 }
 
 impl ModeSMBData {
@@ -290,6 +286,10 @@ impl ModeSMBData {
 pub struct MBData {
     #[deku(count = "7")]
     pub data: Vec<u8>,
+    #[deku(bits = "4")]
+    pub bds1: u8,
+    #[deku(bits = "4")]
+    pub bds2: u8,
 }
 
 /// An integer value representing a unique reference to a track

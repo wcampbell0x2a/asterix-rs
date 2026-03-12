@@ -74,10 +74,12 @@ fn it_works() {
         assert_eq!(mode_smb_data.count, 1);
         assert_eq_hex!(
             mode_smb_data.mb_data,
-            vec![MBData { data: [0xc0, 0x78, 0x00, 0x31, 0xbc, 0x00, 0x00].to_vec() }]
+            vec![MBData {
+                data: [0xc0, 0x78, 0x00, 0x31, 0xbc, 0x00, 0x00].to_vec(),
+                bds1: 4,
+                bds2: 0
+            }]
         );
-        // TODO assert BDS1
-        // TODO assert BDS2
 
         let track_number = message.track_number.as_ref().unwrap();
         assert_eq!(track_number.number, 3563);
@@ -212,10 +214,12 @@ fn third_packet() {
         assert_eq!(mode_smb_data.count, 1);
         assert_eq!(
             mode_smb_data.mb_data,
-            vec![MBData { data: [0xc6, 0x56, 0x32, 0xb0, 0xa8, 0x00, 0x00].to_vec() }]
+            vec![MBData {
+                data: [0xc6, 0x56, 0x32, 0xb0, 0xa8, 0x00, 0x00].to_vec(),
+                bds1: 4,
+                bds2: 0
+            }]
         );
-        assert_eq!(mode_smb_data.bds1, 4);
-        assert_eq!(mode_smb_data.bds2, 0);
 
         let track_number = message.track_number.as_ref().unwrap();
         assert_eq!(track_number.number, 482);
